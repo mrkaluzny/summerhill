@@ -11,7 +11,7 @@ let colors = {
   grey: "#B1B1B1",
   "grey-light": "#F0EDED",
   "grey-lighter": "#f1f5f8",
-  "grey-lightest": "#f8fafc",
+  "grey-lightest": "#F8F8F8",
   "grey-ultralight": "#ececec",
   "almost-white": "#fafafa",
 };

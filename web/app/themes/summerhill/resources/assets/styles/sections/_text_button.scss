@@ -1,0 +1,10 @@
+.text_button {
+  padding: 5rem 0;
+  @screen xl {
+    padding: 7rem 0;
+  }
+
+  @screen xxl {
+    padding: 10rem 0;
+  }
+}
