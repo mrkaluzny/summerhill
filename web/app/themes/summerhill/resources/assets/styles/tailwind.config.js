@@ -1,9 +1,10 @@
 let colors = {
-  primary: "#484848",
+  primary: "#0F749F",
   transparent: "transparent",
   white: "#ffffff",
   black: "#231B08",
   "black-darker": "#333333",
+  "black-darkest": "#000000",
   "grey-darkest": "#484848",
   "grey-darker": "#5A5A5A",
   "grey-dark": "#707070",

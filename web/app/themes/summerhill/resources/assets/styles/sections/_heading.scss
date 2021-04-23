@@ -1,0 +1,30 @@
+.heading {
+  // height: 70vh;
+  // max-height: 750px;
+  // min-height: 500px;
+
+  padding: 7rem 0;
+  @screen xl {
+    padding: 10rem 0;
+  }
+
+  @screen xxl {
+    padding: 14rem 0;
+  }
+
+  img {
+    top: 0;
+    left: 0;
+    object-fit: cover;
+  }
+
+  &__overlay {
+    top: 0;
+    left: 0;
+    opacity: 0.42;
+  }
+
+  &__content {
+    z-index: 1;
+  }
+}

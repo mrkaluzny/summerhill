@@ -1,5 +1,10 @@
 .btn {
-  @apply bg-primary rounded my-3 px-4 py-3 text-white leading-none;
+  border: 1px solid;
+  @apply inline-flex bg-primary border-primary px-6 py-4 rounded text-white leading-none no-underline;
+  border-radius: 41px;
+  transition: background-color 0.22s, border-color 0.22s;
 
-  transition: 0.2s ease;
+  &:hover {
+    @apply bg-transparent border-white;
+  }
 }

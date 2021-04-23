@@ -42,7 +42,8 @@
     top: 0;
     left: 0;
     opacity: 0;
-    transition: opacity 0.3s;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility ease 0.3s;
 
     .nav {
       @apply flex-col p-0;
@@ -111,6 +112,8 @@
   .is-menu-open {
     .header__mobile {
       opacity: 1;
+      visibility: visible;
+      transition: opacity 0.3s, visibility ease 0s;
 
       .menu-item {
         opacity: 1;
@@ -163,8 +166,4 @@
       }
     }
   }
-}
-
-body {
-  background-color: red;
 }

@@ -25,6 +25,7 @@ const routes = new Router({
 jQuery(document).ready(() => routes.loadEvents());
 
 function handleMobileMenu() {
+  if (window.innerWidth > 1200) return;
   const hamburger = document.getElementById("hamburger");
 
   hamburger.addEventListener("click", function () {
@@ -33,3 +34,4 @@ function handleMobileMenu() {
   });
 }
 handleMobileMenu();
+window.addEventListener("resize", handleMobileMenu);

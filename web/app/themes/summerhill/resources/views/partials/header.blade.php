@@ -1,4 +1,4 @@
-<header class="header bg-white z-40">
+<header class="header sticky bg-white z-40">
   <div class="container-lg flex justify-between items-center py-5">
     @php echo get_custom_logo(); @endphp
 
@@ -19,6 +19,5 @@
       <span></span>
       <span></span>
     </button>
-
   </div>
 </header>
