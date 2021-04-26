@@ -23,7 +23,7 @@ $button = get_sub_field('button');
   <div class="container flex flex-wrap md:flex-no-wrap w-5/6 md:w-full @if($is_img_left) flex-row-reverse @endif">
 
     <div
-      class="image_content__content text-center md:text-left flex flex-col justify-center w-full mx-auto md:{{ $proportions[1] }} @if($is_img_left) md:pl-8 lg:pl-16 @else md:pr-12 lg:pr-32 @endif">
+      class="image_content__content text-center md:text-left flex flex-col justify-center w-full mx-auto md:{{ $proportions[1] }} @if($is_img_left) md:pl-12 lg:pl-24 @else md:pr-12 lg:pr-32 @endif">
       <h2
         class="text-black font-souvenir @if($heading_size === 'h5') leading-average @elseif($heading_size === 'h2') leading-regular @else leading-medium @endif @if($is_heading_bold) font-bold @else font-normal @endif text-{{ $heading_size }}">
         {{ $heading }}

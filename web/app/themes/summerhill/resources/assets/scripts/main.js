@@ -35,3 +35,9 @@ function handleMobileMenu() {
 }
 handleMobileMenu();
 window.addEventListener("resize", handleMobileMenu);
+
+class Slider {
+  constructor() {
+    this.curr = 0;
+  }
+}

@@ -30,4 +30,20 @@ class App extends Controller
         }
         return get_the_title();
     }
+
+    public static function testimonials($testimonials_ids) {        
+        $testimonials = [];
+
+
+        foreach ($testimonials_ids as $id) {
+            $single_testimonial = [
+                'testimonial' => get_field('testimonial', $id),
+                'author' => get_field('author', $id),
+            ];
+
+            array_push($testimonials, $single_testimonial);
+        }
+
+        return $testimonials;
+    }
 }
