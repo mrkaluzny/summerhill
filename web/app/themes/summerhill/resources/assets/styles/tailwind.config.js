@@ -104,6 +104,7 @@ module.exports = {
     tight: 1.25,
     regular: 1.33,
     normal: 1.5,
+    average: 1.66,
     medium: 1.75,
     loose: 2,
   },

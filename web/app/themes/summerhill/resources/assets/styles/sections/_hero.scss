@@ -1,4 +1,4 @@
-.heading {
+.hero {
   padding: 7rem 0;
   @screen xl {
     padding: 10rem 0;
@@ -12,6 +12,10 @@
     top: 0;
     left: 0;
     object-fit: cover;
+  }
+
+  &--sub_page {
+    height: 27rem;
   }
 
   &__overlay {

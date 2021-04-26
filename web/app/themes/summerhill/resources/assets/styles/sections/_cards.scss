@@ -1,0 +1,17 @@
+.cards {
+  &__card {
+    width: 100%;
+    border-radius: 15px;
+
+    @screen md {
+      width: calc(50% - 15px);
+    }
+
+    p {
+      @apply mt-4;
+    }
+    p:first-of-type {
+      @apply mt-0;
+    }
+  }
+}

@@ -6,19 +6,25 @@ $subtitle = get_sub_field('subtitle');
 $button = get_sub_field('button');
 @endphp
 
-<section class="heading relative w-screen flex justify-center items-center">
+<section class="hero @if($is_on_subpage) hero--sub_page p-0 @endif relative w-screen flex justify-center items-center">
 
-  {!! wp_get_attachment_image($image, "large", "", ["class" => "absolute w-full h-full md:w-screen","alt"=>"Heading
+  {!! wp_get_attachment_image($image, "large", "", ["class" => "absolute w-full h-full md:w-screen","alt"=>"hero
   image"])
   !!}
 
-  <div class="heading__overlay w-full h-full bg-black-darkest absolute"></div>
+  <div class="hero__overlay w-full h-full bg-black-darkest absolute"></div>
 
-  <div class="heading__content text-center  w-3/4 xxl:w-2/5">
+  <div class="hero__content text-center  w-3/4 xxl:w-3/5">
+    @if($title)
     <h1 class="text-white font-souvenir text-h3 sm:text-h3 md:text-h2 lg:text-h1 font-medium leading-normal">
       {{ $title }}</h1>
+    @endif
+    @if($subtitle)
     <h2 class="text-white font-roboto text-base font-normal mt-6 leading-loose">{{ $subtitle }}</h2>
+    @endif
+    @if($button)
     <a class="btn mt-8" href="{{ $button['url'] }}" target="{{ $button['target'] }}">{{ $button['title'] }}</a>
+    @endif
   </div>
 
 </section>

@@ -7,6 +7,7 @@
 
   .nav {
     @apply flex;
+
     .menu-item {
       @apply list-reset;
 
@@ -68,7 +69,7 @@
     span {
       @apply block bg-black w-full rounded-sm;
       height: 2px;
-      margin: 6px 0;
+      margin: 5.5px 0;
     }
 
     span:first-of-type {

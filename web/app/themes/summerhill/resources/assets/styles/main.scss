@@ -37,10 +37,11 @@
 @import "layouts/posts";
 @import "layouts/tinymce";
 
-@import "sections/heading";
+@import "sections/hero";
 @import "sections/text_button";
-
 @import "sections/image_content";
+@import "sections/cards";
+@import "sections/slider";
 
 /**
  * This injects all of Tailwind's utility classes, generated based on your

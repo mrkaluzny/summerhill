@@ -25,7 +25,7 @@ $button = get_sub_field('button');
     <div
       class="image_content__content text-center md:text-left flex flex-col justify-center w-full mx-auto md:{{ $proportions[1] }} @if($is_img_left) md:pl-8 lg:pl-16 @else md:pr-12 lg:pr-32 @endif">
       <h2
-        class="text-black font-souvenir @if($is_heading_bold) font-bold leading-regular @else font-normal leading-medium @endif text-{{ $heading_size }}">
+        class="text-black font-souvenir @if($heading_size === 'h5') leading-average @elseif($heading_size === 'h2') leading-regular @else leading-medium @endif @if($is_heading_bold) font-bold @else font-normal @endif text-{{ $heading_size }}">
         {{ $heading }}
       </h2>
       <div class="text-grey-darkest flex flex-col font-roboto text-base font-normal mt-4 leading-loose">
