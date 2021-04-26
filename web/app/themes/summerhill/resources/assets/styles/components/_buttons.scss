@@ -1,10 +1,21 @@
 .btn {
   border: 1px solid;
-  @apply inline-flex bg-primary border-primary px-6 py-4 rounded text-white leading-none no-underline;
+  @apply inline-flex text-sm bg-primary border-primary px-6 py-4 rounded text-white leading-none no-underline;
   border-radius: 41px;
   transition: background-color 0.22s, border-color 0.22s;
 
   &:hover {
     @apply bg-transparent border-white;
+  }
+}
+
+.btn2 {
+  border: 1px solid;
+  @apply inline-flex text-sm bg-primary border-primary px-6 py-4 rounded text-white leading-none no-underline;
+  border-radius: 41px;
+  transition: background-color 0.22s, border-color 0.22s;
+
+  &:hover {
+    @apply bg-transparent text-primary;
   }
 }

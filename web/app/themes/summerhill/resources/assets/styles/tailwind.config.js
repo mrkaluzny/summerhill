@@ -5,7 +5,7 @@ let colors = {
   black: "#231B08",
   "black-darker": "#333333",
   "black-darkest": "#000000",
-  "grey-darkest": "#484848",
+  "grey-darkest": "#464950",
   "grey-darker": "#5A5A5A",
   "grey-dark": "#707070",
   grey: "#B1B1B1",
@@ -102,7 +102,9 @@ module.exports = {
   leading: {
     none: 1,
     tight: 1.25,
+    regular: 1.33,
     normal: 1.5,
+    medium: 1.75,
     loose: 2,
   },
 
