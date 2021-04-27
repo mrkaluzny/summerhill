@@ -37,7 +37,45 @@ handleMobileMenu();
 window.addEventListener("resize", handleMobileMenu);
 
 class Slider {
-  constructor() {
+  constructor(sliderTrack, arrowLeft, arrowRight) {
     this.curr = 0;
+    this.sliderTrack = sliderTrack;
+    this.arrowLeft = arrowLeft;
+    this.arrowRight = arrowRight;
+    this.slidesLength = sliderTrack.children.length;
   }
+
+  init() {
+    this.arrowLeft.addEventListener("click", () => this.prevSlide());
+    this.arrowRight.addEventListener("click", () => this.nextSlide());
+  }
+
+  prevSlide() {
+    this.curr = this.curr === 0 ? this.slidesLength - 1 : this.curr - 1;
+    this.updateTrack();
+    this.updateNaviDots();
+  }
+
+  nextSlide() {
+    this.curr = this.curr === this.slidesLength - 1 ? 0 : this.curr + 1;
+    this.updateTrack();
+    this.updateNaviDots();
+  }
+
+  updateTrack() {
+    const slides = Array.from(this.sliderTrack.children);
+    slides.forEach((slide) => {
+      slide.classList.remove("active");
+      if (slides.indexOf(slide) === this.curr) slide.classList.add("active");
+    });
+  }
+
+  updateNaviDots() {}
 }
+
+const sliderTrack = document.getElementById("track");
+const arrowLeft = document.getElementById("leftArrow");
+const arrowRight = document.getElementById("rightArrow");
+
+const slider = new Slider(sliderTrack, arrowLeft, arrowRight);
+slider.init();

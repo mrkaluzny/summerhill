@@ -10,21 +10,25 @@ $testimonials = App::testimonials($raw_testimonials);
     <h2>{{ $heading }}</h2>
 
     <div class="testimonials__wrapper">
-      <span class="testimonials__arrow__left"></span>
-
-
-      @foreach ($testimonials as $testimonial)
-      <div class="testimonials__testimonial bg-grey-lightest">
-        @if($testimonial['testimonial'])
-        <div>{!! $testimonial['testimonial'] !!}</div>
-        @endif
-        @if($testimonial['author'])
-        <span>{{ $testimonial['author'] }}</span>
-        @endif
+      <span class="testimonials__arrow__left absolute cursor-pointer" id="leftArrow">
+        PREV</span>
+      <div class="testimonials__track__wrapper">
+        <div class="testimonials__track" id="track">
+          @foreach ($testimonials as $key => $testimonial)
+          <div
+            class="testimonials__track__testimonial @if($key == 0) active @endif absolute bg-grey-lightest min-w-full">
+            @if($testimonial['testimonial'])
+            <div>{!! $testimonial['testimonial'] !!}</div>
+            @endif
+            @if($testimonial['author'])
+            <span>{{ $testimonial['author'] }}</span>
+            @endif
+          </div>
+          @endforeach
+        </div>
       </div>
-      @endforeach
 
-      <span class="testimonials__arrow__left"></span>
+      <span class="testimonials__arrow__right absolute cursor-pointer" id="rightArrow">NEXT</span>
     </div>
 
     <div class="testimonials__navi">
