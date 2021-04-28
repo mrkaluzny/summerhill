@@ -14,6 +14,7 @@ let colors = {
   "grey-lightest": "#F8F8F8",
   "grey-ultralight": "#ececec",
   "almost-white": "#fafafa",
+  blue: "#0B7EAF",
 };
 
 module.exports = {

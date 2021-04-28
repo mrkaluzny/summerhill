@@ -16,7 +16,7 @@ $button = get_sub_field('button');
 
   <div class="hero__content text-center  w-3/4 xxl:w-3/5">
     @if($title)
-    <h1 class="text-white font-souvenir text-h3 sm:text-h3 md:text-h2 lg:text-h1 font-medium leading-normal">
+    <h1 class="text-white font-souvenir text-h2 sm:text-h3 md:text-h2 lg:text-h1 font-medium leading-normal">
       {{ $title }}</h1>
     @endif
     @if($subtitle)

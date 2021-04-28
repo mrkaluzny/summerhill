@@ -18,7 +18,7 @@ $row_under_text = get_sub_field('row_under_text');
 $button = get_sub_field('button');
 @endphp
 
-<section class="image_content relative w-screen  @if($has_background_color && $default_color) bg-grey-lightest @endif"
+<section class="image_content relative w-full @if($has_background_color && $default_color) bg-grey-lightest @endif"
   @if($has_background_color && !$default_color) style="background-color: {{ $color_picker }}" @endif>
   <div class="container flex flex-wrap md:flex-no-wrap w-5/6 md:w-full @if($is_img_left) flex-row-reverse @endif">
 
@@ -60,12 +60,12 @@ $button = get_sub_field('button');
         @endif
       </div>
       @if($button)
-      <a class="btn2 mt-8 mx-auto md:mx-0" href="{{ $button['url'] }}"
+      <a class="btn2 mt-8 mb-4 mx-auto md:mx-0" href="{{ $button['url'] }}"
         target="{{ $button['target'] }}">{{ $button['title'] }}</a>
       @endif
     </div>
 
-    <div class="w-full mx-auto mt-8
+    <div class="w-full mx-auto mt-12 md:mt-8
     md:mt-0 md:{{ $proportions[0] }}">
       {!! wp_get_attachment_image($image, "large", "", ["class" => "w-full h-full", "alt"=>"Heading image"])!!}
 

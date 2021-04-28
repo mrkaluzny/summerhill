@@ -39,7 +39,7 @@ $link = get_sub_field('link');
     <a class="btn2 mt-6 sm:mt-10 mx-auto" href="tel:{{ $phone_number }}">{{ $button_value }}</a>
     @elseif($button_type === 'mail_us')
     <a class="btn2 mt-6 sm:mt-10 mx-auto" href="mailto:{{ $email_address }}">{{ $button_value }}</a>
-    @else
+    @elseif($link)
     <a class="btn2 mt-6 sm:mt-10 mx-auto" href="{{ $link['url'] }}"
       target="{{ $link['target'] }}">{{ $link['title'] }}</a>
     @endif
