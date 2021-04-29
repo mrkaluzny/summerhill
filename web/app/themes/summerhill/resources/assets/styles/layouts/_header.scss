@@ -1,8 +1,14 @@
 .header {
-  height: 5rem;
+  top: 0;
+  left: 0;
+  height: 80px;
 
-  .custom-logo-link {
-    @apply inline-flex z-10;
+  &__wrapper {
+    max-height: 80px;
+  }
+
+  svg {
+    display: block;
   }
 
   .nav {
@@ -13,6 +19,29 @@
 
       a {
         @apply no-underline text-black text-sm font-medium;
+        transition: color 0.22s;
+
+        &:hover {
+          @apply text-blue;
+        }
+      }
+    }
+
+    .current_page_item {
+      a {
+        @apply relative text-blue;
+        pointer-events: none;
+
+        &::before {
+          content: "";
+          position: absolute;
+          bottom: -6px;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background-color: #0b7eaf9a;
+          transition: transform 0.2s;
+        }
       }
     }
   }
@@ -50,7 +79,7 @@
       @apply flex-col p-0;
 
       .menu-item {
-        @apply my-2;
+        margin: 2vh 0;
         opacity: 0;
         transform: translateX(-100px);
         transition: opacity 0.3s, transform 0.22s;

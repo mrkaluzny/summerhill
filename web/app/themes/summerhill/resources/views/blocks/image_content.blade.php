@@ -13,12 +13,15 @@ $image = get_sub_field('image');
 $has_background_color = get_sub_field('has_background_color');
 $default_color = get_sub_field('default_color');
 $color_picker = get_sub_field('color_picker');
+$img_transparent_bg = get_sub_field('img_transparent_bg');
+
 
 $row_under_text = get_sub_field('row_under_text');
 $button = get_sub_field('button');
 @endphp
 
-<section class="image_content relative w-full @if($has_background_color && $default_color) bg-grey-lightest @endif"
+<section
+  class="image_content relative w-full @if($has_background_color && $default_color) bg-grey-lightest @endif @if($img_transparent_bg) has_img_transparent_bg @endif"
   @if($has_background_color && !$default_color) style="background-color: {{ $color_picker }}" @endif>
   <div class="container flex flex-wrap md:flex-no-wrap w-5/6 md:w-full @if($is_img_left) flex-row-reverse @endif">
 
@@ -65,7 +68,7 @@ $button = get_sub_field('button');
       @endif
     </div>
 
-    <div class="w-full mx-auto mt-12 md:mt-8
+    <div class="w-full mx-auto mt-12 sm:mt-8
     md:mt-0 md:{{ $proportions[0] }}">
       {!! wp_get_attachment_image($image, "large", "", ["class" => "w-full h-full", "alt"=>"Heading image"])!!}
 

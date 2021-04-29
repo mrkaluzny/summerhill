@@ -46,4 +46,52 @@ class App extends Controller
 
         return $testimonials;
     }
+
+
+    public static function default_programs() {        
+        $programs_arr = [];
+
+        $args = [
+            'post_type' => 'program',
+            'post_status' => 'publish',
+            'posts_per_page' => '6',
+            'orderby' => 'title',
+            'order' => 'ASC',
+            
+        ];
+
+        $programs = new \WP_Query( $args );
+
+        foreach ($programs->posts as $post) {
+            $name = $post->post_title;
+            $nameClean = is_numeric(substr($name, 0, 1)) ? substr($name, 3) : $name;
+            
+
+            $program = array(
+                'name' => $nameClean,
+                'slug' => $post->post_name,
+                'post_id' => $post->ID,
+            );
+            array_push($programs_arr, $program);
+        }
+
+        wp_reset_postdata();
+        return $programs_arr;
+    }
+
+    public static function custom_programs($program_ids_arr) {  
+            $programs_arr = [];
+      
+
+        foreach ($program_ids_arr as $id) {
+            $name = get_the_title($id);
+            $nameClean = is_numeric(substr($name, 0, 1)) ? substr($name, 3) : $name;
+            array_push($programs_arr, $nameClean);
+
+        }
+
+        wp_reset_postdata();
+        return $programs_arr;
+    }
+
 }

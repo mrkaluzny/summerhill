@@ -8,7 +8,7 @@ $button_value = get_sub_field('button_value');
 $link = get_sub_field('link');
 @endphp
 
-<section class="cards">
+<section class="cards w-full">
   <div class="container pt-16 pb-10 @if($introduction_text) sm:pt-24 sm:pb-16 @else sm:py-16 @endif flex flex-col">
     @if($introduction_text)
     <h2

@@ -45,6 +45,7 @@ function custom_post_type_programs()
     'publicly_queryable'  => true,
     'capability_type'     => 'page',
     'taxonomies'          => array('category'),
+
   );
 
   // Registering your Custom Post Type

@@ -5,11 +5,11 @@ $testimonials = App::testimonials($raw_testimonials);
 
 @endphp
 
-<section class="testimonials">
-  <div class="container py-20 text-center">
+<section class="testimonials overflow-hidden w-full">
+  <div class="container py-16 text-center">
     <h2 class="text-h2 text-black font-souvenir text-center">{{ $heading }}</h2>
 
-    <div class="w-full overflow-hidden">
+    <div class="w-full">
       <span class="testimonials__arrow__left absolute cursor-pointer hidden lg:block" id="leftArrow">
         @include('icons.chevron')
       </span>

@@ -1,6 +1,7 @@
-<header class="header sticky bg-white z-40">
-  <div class="container-lg flex justify-between items-center py-5">
-    @php echo get_custom_logo(); @endphp
+<header class="header fixed bg-white z-40 w-full">
+  <div class="header__wrapper container-lg sticky flex justify-between items-center py-5">
+    {{-- @php echo get_custom_logo(); @endphp --}}
+    <a class="z-40" href="/">@include('icons.logo')</a>
 
     <nav class="header__nav hidden xl:block">
       @if (has_nav_menu('primary_navigation'))
