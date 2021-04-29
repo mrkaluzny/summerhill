@@ -85,20 +85,21 @@
         transition: opacity 0.3s, transform 0.22s;
 
         a {
-          @apply text-h3;
+          @apply text-h3 text-black-darker;
         }
       }
     }
   }
 
   .hamburger {
+    transform: translateX(8px);
     @apply w-12 h-12 p-2 z-10;
     -webkit-tap-highlight-color: transparent;
 
     span {
       @apply block bg-black w-full rounded-sm;
       height: 2px;
-      margin: 5.5px 0;
+      margin: 6px 0;
     }
 
     span:first-of-type {
