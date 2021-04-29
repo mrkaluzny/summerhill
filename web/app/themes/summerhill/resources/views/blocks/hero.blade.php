@@ -8,7 +8,7 @@ $button = get_sub_field('button');
 
 <section class="hero w-full @if($is_on_subpage) hero--sub_page p-0 @endif relative flex justify-center items-center">
 
-  {!! wp_get_attachment_image($image, "large", "", ["class" => "absolute w-full h-full md:w-screen","alt"=>"hero
+  {!! wp_get_attachment_image($image, "large", "", ["class" => "absolute w-full h-full","alt"=>"hero
   image"])
   !!}
 
