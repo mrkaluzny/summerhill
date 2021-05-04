@@ -34,7 +34,8 @@ $programs = App::default_programs();
       @endif
     </div>
 
-    <div class="programs__circles ml-auto w-full justify-between lg:justify-end lg:w-2/5 xl:w-1/2 mt-4 lg:mt-0">
+    <div
+      class="programs__circles list-reset flex ml-auto w-full justify-between lg:justify-end lg:w-2/5 xl:w-1/2 mt-12 lg:mt-0">
       @foreach ($programs as $program)
       <li class="@if($program['post_id'] === get_the_ID()) active @endif"><a href="{{ $program['slug'] }}"
           class="text-black font-souvenir text-xs mobile:text-sm sm:text-lg md:text-xs lg:text-base leading-normal text-center px-5 flex no-underline absolute flex-col justify-center items-center">{{ $program['name'] }}</a>

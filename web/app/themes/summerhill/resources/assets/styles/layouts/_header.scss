@@ -7,6 +7,10 @@
     max-height: 80px;
   }
 
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   svg {
     display: block;
   }
@@ -83,6 +87,13 @@
         opacity: 0;
         transform: translateX(-100px);
         transition: opacity 0.3s, transform 0.22s;
+        -webkit-tap-highlight-color: transparent;
+
+        &.current_page_item {
+          a {
+            @apply text-blue;
+          }
+        }
 
         a {
           @apply text-h3 text-black-darker;

@@ -22,9 +22,7 @@
   }
 
   &__circles {
-    display: flex;
     flex-flow: row wrap;
-    list-style: none;
     padding-bottom: 36px;
 
     @screen md {
@@ -33,6 +31,7 @@
 
     li {
       flex: 0 0 calc(50% - 20px);
+      -webkit-tap-highlight-color: transparent;
 
       &.active {
         a {

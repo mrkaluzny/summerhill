@@ -55,7 +55,7 @@ class App extends Controller
             'post_type' => 'program',
             'post_status' => 'publish',
             'posts_per_page' => '6',
-            'orderby' => 'title',
+            'orderby' => 'date',
             'order' => 'ASC',
             
         ];
@@ -64,11 +64,10 @@ class App extends Controller
 
         foreach ($programs->posts as $post) {
             $name = $post->post_title;
-            $nameClean = is_numeric(substr($name, 0, 1)) ? substr($name, 3) : $name;
             
 
             $program = array(
-                'name' => $nameClean,
+                'name' => $name,
                 'slug' => $post->post_name,
                 'post_id' => $post->ID,
             );
@@ -85,8 +84,7 @@ class App extends Controller
 
         foreach ($program_ids_arr as $id) {
             $name = get_the_title($id);
-            $nameClean = is_numeric(substr($name, 0, 1)) ? substr($name, 3) : $name;
-            array_push($programs_arr, $nameClean);
+            array_push($programs_arr, $name);
 
         }
 

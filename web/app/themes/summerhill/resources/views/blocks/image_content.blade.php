@@ -38,22 +38,39 @@ $button = get_sub_field('button');
           @foreach ($row_under_text as $row)
           <div
             class="image_content__content__additional_row inline-flex items-center justify-center md:justify-start mt-4">
-            <span class="bg-grey-lightest p-3 rounded mr-3 w-12 h-12">
-              {!! wp_get_attachment_image($row['icon'])!!}
-            </span>
             @switch($row['type'])
             @case('phone')
+            <span class="bg-grey-lightest p-3 rounded mr-3 w-12 h-12">
+              @if($row['icon'])
+              {!! wp_get_attachment_image($row['icon'])!!}
+              @else @include('icons.phone', ['color' => '#0B7EAF']) @endif
+            </span>
             <a class="no-underline text-grey-darkest text-lg"
               href="tel:{{ $row['phone_number'] }}">{{ $row['phone_number'] }}</a>
             @break
             @case('email')
+            <span class="bg-grey-lightest p-3 rounded mr-3 w-12 h-12">
+              @if($row['icon'])
+              {!! wp_get_attachment_image($row['icon'])!!}
+              @else @include('icons.email', ['color' => '#0B7EAF']) @endif
+            </span>
             <a class="no-underline text-grey-darkest text-lg" href="mailto:{{ $row['email'] }}">{{ $row['email'] }}</a>
             @break
             @case('link')
+            <span class="bg-grey-lightest p-3 rounded mr-3 w-12 h-12">
+              @if($row['icon'])
+              {!! wp_get_attachment_image($row['icon'])!!}
+              @else @include('icons.logo-icon') @endif
+            </span>
             <a class="no-underline text-grey-darkest text-lg" href="{{ $row['link']['url'] }}"
               target="{{ $row['link']['target'] }}">{{ $row['link']['title'] }}</a>
             @break
             @case('text')
+            <span class="bg-grey-lightest p-1 rounded mr-3 w-12 h-12">
+              @if($row['icon'])
+              {!! wp_get_attachment_image($row['icon'])!!}
+              @else @include('icons.logo-icon') @endif
+            </span>
             <span class="text-grey-darkest text-lg">{{ $row['text'] }}</span>
             @break
             @endswitch
