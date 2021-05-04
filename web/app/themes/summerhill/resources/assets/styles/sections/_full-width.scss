@@ -1,0 +1,12 @@
+.fw {
+  @apply mx-auto;
+
+  &--narrow {
+    max-width: 880px;
+
+    p {
+      max-width: 650px;
+      @apply mx-auto;
+    }
+  }
+}
