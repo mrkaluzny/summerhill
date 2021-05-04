@@ -21,7 +21,7 @@
           @apply list-reset;
 
           a {
-            @apply no-underline font-souvenir text-h6 text-white leading-loose font-medium;
+            @apply no-underline font-heading text-h6 text-white leading-loose font-medium;
           }
 
           ul {
@@ -35,7 +35,7 @@
               }
 
               a {
-                @apply font-roboto font-normal text-base;
+                @apply font-main font-normal text-base;
                 opacity: 0.7;
               }
             }

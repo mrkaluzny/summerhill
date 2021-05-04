@@ -30,22 +30,8 @@ module.exports = {
     xxl: "1400px",
   },
   fonts: {
-    souvenir: [
-      "ITC Souvenir STD",
-      "system-ui",
-      "BlinkMacSystemFont",
-      "-apple-system",
-      "Segoe UI",
-      "Roboto",
-      "Oxygen",
-      "Ubuntu",
-      "Cantarell",
-      "Fira Sans",
-      "Droid Sans",
-      "Helvetica Neue",
-      "sans-serif",
-    ],
-    roboto: [
+    heading: ["ITC Souvenir Std", "serif"],
+    main: [
       "Roboto",
       "system-ui",
       "BlinkMacSystemFont",

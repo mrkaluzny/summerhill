@@ -16,20 +16,20 @@ $school_name = get_field('school_name', 'options')
       @if($phone_number)
       <div class="mt-8 inline-flex items-center mx-auto lg:mx-0">
         <span>@include('icons.phone', ['color' => '#FFFFFF'])</span>
-        <a class="no-underline text-white font-roboto text-sm ml-2 font-medium"
+        <a class="no-underline text-white font-main text-sm ml-2 font-medium"
           href="tel:{{ $phone_number }}">{{ $phone_number }}</a>
       </div>
       @endif
       @if($email_address)
       <div class="mt-4 inline-flex items-center mx-auto lg:mx-0">
         <span>@include('icons.email', ['color' => '#FFFFFF'])</span>
-        <a class="no-underline text-white font-roboto text-sm ml-2 font-medium"
+        <a class="no-underline text-white font-main text-sm ml-2 font-medium"
           href="mailto:{{ $email_address }}">{{ $email_address }}</a>
       </div>
       @endif
 
       <div
-        class="font-roboto opacity-75 text-white font-normal text-base mt-6 leading-loose flex flex-col mx-auto text-center lg:mx-0 lg:text-left">
+        class="font-main opacity-75 text-white font-normal text-base mt-6 leading-loose flex flex-col mx-auto text-center lg:mx-0 lg:text-left">
         @if ($city)
         <span>{{ $city }}</span>
         @endif
@@ -58,9 +58,9 @@ $school_name = get_field('school_name', 'options')
     </div>
   </div>
   <div class="footer__below text-center flex flex-col py-4">
-    <span class="text-xs font-medium font-roboto text-white">{{ date("Y") }} {{ $school_name }} All rights
+    <span class="text-xs font-medium font-main text-white">{{ date("Y") }} {{ $school_name }} All rights
       reserved.</span>
-    <span class="text-xs font-normal font-roboto text-white opacity-75 mt-1">Designed and developed by <a
+    <span class="text-xs font-normal font-main text-white opacity-75 mt-1">Designed and developed by <a
         class="no-underline text-white" href="https://Cleancommit.io">CleanCommit</a></span>
   </div>
 
