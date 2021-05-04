@@ -14,7 +14,7 @@ $default_color = get_sub_field('default_color');
 $color_picker = get_sub_field('color_picker');
 $img_transparent_bg = get_sub_field('img_transparent_bg');
 
-$row_under_text = get_sub_field('row_under_text');
+$icons = get_sub_field('icons');
 $button = get_sub_field('button');
 @endphp
 
@@ -26,61 +26,43 @@ $button = get_sub_field('button');
 
     <div
       class="image_content__content text-center md:text-left flex flex-col justify-center w-full mx-auto md:{{ $proportions[1] }} @if ($is_img_left) md:pl-12 lg:pl-24 @else md:pr-12 lg:pr-32 @endif">
-      <h2 class="text-black font-heading @if ($heading_size==='h5' ) leading-average @elseif($heading_size === 'h2') leading-regular @else leading-medium @endif @if ($is_heading_bold) font-bold @else font-normal @endif
+      <h2 class="text-black font-heading @if ($heading_size==='h5' ) leading-average @elseif($heading_size === 'h2') leading-regular @else leading-medium @endif @if ($is_heading_bold) font-bold @else font-normal
+        @endif
         text-{{ $heading_size }}">
         {{ $heading }}
       </h2>
       <div class="text-grey-darkest flex flex-col font-main text-base font-normal mt-4 leading-loose">
         {!! $subheading !!}
-        @if ($row_under_text)
+
+        @if ($icons)
           <div class="mt-4 flex flex-col">
-            @foreach ($row_under_text as $row)
+            @foreach ($icons as $icon)
               <div
                 class="image_content__content__additional_row inline-flex items-center justify-center md:justify-start mt-4">
-                @switch($row['type'])
-                  @case('phone')
-                    <span class="bg-grey-lightest p-3 rounded mr-3 w-12 h-12">
-                      @if ($row['icon'])
-                        {!! wp_get_attachment_image($row['icon']) !!}
-                      @else @include('icons.phone', ['color' => '#0B7EAF']) @endif
-                    </span>
-                    <a class="no-underline text-grey-darkest text-lg"
-                      href="tel:{{ $row['phone_number'] }}">{{ $row['phone_number'] }}</a>
-                  @break
-                  @case('email')
-                    <span class="bg-grey-lightest p-3 rounded mr-3 w-12 h-12">
-                      @if ($row['icon'])
-                        {!! wp_get_attachment_image($row['icon']) !!}
-                      @else @include('icons.email', ['color' => '#0B7EAF']) @endif
-                    </span>
-                    <a class="no-underline text-grey-darkest text-lg"
-                      href="mailto:{{ $row['email'] }}">{{ $row['email'] }}</a>
-                  @break
-                  @case('link')
-                    <span class="bg-grey-lightest p-3 rounded mr-3 w-12 h-12">
-                      @if ($row['icon'])
-                        {!! wp_get_attachment_image($row['icon']) !!}
-                      @else @include('icons.logo-icon') @endif
-                    </span>
-                    <a class="no-underline text-grey-darkest text-lg" href="{{ $row['link']['url'] }}"
-                      target="{{ $row['link']['target'] }}">{{ $row['link']['title'] }}</a>
-                  @break
-                  @case('text')
-                    <span class="bg-grey-lightest p-1 rounded mr-3 w-12 h-12">
-                      @if ($row['icon'])
-                        {!! wp_get_attachment_image($row['icon']) !!}
-                      @else @include('icons.logo-icon') @endif
-                    </span>
-                    <span class="text-grey-darkest text-lg">{{ $row['text'] }}</span>
-                  @break
-                @endswitch
+                <span class="bg-grey-lightest p-3 rounded mr-3 w-12 h-12 text-blue">
+                  @if (strpos($icon['link']['url'], 'tel:'))
+                    @include('icons.phone')
+                  @elseif (strpos($icon['link']['url'], 'mailto:'))
+                    @include('icons.email')
+                  @endif
+                </span>
+                @if ($icon['link']['url'] !== '#')
+                  <a class="no-underline text-grey-darkest text-lg" href="{{ $icon['link']['url'] }}">
+                    {{ $icon['link']['title'] }}
+                  </a>
+                @else
+                  <span class="no-underline text-grey-darkest text-lg">
+                    {{ $icon['link']['title'] }}
+                  </span>
+                @endif
+
               </div>
             @endforeach
           </div>
         @endif
       </div>
       @if ($button)
-        <a class="btn2 mt-8 mb-4 mx-auto md:mx-0" href="{{ $button['url'] }}"
+        <a class="btn btn--secondary mt-8 mb-4 mx-auto md:mx-0" href="{{ $button['url'] }}"
           target="{{ $button['target'] }}">{{ $button['title'] }}</a>
       @endif
     </div>

@@ -20,28 +20,29 @@ if ($has_custom_programs) {
 
 
 <section class="programs overflow-hidden w-full">
-  <div
-    class="programs__wrapper flex flex-wrap lg:flex-no-wrap container my-6 sm:my-12 md:mt-16 py-16 md:py-10 lg:py-12 xl:py-16 @if ($has_background_color && $default_color) bg-grey-lightest @endif">
-    <div class=" w-full lg:w-1/2  xl:pr-16 text-center lg:text-left">
-      <h2 class=" text-h3 md:text-h2 text-black font-heading leading-normal">
-        {{ $title }}
-      </h2>
-      <div class="mt-4 text-base text-grey-darkest leading-loose font-main">{{ $text }}</div>
-
-      @if ($button)
-        <a class="btn2 mt-8 mx-auto md:mx-0 text-center" href="{{ $button['url'] }}"
-          target="{{ $button['target'] }}">{{ $button['title'] }}</a>
-      @endif
-    </div>
-
+  <div class="container @if ($has_background_color && $default_color) bg-grey-lightest @endif">
     <div
-      class="programs__circles list-reset flex ml-auto w-full justify-between lg:justify-end lg:w-2/5 xl:w-1/2 mt-12 lg:mt-0">
-      @foreach ($programs as $program)
-        <li class="@if ($program['post_id']===get_the_ID()) active @endif"><a href="{{ $program['slug'] }}"
-            class="text-black font-heading text-xs mobile:text-sm sm:text-lg md:text-xs lg:text-base leading-normal text-center px-5 flex no-underline absolute flex-col justify-center items-center">{{ $program['name'] }}</a>
-        </li>
-      @endforeach
+      class="programs__wrapper flex flex-wrap lg:flex-no-wrap my-6 sm:my-12 md:mt-16 py-16 md:py-10 lg:py-12 xl:py-16">
+      <div class=" w-full lg:w-1/2  xl:pr-16 text-center lg:text-left">
+        <h2 class="leading-normal">
+          {{ $title }}
+        </h2>
+        <div class="mt-4 text-base text-grey-darkest leading-loose font-main">{{ $text }}</div>
+
+        @if ($button)
+          <a class="btn btn--secondary mt-8 mx-auto md:mx-0 text-center" href="{{ $button['url'] }}"
+            target="{{ $button['target'] }}">{{ $button['title'] }}</a>
+        @endif
+      </div>
+
+      <ul
+        class="programs__circles list-reset flex ml-auto w-full justify-between lg:justify-end lg:w-2/5 xl:w-1/2 mt-12 lg:mt-0">
+        @foreach ($programs as $program)
+          <li class="@if ($program['post_id']===get_the_ID()) active @endif"><a href="{{ $program['slug'] }}"
+              class="text-black font-heading text-xs mobile:text-sm sm:text-lg md:text-xs lg:text-base leading-normal text-center px-5 flex no-underline absolute flex-col justify-center items-center">{{ $program['name'] }}</a>
+          </li>
+        @endforeach
+      </ul>
     </div>
-  </div>
   </div>
 </section>

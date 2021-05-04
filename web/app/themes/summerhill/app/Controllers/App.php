@@ -31,7 +31,8 @@ class App extends Controller
         return get_the_title();
     }
 
-    public static function testimonials($testimonials_ids) {        
+    public static function testimonials($testimonials_ids)
+    {
         $testimonials = [];
 
 
@@ -48,7 +49,8 @@ class App extends Controller
     }
 
 
-    public static function default_programs() {        
+    public static function default_programs()
+    {
         $programs_arr = [];
 
         $args = [
@@ -57,18 +59,18 @@ class App extends Controller
             'posts_per_page' => '6',
             'orderby' => 'date',
             'order' => 'ASC',
-            
+
         ];
 
-        $programs = new \WP_Query( $args );
+        $programs = get_posts($args);
 
-        foreach ($programs->posts as $post) {
+        foreach ($programs as $post) {
             $name = $post->post_title;
-            
+
 
             $program = array(
                 'name' => $name,
-                'slug' => $post->post_name,
+                'slug' => get_permalink($post->ID),
                 'post_id' => $post->ID,
             );
             array_push($programs_arr, $program);
@@ -78,18 +80,17 @@ class App extends Controller
         return $programs_arr;
     }
 
-    public static function custom_programs($program_ids_arr) {  
-            $programs_arr = [];
-      
+    public static function custom_programs($program_ids_arr)
+    {
+        $programs_arr = [];
+
 
         foreach ($program_ids_arr as $id) {
             $name = get_the_title($id);
             array_push($programs_arr, $name);
-
         }
 
         wp_reset_postdata();
         return $programs_arr;
     }
-
 }
