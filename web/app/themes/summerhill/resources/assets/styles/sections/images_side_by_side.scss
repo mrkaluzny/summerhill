@@ -6,13 +6,13 @@
 
   &__length {
     &--1 {
-      img {
+      picture {
         width: 100%;
       }
     }
 
     &--2 {
-      img {
+      picture {
         width: 100%;
         object-fit: cover;
         margin-top: 1rem;
@@ -23,27 +23,27 @@
       }
 
       @screen mobile {
-        img {
+        picture {
           width: calc(50% - 5px);
           margin-top: 0rem;
         }
       }
 
       @screen md {
-        img {
+        picture {
           width: calc(50% - 10px);
         }
       }
 
       @screen xl {
-        img {
+        picture {
           width: calc(50% - 15px);
         }
       }
     }
 
     &--3 {
-      img {
+      picture {
         width: 100%;
         object-fit: cover;
         margin-top: 1rem;
@@ -54,20 +54,20 @@
       }
 
       @screen mobile {
-        img {
+        picture {
           width: calc(33% - 5px);
           margin-top: 0rem;
         }
       }
 
       @screen md {
-        img {
+        picture {
           width: calc(33% - 10px);
         }
       }
 
       @screen xl {
-        img {
+        picture {
           width: calc(33% - 15px);
         }
       }

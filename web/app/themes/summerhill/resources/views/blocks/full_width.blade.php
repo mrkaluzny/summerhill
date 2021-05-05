@@ -10,12 +10,12 @@ $innerClass = $width === 'max-w-lg' ? 'fw fw--narrow' : 'fw fw--wide';
 
 <section class="{{ $bg == 'grey-lightest' ? 'my-12' : 'my-0'}} overflow-hidden">
   <div class="container">
-    <div class="full-width bg-{{ $bg }} {{ $innerClass }} py-24 relative">
+    <div class="full-width bg-{{ $bg }} {{ $innerClass }} py-24 relative flex flex-col">
       @if ($content)
       {!! $content !!}
       @endif
       @if ($button)
-      <a class="btn btn--secondary mt-8" href="{{ $button['url'] }}"
+      <a class="btn btn--secondary btn--secondary-center mt-8" href="{{ $button['url'] }}"
         target="{{ $button['target'] }}">{{ $button['title'] }}</a>
       @endif
     </div>

@@ -35,37 +35,37 @@ h6 {
 }
 
 h1 {
-  @apply text-h2;
+  @apply text-h2 leading-regular;
   @screen md {
-    @apply text-h1;
+    @apply text-h1 leading-tight;
   }
 }
 
 h2 {
-  @apply text-h3;
+  @apply text-h3 leading-tight;
   @screen md {
     @apply text-h2 leading-regular;
   }
 }
 
 h3 {
-  @apply text-h4;
+  @apply text-h4 leading-average;
   @screen md {
-    @apply text-h3;
+    @apply text-h3 leading-tight;
   }
 }
 
 h4 {
-  @apply text-h5;
+  @apply text-h5 leading-average;
   @screen md {
     @apply text-h4;
   }
 }
 
 h5 {
-  @apply text-h6;
+  @apply text-h6 leading-normal;
   @screen md {
-    @apply text-h5;
+    @apply text-h5 leading-average;
   }
 }
 

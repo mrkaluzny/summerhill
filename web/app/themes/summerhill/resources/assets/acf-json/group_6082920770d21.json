@@ -471,7 +471,7 @@
                         {
                             "key": "field_608a89be1f1f0",
                             "label": "Contained Image",
-                            "name": "img_transparent_bg",
+                            "name": "contained_image",
                             "type": "true_false",
                             "instructions": "",
                             "required": 0,
@@ -647,7 +647,7 @@
                             "key": "field_608693f98c1c0",
                             "label": "Introduce text",
                             "name": "introduce_text",
-                            "type": "textarea",
+                            "type": "wysiwyg",
                             "instructions": "",
                             "required": 0,
                             "conditional_logic": 0,
@@ -657,10 +657,10 @@
                                 "id": ""
                             },
                             "default_value": "",
-                            "placeholder": "",
-                            "maxlength": "",
-                            "rows": "",
-                            "new_lines": ""
+                            "tabs": "all",
+                            "toolbar": "full",
+                            "media_upload": 1,
+                            "delay": 0
                         },
                         {
                             "key": "field_608694108c1c1",
@@ -726,8 +726,8 @@
                                 },
                                 {
                                     "key": "field_6086942c8c1c4",
-                                    "label": "Text",
-                                    "name": "text",
+                                    "label": "Content",
+                                    "name": "content",
                                     "type": "wysiwyg",
                                     "instructions": "",
                                     "required": 0,
@@ -986,5 +986,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1620211266
+    "modified": 1620212411
 }

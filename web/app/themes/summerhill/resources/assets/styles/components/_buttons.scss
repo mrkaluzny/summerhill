@@ -18,5 +18,11 @@
     &:hover {
       @apply bg-transparent text-primary border-primary;
     }
+
+    &-center {
+      @screen md {
+        @apply mx-auto;
+      }
+    }
   }
 }
