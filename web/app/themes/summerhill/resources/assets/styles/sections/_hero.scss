@@ -11,6 +11,8 @@
   }
 
   picture {
+    @apply absolute w-full h-full;
+
     img {
       @apply w-full h-full;
       top: 0;
