@@ -1,15 +1,15 @@
 .btn {
   border: 1px solid;
-  @apply inline-flex text-sm bg-primary border-primary px-6 py-4 rounded text-white leading-none no-underline;
+  @apply inline-block text-sm bg-primary border-primary px-6 py-4 rounded text-white leading-none no-underline text-center font-bold;
   border-radius: 41px;
   transition: background-color 0.22s, border-color 0.22s;
 
   &:hover {
-    @apply bg-transparent border-white;
+    @apply border-blue text-blue bg-transparent;
   }
 
   &--secondary {
-    @apply mx-auto;
+    @apply bg-transparent text-primary border-primary mx-auto;
 
     @screen md {
       @apply ml-0 mr-auto;
@@ -17,6 +17,13 @@
 
     &:hover {
       @apply bg-transparent text-primary border-primary;
+    }
+  }
+
+  &--dark {
+    @apply bg-black border-black;
+    &:hover {
+      @apply bg-transparent text-black border-black;
     }
   }
 }

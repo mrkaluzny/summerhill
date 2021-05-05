@@ -1,0 +1,42 @@
+#map {
+  min-height: 520px;
+  margin-bottom: -15px;
+}
+
+.map {
+  position: relative;
+
+  &__card {
+    @apply bg-white rounded-lg shadow-md;
+    width: 360px;
+    padding: 32px 41px;
+    position: absolute;
+    z-index: 99999;
+    top: 50%;
+    left: 135px;
+
+    transform: translate(0, -50%);
+
+    @media screen and (max-width: 800px) {
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    &__content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+
+      svg {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+    &__button {
+      margin-top: 30px;
+    }
+  }
+}

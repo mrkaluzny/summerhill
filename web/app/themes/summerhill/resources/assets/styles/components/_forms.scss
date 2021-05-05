@@ -1,0 +1,418 @@
+// Colors
+$waterdown-black-primary: #4c4c4c;
+$waterdown-black-faded: rgb(158, 158, 158);
+$waterdown-brown-primary: #a87865;
+$waterdown-brown-dark: #8d5d49;
+$waterdown-brown-light: #a58e7f;
+$waterdown-brown-faded: #e5d7d1;
+$waterdown-grey: #d8d8d8;
+$waterdown-grey-light: #f5f4f5;
+$waterdown-white-primary: #fff;
+$waterdown-green-dark: #869212;
+$waterdown-turquoise: #7da1a4;
+$waterdown-input-border: #d4d4d4;
+$waterdown-grey-admissions: #c3c3c3;
+$waterdown-footer: #a89f99;
+$waterdown-enrollment-main: $waterdown-brown-light;
+
+// With Opacity
+$waterdown-overlay-dark: rgba($waterdown-black-primary, 0.5);
+$waterdown-overlay-404: rgba($waterdown-black-primary, 0.77);
+$waterdown-overlay-light: rgba(#a89f99, 0.7);
+
+// Box Shadows
+$waterdown-box-grey: 0 0 30px 0 rgba($waterdown-grey, 0.3);
+$waterdown-box-grey-large: 0 0 55px 0 rgba($waterdown-grey, 0.2);
+$waterdown-box-grey-15: 0 0 15px 0 rgba(216, 216, 216, 0.3);
+$waterdown-box-grey-55: 0 0 55px 0 rgba(216, 216, 216, 0.35);
+$waterdown-box-dark: 0 0 30px 0 rgba(76, 76, 76, 0.3);
+$waterdown-box-submenu: 0 6px 15px 0 rgba(76, 76, 76, 0.5);
+$waterdown-box-button: 0 3px 15px 0 rgba(0, 0, 0, 0.25);
+$waterdown-box-button--dark: 0 3px 15px 0 rgba(0, 0, 0, 0.45);
+
+// Fonts
+$waterdown-serif: "TeXGyreSchola", serif;
+$waterdown-sans: "Figgins Sans", sans-serif;
+$waterdown-serif-secondary: "SouvenirStd", serif;
+
+.contact-form {
+  padding: 80px 0;
+  &__form {
+    padding: 24px 30px;
+    @screen lg {
+      padding: 64px 130px;
+    }
+    @apply bg-grey-lightest rounded-lg;
+  }
+
+  .form__label {
+    @apply text-lg mb-3;
+  }
+}
+
+.form {
+  position: relative;
+
+  &__child {
+    margin: 45px 0;
+    display: none;
+    &--first {
+      margin-top: 0;
+      display: block;
+    }
+  }
+
+  &__message {
+    @apply w-full h-full absolute bg-white;
+    transform: translate(0, 100%);
+    top: 0;
+    left: 0;
+    z-index: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.4s ease-in-out;
+    &__inner {
+      text-align: center;
+      h2 {
+        @apply text-primary;
+        margin: 0 0 15px;
+      }
+    }
+
+    &__content {
+      display: none;
+    }
+
+    &__logo {
+      background-image: url("../images/summerhill-logo.svg");
+      height: 60px;
+      margin-bottom: 30px;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    &__loader {
+      display: flex;
+      justify-content: center;
+    }
+
+    &--active {
+      transform: translate(0, 0);
+      z-index: 4;
+    }
+  }
+
+  &__title {
+    @apply text-center mx-auto my-8;
+    max-width: 450px;
+    font-size: 1.778rem;
+  }
+
+  &__group {
+    margin-bottom: 20px;
+    &--half {
+      display: flex;
+      justify-content: space-between;
+      @media screen and (max-width: 800px) {
+        flex-direction: column;
+      }
+    }
+  }
+
+  &__half {
+    width: calc(50% - 30px);
+    position: relative;
+
+    @media screen and (max-width: 800px) {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+  }
+
+  &__label {
+    @apply mb-1 block;
+  }
+
+  &__checkboxes {
+    @apply flex flex-wrap;
+    gap: 1rem;
+  }
+}
+
+.input {
+  width: 100%;
+  height: 38px;
+  line-height: 38px;
+  padding: 0 15px;
+  border: 1px solid $waterdown-input-border;
+  border-radius: 3px;
+
+  &::-webkit-input-placeholder,
+  &::-moz-placeholder,
+  &:-ms-input-placeholder,
+  &:-moz-placeholder {
+    color: $waterdown-input-border;
+  }
+
+  &--required {
+    padding: 0 26px 0 15px;
+    background-image: url("../images/required.svg");
+    background-position: right 15px center;
+    background-repeat: no-repeat;
+  }
+
+  &--textarea {
+    height: 150px;
+    padding: 10px 15px;
+    line-height: 24px;
+    resize: none;
+  }
+
+  &--date,
+  &--birthday {
+    position: relative;
+  }
+
+  &--arrow {
+    background-image: url("../images/chevron-down.svg");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+  }
+
+  &--select {
+    display: none;
+  }
+}
+
+.select {
+  position: relative;
+
+  &__styled {
+    width: 100%;
+    height: 38px;
+    line-height: 38px;
+    padding: 0 15px;
+    border: 1px solid $waterdown-input-border;
+    border-radius: 3px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    background-image: url("../images/chevron-down.svg");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+
+    &--default {
+      color: $waterdown-input-border;
+    }
+  }
+
+  &__active {
+    background-color: $waterdown-grey-light;
+  }
+
+  &__options {
+    display: block;
+    position: absolute;
+    z-index: 34;
+    background-color: $waterdown-white-primary;
+    width: 100%;
+    border: 1px solid $waterdown-input-border;
+    border-top: none;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+
+    li {
+      display: block;
+      padding: 10px 15px;
+      transition: all 0.3s ease-in-out;
+      cursor: pointer;
+
+      &:hover {
+        background-color: $waterdown-grey-light;
+      }
+
+      &:not(:last-child) {
+        border-bottom: 1px solid $waterdown-input-border;
+      }
+    }
+
+    li[rel="hide"] {
+      display: none;
+    }
+  }
+
+  &__checkboxes {
+    display: flex;
+  }
+}
+
+.upload {
+  border: 3px dashed #d4d4d4;
+  border-radius: 3px;
+  display: flex;
+  height: 280px;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    background-color: rgba($waterdown-grey-light, 0.4);
+    .upload__label {
+      color: $waterdown-overlay-dark;
+    }
+  }
+
+  &--is-dragover {
+    @apply bg-blue-dark border-blue;
+  }
+
+  &--is-uploaded {
+    border-color: #869212;
+  }
+
+  &__label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    color: $waterdown-input-border;
+    font-weight: 400;
+    transition: all 0.3s ease-in-out;
+  }
+
+  &__input {
+    display: none !important;
+  }
+
+  &__info {
+    font-size: 1.111rem;
+    margin: 9px 0 16px;
+  }
+
+  &__break {
+    font-size: 0.8889rem;
+  }
+
+  &__button {
+    max-width: 200px;
+    margin-top: 15px;
+    padding: 13px 0 9px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+
+  &__icon {
+    &--rotated {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__message {
+    display: none;
+    transition: all 0.3s ease-in-out;
+  }
+
+  &__success {
+    font-size: 1.1rem;
+    @apply text-blue-dark;
+    span {
+      font-weight: 600;
+    }
+  }
+
+  &__drop {
+    display: none;
+  }
+}
+
+.checkbox {
+  display: inline-block;
+
+  input {
+    display: none;
+  }
+
+  &__control {
+    @apply border-primary text-blue;
+    border: 2px solid;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    font-size: 0.8889rem;
+    padding: 17px 40px;
+    display: inline-block;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+
+    &:hover {
+      @apply border-blue-dark text-white bg-blue-dark;
+    }
+  }
+
+  input:checked + .checkbox__control {
+    @apply bg-blue border-blue text-white;
+  }
+}
+
+$cubeSize: 3em;
+
+.loader {
+  width: $cubeSize;
+  height: $cubeSize;
+  animation: loaderAnim 1.25s infinite;
+  outline: 1px solid transparent;
+  &__largeBox {
+    height: $cubeSize;
+    width: $cubeSize;
+    @apply bg-blue;
+    outline: 1px solid transparent;
+    position: fixed;
+  }
+  &__smallBox {
+    @apply bg-white;
+    height: $cubeSize;
+    width: $cubeSize;
+    position: fixed;
+    z-index: 1;
+    outline: 1px solid transparent;
+    animation: smallBoxAnim 1.25s alternate infinite ease-in-out;
+  }
+}
+
+@keyframes smallBoxAnim {
+  0% {
+    transform: scale(0.2);
+  }
+  100% {
+    transform: scale(0.75);
+  }
+}
+
+@keyframes loaderAnim {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(90deg);
+  }
+}
+
+.showMore {
+  @apply mb-5 block text-lg;
+
+  span {
+    @apply ml-2;
+  }
+  font-weight: 400;
+  margin-left: 5px;
+
+  &__content {
+    display: none;
+  }
+}

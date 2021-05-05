@@ -1,0 +1,123 @@
+$waterdown-box-button--dark: 0 3px 15px 0 rgba(0, 0, 0, 0.45);
+$waterdown-box-button: 0 3px 15px 0 rgba(0, 0, 0, 0.25);
+
+.single-programs .form-addon {
+  display: none;
+}
+
+.form-addon {
+  position: fixed;
+  bottom: 15px;
+  right: 25px;
+  z-index: 99999;
+
+  .form__label {
+    @apply text-base;
+  }
+
+  &__button {
+    @apply bg-blue-dark;
+    padding: 0 20px;
+    height: 48px;
+    border: none;
+    border-radius: 100px;
+    box-shadow: $waterdown-box-button;
+    transform: translateY(150px);
+    transition: all 0.6s ease-in-out;
+    position: absolute;
+    z-index: 99999;
+    bottom: 0;
+    right: 0;
+
+    @media screen and (max-width: 320px) {
+      right: -10px;
+    }
+
+    &:hover,
+    &:active,
+    &:focus {
+      @apply bg-blue;
+      outline: none;
+      box-shadow: $waterdown-box-button--dark;
+    }
+
+    &--active {
+      transform: translateY(0);
+    }
+
+    &__icon {
+      background-image: url("../images/mail.svg");
+      width: 40px;
+      margin: 0 auto;
+      height: 30px;
+      display: block;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+  }
+
+  &__form {
+    width: 350px;
+    box-shadow: $waterdown-box-button;
+    transform: translateY(130%);
+    transition: all 0.6s ease-in-out;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+
+    @media screen and (max-width: 420px) {
+      width: 290px;
+    }
+
+    @media screen and (max-width: 320px) {
+      width: 260px;
+      right: -10px;
+    }
+
+    &--active {
+      transform: translateY(0);
+    }
+  }
+
+  &__header {
+    @apply w-full bg-primary flex justify-between items-center text-white py-3 px-5;
+    cursor: pointer;
+
+    svg {
+      transform: rotate(90deg);
+    }
+
+    &__title {
+      @apply font-heading;
+      letter-spacing: 0.04em;
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    .fa {
+      transform: translate(0);
+      transition: all 0.2s ease-in-out;
+    }
+
+    &:hover {
+      .fa {
+        transform: translateY(4px);
+      }
+    }
+  }
+
+  &__content {
+    @apply bg-white;
+    padding: 20px;
+
+    p {
+      margin-bottom: 1rem;
+      line-height: 1.4em;
+    }
+  }
+
+  .form__message__inner h2 {
+    font-size: 1.6rem;
+  }
+}
