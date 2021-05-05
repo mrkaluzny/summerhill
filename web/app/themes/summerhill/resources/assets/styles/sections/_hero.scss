@@ -10,11 +10,13 @@
     padding: 14rem 0;
   }
 
-  img {
-    @apply w-full h-full;
-    top: 0;
-    left: 0;
-    object-fit: cover;
+  picture {
+    img {
+      @apply w-full h-full;
+      top: 0;
+      left: 0;
+      object-fit: cover;
+    }
   }
 
   &--sub-page {

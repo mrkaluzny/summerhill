@@ -8,7 +8,7 @@ $button = get_sub_field('button');
 <section
   class="hero w-full relative flex justify-center items-center {{ $size === 'small' ? 'hero--sub-page p-0' : '' }}">
 
-  {!! wp_get_attachment_image($image, 'full', '', [
+  {!! wp_get_attachment_image($image, 'full_hd', '', [
   'class' => 'absolute w-full h-full',
   'style' => 'object-fit: cover',
   ]) !!}
