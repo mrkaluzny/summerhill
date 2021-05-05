@@ -1,5 +1,5 @@
 @php
-$heading = get_sub_field('heading');
+$title = get_sub_field('title');
 $raw_testimonials = get_sub_field('testimonials');
 $testimonials = App::testimonials($raw_testimonials);
 
@@ -7,7 +7,7 @@ $testimonials = App::testimonials($raw_testimonials);
 
 <section class="testimonials overflow-hidden py-16">
   <div class="container">
-    <h2 class="text-center">{{ $heading }}</h2>
+    <h2 class="text-center">{{ $title }}</h2>
 
     <div>
       <span class="arrow arrow--left" id="leftArrow">

@@ -4,8 +4,6 @@ $title = get_sub_field('title');
 $content = get_sub_field('content');
 
 $bg = get_sub_field('background_color');
-$default_color = get_sub_field('default_color');
-$color_picker = get_sub_field('color_picker');
 @endphp
 
 <section class="images_side_by_side py-8 md:py-16 w-full bg-{{ $bg }}">
