@@ -73,6 +73,3 @@ $school_name = get_field('school_name', 'options');
     </span>
   </div>
 </footer>
-
-
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiN8Z_yXbPgum-N9AmrugwVd962ROQg3E"></script>
