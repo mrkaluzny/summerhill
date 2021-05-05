@@ -28,13 +28,16 @@
 @import "components/buttons";
 @import "components/arrows";
 @import "components/comments";
-@import "components/forms";
 @import "components/wp-classes";
 
 /*! purgecss start ignore */
 @import "layouts/header";
 @import "layouts/footer";
+@import "components/forms";
+@import "components/form-addon";
+@import "components/map";
 /*! purgecss end ignore */
+
 @import "layouts/sidebar";
 @import "layouts/pages";
 @import "layouts/posts";

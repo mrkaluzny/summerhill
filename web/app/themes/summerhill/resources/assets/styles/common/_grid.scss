@@ -15,21 +15,7 @@ $container__width-full: 100%;
   padding-right: 15px;
   @apply relative;
 
-  @screen sm {
-    padding-left: 10vw;
-    padding-right: 10vw;
-  }
-
   @screen md {
-    padding-left: 30px;
-    padding-right: 30px;
-  }
-  @screen lg {
-    padding-left: 8vw;
-    padding-right: 8vw;
-  }
-
-  @screen xl {
     padding-left: 30px;
     padding-right: 30px;
   }
