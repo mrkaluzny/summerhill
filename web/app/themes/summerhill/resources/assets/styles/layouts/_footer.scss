@@ -1,6 +1,6 @@
 .footer {
   &__main {
-    @apply flex flex-col-reverse pt-14 pb-8;
+    @apply flex flex-col pt-14 pb-8;
     z-index: 1;
 
     @screen lg {

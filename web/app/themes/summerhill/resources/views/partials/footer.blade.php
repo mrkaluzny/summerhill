@@ -11,7 +11,7 @@ $school_name = get_field('school_name', 'options')
 <footer class="footer bg-blue-dark">
   <div class="container">
     <div class="footer__main">
-      <div class="w-full lg:w-1/3 flex flex-col lg:pr-4 sm:mt-12 mt-16 md:mt-16 lg:mt-0 z-10">
+      <div class="w-full lg:w-1/3 flex flex-col lg:pr-4 z-10">
         <a class="z-40 mx-auto lg:mx-0" href="/">@include('icons.logo', ['color' => '#FFFFFF'])</a>
         @if($phone_number)
         <div class="mt-8 inline-flex items-center mx-auto lg:mx-0">
@@ -51,7 +51,7 @@ $school_name = get_field('school_name', 'options')
         </div>
 
       </div>
-      <div class="w-full md:w-4/5 mx-auto lg:w-2/3 flex">
+      <div class="w-full md:w-4/5 mx-auto lg:w-2/3 flex sm:mt-12 mt-16 md:mt-16 lg:mt-0 z-10">
         @if (has_nav_menu('footer_menu'))
         {!! wp_nav_menu(['theme_location' => 'footer_menu', 'menu_class' => 'nav']) !!}
         @endif
