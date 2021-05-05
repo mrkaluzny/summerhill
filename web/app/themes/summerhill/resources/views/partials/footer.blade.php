@@ -12,7 +12,10 @@ $school_name = get_field('school_name', 'options');
   <div class="container">
     <div class="footer__main">
       <div class="w-full lg:w-1/3 flex flex-col lg:pr-4 z-10">
-        <a class="z-40 mx-auto lg:mx-0" href="/">@include('icons.logo', ['color' => '#FFFFFF'])</a>
+        <a class="z-40 mx-auto lg:mx-0" href="{{ home_url('/') }}">
+          @include('icons.logo-white')
+          <div class="sr-only">Summerhill Day School</div>
+        </a>
         @if ($phone_number)
           <div class="mt-8 inline-flex items-center mx-auto lg:mx-0">
             <span class="text-white">@include('icons.phone')</span>
@@ -41,11 +44,17 @@ $school_name = get_field('school_name', 'options');
 
         <div class="inline-flex mt-4 mx-auto lg:mx-0">
           @if ($facebook_link)
-            <a href="{{ $facebook_link }}">@include('icons.facebook')</a>
+            <a href="{{ $facebook_link }}">
+              @include('icons.facebook')
+              <div class="sr-only">Summerhill Day School's Facebook</div>
+            </a>
           @endif
 
           @if ($twitter_link)
-            <a class="ml-4" href="{{ $twitter_link }}">@include('icons.twitter')</a>
+            <a class="ml-4" href="{{ $twitter_link }}">
+              @include('icons.twitter')
+              <div class="sr-only">Summerhill Day School's Twitter</div>
+            </a>
           @endif
 
         </div>
