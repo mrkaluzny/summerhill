@@ -27,12 +27,15 @@ const routes = new Router({
 jQuery(document).ready(() => routes.loadEvents());
 
 function handleMobileMenu() {
-  if (window.innerWidth > 1200) return;
   const hamburger = document.getElementById("hamburger");
 
   hamburger.addEventListener("click", function () {
-    console.log("click", this);
+    if (window.outerWidth > 1200) return;
     this.parentNode.classList.toggle("is-menu-open");
+    const overflow = this.parentNode.classList.contains("is-menu-open")
+      ? "hidden"
+      : "scroll";
+    document.body.style.overflowY = overflow;
   });
 }
 handleMobileMenu();
@@ -123,7 +126,7 @@ const sliderTrack = document.getElementById("track");
 if (sliderTrack) {
   const arrowLeft = document.getElementById("leftArrow");
   const arrowRight = document.getElementById("rightArrow");
-  const dots = document.getElementById("testimonials__dot");
+  const dots = document.getElementById("testimonials__dots");
   const slides = document.querySelectorAll(".testimonials__track__testimonial");
 
   const slider = new Slider({

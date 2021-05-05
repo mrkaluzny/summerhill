@@ -1,24 +1,4 @@
 .image_content {
-  max-width: 100%;
-  padding: 4rem 0;
-  @screen xl {
-    padding: 5rem 0;
-  }
-
-  @screen xxl {
-    padding: 6rem 0;
-  }
-
-  &__content {
-    line-height: 1.7;
-
-    &__additional_row {
-      img {
-        display: block;
-      }
-    }
-  }
-
   img {
     border-radius: 10px;
     width: 100%;
@@ -27,11 +7,11 @@
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.12);
   }
 
-  .btn2 {
-    width: fit-content;
+  p {
+    @apply text-grey-darkest mt-6;
   }
 
-  &.has_img_transparent_bg {
+  .is-contained {
     img {
       object-fit: contain;
       box-shadow: none;

@@ -9,8 +9,14 @@
   }
 
   &--secondary {
+    @apply mx-auto;
+
+    @screen md {
+      @apply ml-0 mr-auto;
+    }
+
     &:hover {
-      @apply bg-transparent text-primary;
+      @apply bg-transparent text-primary border-primary;
     }
   }
 }

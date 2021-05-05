@@ -1,12 +1,50 @@
 .fw {
   @apply mx-auto;
+  max-width: 1010px;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    background-color: inherit;
+    width: 240px;
+    height: 100%;
+  }
+
+  &::before {
+    left: -240px;
+    border-radius: 15px 0 0 15px;
+  }
+
+  &::after {
+    right: -240px;
+    border-radius: 0 15px 15px 0;
+  }
 
   &--narrow {
     max-width: 880px;
+
+    &::before,
+    &::after {
+      width: 280px;
+    }
+
+    &::before {
+      left: -280px;
+    }
+
+    &::after {
+      right: -280px;
+    }
 
     p {
       max-width: 650px;
       @apply mx-auto;
     }
+  }
+
+  p {
+    @apply mt-4;
   }
 }

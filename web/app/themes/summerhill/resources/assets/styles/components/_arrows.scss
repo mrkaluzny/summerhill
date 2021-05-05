@@ -1,0 +1,30 @@
+.arrow {
+  @apply absolute cursor-pointer hidden;
+  top: 50%;
+  transform: translateY(-50%);
+
+  @screen lg {
+    @apply block;
+  }
+
+  &--left {
+    @screen lg {
+      left: 10vw;
+      transform: rotate(-180deg);
+    }
+
+    @screen xxl {
+      left: calc(-12vw + 150px);
+    }
+  }
+
+  &--right {
+    @screen lg {
+      right: 10vw;
+    }
+
+    @screen xxl {
+      right: calc(-12vw + 150px);
+    }
+  }
+}

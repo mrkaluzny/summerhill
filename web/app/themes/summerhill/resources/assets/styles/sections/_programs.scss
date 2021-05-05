@@ -1,64 +1,64 @@
 .programs {
+  @apply overflow-hidden;
+
   &__wrapper {
+    @apply flex flex-wrap py-16 relative;
+
+    @screen lg {
+      @apply my-16 py-32 flex-no-wrap;
+    }
+
     &::before,
     &::after {
       content: "";
       position: absolute;
       top: 0;
-      left: -8rem;
-      width: 8rem;
-      height: 100%;
       background-color: inherit;
+      width: 130px;
+      height: 100%;
+    }
+
+    &::before {
+      left: -130px;
+      border-radius: 15px 0 0 15px;
     }
 
     &::after {
-      left: unset;
-      right: -8rem;
+      right: -130px;
+      border-radius: 0 15px 15px 0;
     }
-  }
-
-  .content-box {
-    box-sizing: content-box;
   }
 
   &__circles {
+    @apply flex ml-auto w-full justify-center mt-12 p-0;
     flex-flow: row wrap;
-    padding-bottom: 36px;
 
     @screen md {
-      padding-bottom: auto;
+      @apply w-full justify-between;
+    }
+
+    @screen lg {
+      @apply justify-center mt-0;
+    }
+
+    @screen xl {
+      @apply w-3/5;
     }
 
     li {
-      flex: 0 0 calc(50% - 20px);
+      @apply relative;
       -webkit-tap-highlight-color: transparent;
+      flex: 0 0 calc(50% - 1vw);
+      margin: 0 1px 20px 1px;
 
-      &.active {
-        a {
-          border-width: 10px;
-          pointer-events: none;
-          cursor: not-allowed;
-        }
-      }
-      flex: 0 0 calc(30% - 2vw);
-      margin: 0 7px 20px 7px;
-
-      &:nth-of-type(2),
-      &:nth-of-type(5),
-      &:nth-of-type(8),
-      &:nth-of-type(10) {
-        transform: translateY(36px);
+      @screen mobile {
+        flex: 0 0 calc(30% - 2vw);
+        margin: 0 7px 20px 7px;
       }
 
       @screen md {
         flex: 0 0 calc(20% - 40px);
         margin: 0;
-        &:nth-of-type(2),
-        &:nth-of-type(5),
-        &:nth-of-type(8),
-        &:nth-of-type(10) {
-          transform: translateY(0);
-        }
       }
 
       @screen lg {
@@ -70,7 +70,6 @@
         flex: 0 0 calc(33% - 20px);
         margin: 0 0 20px 20px;
       }
-      position: relative;
 
       &:before {
         display: block;
@@ -79,49 +78,21 @@
         padding-top: 100%;
       }
       a {
-        border-radius: 100%;
-
+        @apply text-black font-heading border-2 border-solid border-transparent rounded-full text-xs leading-normal text-center px-5 flex no-underline absolute flex-col justify-center items-center;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-
         box-sizing: content-box;
-        border-width: 0;
-        border-style: solid;
-        &:hover {
-          border-width: 3px;
+        background-color: var(--bg-color);
+
+        @screen xl {
+          @apply text-base;
         }
-      }
 
-      &:nth-of-type(1) a {
-        background-color: rgba(200, 62, 62, 0.15);
-        border-color: rgba(200, 62, 62, 0.5);
-      }
-
-      &:nth-of-type(2) a {
-        background-color: rgba(26, 172, 155, 0.15);
-        border-color: rgba(26, 172, 155, 0.5);
-      }
-
-      &:nth-of-type(3) a {
-        background-color: rgba(202, 167, 42, 0.15);
-        border-color: rgba(202, 167, 42, 0.5);
-      }
-
-      &:nth-of-type(4) a {
-        background-color: rgba(71, 168, 11, 0.15);
-        border-color: rgba(71, 168, 11, 0.5);
-      }
-
-      &:nth-of-type(5) a {
-        background-color: rgba(26, 145, 195, 0.15);
-        border-color: rgba(26, 145, 195, 0.5);
-      }
-
-      &:nth-of-type(6) a {
-        background-color: rgba(244, 93, 1, 0.15);
-        border-color: rgba(244, 93, 1, 0.5);
+        &:hover {
+          border-color: var(--border-color);
+        }
       }
     }
   }

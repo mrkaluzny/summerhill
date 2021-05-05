@@ -66,12 +66,15 @@ class App extends Controller
 
         foreach ($programs as $post) {
             $name = $post->post_title;
+            $id = $post->ID;
 
 
             $program = array(
                 'name' => $name,
-                'slug' => get_permalink($post->ID),
-                'post_id' => $post->ID,
+                'slug' => get_permalink($id),
+                'color' => get_field('base_color', $id),
+
+                'post_id' => $id,
             );
             array_push($programs_arr, $program);
         }

@@ -69,9 +69,9 @@ module.exports = {
     lg: "1.125rem",
     h6: "1.25rem",
     h5: "1.5rem",
-    h4: "1.5rem",
-    h3: "1.75rem",
-    h2: "2.375rem",
+    h4: "1.75rem",
+    h3: "2.375rem",
+    h2: "3rem",
     h1: "4rem",
   },
 

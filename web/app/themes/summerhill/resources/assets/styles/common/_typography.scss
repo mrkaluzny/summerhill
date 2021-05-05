@@ -44,7 +44,7 @@ h1 {
 h2 {
   @apply text-h3;
   @screen md {
-    @apply text-h2;
+    @apply text-h2 leading-regular;
   }
 }
 

@@ -1,94 +1,75 @@
 .testimonials {
   &__track {
-    height: auto;
+    @apply relative h-auto flex flex-no-wrap items-center mx-auto;
     transition: transform 0.3s ease-in-out;
 
     @screen md {
+      @apply mt-12;
       height: 38rem;
     }
 
-    @screen xxl {
-      height: 32rem;
+    @screen lg {
+      @apply bg-grey-lightest w-2/3;
     }
 
-    // &__track {
-    //   transition: transform 0.3s ease-in-out;
-    // }
-
+    @screen xxl {
+      @apply w-full;
+      height: 32rem;
+    }
     &__testimonial {
+      @apply mr-24 bg-grey-lightest relative min-w-full px-4 py-12 mr-20 mt-4;
       left: 50%;
       transform: translateX(-50%);
-      @apply mr-24;
+
+      @screen md {
+        @apply px-12 py-24 mt-0;
+      }
+
+      @screen lg {
+        @apply absolute bg-transparent px-16 py-0 mr-0;
+      }
+
+      @screen xl {
+        @apply px-24;
+      }
+
+      @screen xxl {
+        @apply px-32;
+      }
 
       p {
-        @apply text-sm text-black font-main leading-loose;
-        opacity: 1;
+        @apply text-sm text-black font-main leading-loose opacity-100;
         transition: opacity 0.3s ease 0.1s;
 
         @screen lg {
-          opacity: 0;
+          @apply opacity-0;
         }
       }
 
       span {
+        @apply opacity-100;
         transition: none;
-        opacity: 1;
 
         @screen lg {
+          @apply opacity-0;
           transition: opacity 0.3s ease 0s;
-          opacity: 0;
         }
       }
 
       &.active {
-        display: block;
+        @apply block;
 
         @screen lg {
           p {
-            opacity: 1;
+            @apply opacity-100;
             transition: opacity 0.4s ease 0.3s;
           }
 
           span {
-            opacity: 1;
+            @apply opacity-100;
             transition: opacity 0.4s ease 0.4s;
           }
         }
-      }
-    }
-  }
-
-  &__arrow {
-    &__left,
-    &__right {
-      top: 50%;
-      transform: translateY(-50%);
-
-      &.disabled {
-        opacity: 0.3;
-        pointer-events: none;
-        cursor: not-allowed;
-      }
-    }
-
-    &__left {
-      @screen lg {
-        left: 10vw;
-        transform: rotate(-180deg);
-      }
-
-      @screen xxl {
-        left: calc(-12vw + 150px);
-      }
-    }
-
-    &__right {
-      @screen lg {
-        right: 10vw;
-      }
-
-      @screen xxl {
-        right: calc(-12vw + 150px);
       }
     }
   }
