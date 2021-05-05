@@ -11,15 +11,13 @@ $button = get_sub_field('button');
 
       <div class="mt-0 flex flex-col md:flex-row md:justify-between">
         @foreach ($cards as $card)
-        <div
-          class="cards__card flex flex-col items-center bg-grey-lightest text-center pt-12 pb-8 px-8 sm:pt-16 sm:pb-10 sm:px-16 mt-8 md:mt-0">
+        <div class="cards__card">
           {!! wp_get_attachment_image($card['icon']) !!}
           @if ($card['title'])
           <h5 class="font-heading text-h5 font-normal leading-average text-black md:mt-8">{{ $card['title'] }}</h5>
           @endif
           @if ($card['content'])
-          <div
-            class="mt-4 @if ($card['title']) md:mt-4 @else md:mt-10 @endif text-black text-sm md:text-base font-main font-normal md:leading-loose leading-medium">
+          <div class="cards__card__content {{ $card['title'] ? 'md:mt-4' : 'md:mt-10'}}">
             {!! $card['content'] !!}</div>
           @endif
         </div>

@@ -5,11 +5,11 @@
   transition: background-color 0.22s, border-color 0.22s;
 
   &:hover {
-    @apply border-blue text-blue bg-transparent;
+    @apply border-primary text-primary bg-transparent;
   }
 
   &--secondary {
-    @apply bg-transparent text-primary border-primary mx-auto;
+    @apply bg-primary text-white border-primary mx-auto;
 
     @screen md {
       @apply ml-0 mr-auto;

@@ -9,16 +9,21 @@
     }
 
     @screen lg {
-      @apply bg-grey-lightest w-2/3;
+      @apply bg-grey-lightest max-w-md;
+    }
+
+    @screen xl {
+      @apply max-w-lg;
     }
 
     @screen xxl {
-      @apply w-full;
+      @apply w-full max-w-3xl;
       height: 32rem;
     }
     &__testimonial {
       @apply mr-24 bg-grey-lightest relative min-w-full px-4 py-12 mr-20 mt-4;
       left: 50%;
+      border-radius: 15px;
       transform: translateX(-50%);
 
       @screen md {
@@ -74,7 +79,11 @@
     }
   }
 
-  &__dot.active {
-    @apply bg-blue;
+  &__dot {
+    @apply text-xs h-3 w-3 block mx-1 rounded-full border-primary border-1 cursor-pointer;
+
+    &.active {
+      @apply bg-primary;
+    }
   }
 }

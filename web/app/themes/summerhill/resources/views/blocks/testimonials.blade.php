@@ -36,9 +36,7 @@ $testimonials = App::testimonials($raw_testimonials);
 
     <div id="testimonials__dots" class="mt-4 lg:mt-8 mx-auto flex justify-center">
       @foreach ($testimonials as $key => $item)
-      <span
-        class="testimonials__dot text-xs h-3 w-3 block mx-1 rounded-full border-blue border-1 cursor-pointer @if ($key==0) active @endif"
-        data-key="{{ $key }}"></span>
+      <span class="testimonials__dot  {{$key==0 ? 'active' : ''}}" data-key="{{ $key }}"></span>
       @endforeach
     </div>
   </div>

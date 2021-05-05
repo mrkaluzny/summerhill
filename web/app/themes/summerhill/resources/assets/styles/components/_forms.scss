@@ -267,7 +267,7 @@ $waterdown-serif-secondary: "SouvenirStd", serif;
   }
 
   &--is-dragover {
-    @apply bg-blue-dark border-blue;
+    @apply bg-blue-dark border-primary;
   }
 
   &--is-uploaded {
@@ -338,7 +338,7 @@ $waterdown-serif-secondary: "SouvenirStd", serif;
   }
 
   &__control {
-    @apply border-primary text-blue;
+    @apply border-primary text-primary;
     border: 2px solid;
     border-radius: 10px;
     text-align: center;
@@ -356,7 +356,7 @@ $waterdown-serif-secondary: "SouvenirStd", serif;
   }
 
   input:checked + .checkbox__control {
-    @apply bg-blue border-blue text-white;
+    @apply bg-primary border-primary text-white;
   }
 }
 
@@ -370,7 +370,7 @@ $cubeSize: 3em;
   &__largeBox {
     height: $cubeSize;
     width: $cubeSize;
-    @apply bg-blue;
+    @apply bg-primary;
     outline: 1px solid transparent;
     position: fixed;
   }

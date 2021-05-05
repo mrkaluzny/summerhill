@@ -24,7 +24,7 @@ $contained_img = get_sub_field('contained_image');
           <div class="mt-4 flex flex-col">
             @foreach ($items as $item)
             <div class="mt-4 inline-flex items-center">
-              <span class="bg-grey-lightest p-3 rounded mr-3 w-12 h-12 text-blue">
+              <span class="bg-grey-lightest p-3 rounded mr-3 w-12 h-12 text-primary">
 
                 @if (strpos($item['link']['url'], 'tel:') === 0)
                 @include('icons.phone')

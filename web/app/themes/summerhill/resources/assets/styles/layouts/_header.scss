@@ -26,14 +26,14 @@
         transition: color 0.22s;
 
         &:hover {
-          @apply text-blue;
+          @apply text-primary;
         }
       }
     }
 
     .current_page_item {
       a {
-        @apply relative text-blue;
+        @apply relative text-primary;
         pointer-events: none;
 
         &::before {
@@ -91,7 +91,7 @@
 
         &.current_page_item {
           a {
-            @apply text-blue;
+            @apply text-primary;
           }
         }
 

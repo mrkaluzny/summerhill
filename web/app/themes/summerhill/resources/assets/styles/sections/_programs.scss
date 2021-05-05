@@ -1,13 +1,10 @@
 .programs {
   @apply overflow-hidden;
-
   &__wrapper {
     @apply flex flex-wrap py-16 relative;
-
     @screen lg {
-      @apply my-16 py-32 flex-no-wrap;
+      @apply my-16 py-32  flex-no-wrap;
     }
-
     &::before,
     &::after {
       content: "";
@@ -17,64 +14,49 @@
       width: 130px;
       height: 100%;
     }
-
     &::before {
       left: -130px;
       border-radius: 15px 0 0 15px;
     }
-
     &::after {
       right: -130px;
       border-radius: 0 15px 15px 0;
     }
   }
-
   &__circles {
-    @apply flex ml-auto w-full justify-center mt-12 p-0;
-    flex-flow: row wrap;
+    @apply p-0 ml-auto mt-8;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-gap: 0.6rem 1.2rem;
+
+    @screen mobile {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @screen sm {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
 
     @screen md {
-      @apply w-full justify-between;
+      @apply pl-8 mt-0;
+      justify-content: center;
+      grid-template-columns: repeat(2, minmax(0, 140px));
+      grid-gap: 0.5rem 0.8rem;
     }
-
     @screen lg {
-      @apply justify-center mt-0;
+      @apply px-0;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      max-height: 1px;
+      max-width: 490px;
+      grid-gap: 1rem;
     }
-
-    @screen xl {
-      @apply w-3/5;
-    }
-
     li {
       @apply relative;
       -webkit-tap-highlight-color: transparent;
-      flex: 0 0 calc(50% - 1vw);
-      margin: 0 1px 20px 1px;
-
-      @screen mobile {
-        flex: 0 0 calc(30% - 2vw);
-        margin: 0 7px 20px 7px;
-      }
-
-      @screen md {
-        flex: 0 0 calc(20% - 40px);
-        margin: 0;
-      }
-
-      @screen lg {
-        flex: 0 0 calc(40% - 20px);
-        margin: 0 0 20px 20px;
-      }
-
-      @screen xl {
-        flex: 0 0 calc(33% - 20px);
-        margin: 0 0 20px 20px;
-      }
 
       &:before {
-        display: block;
+        @apply block w-full;
         content: "";
-        width: 100%;
         padding-top: 100%;
       }
       a {
@@ -85,13 +67,16 @@
         bottom: 0;
         box-sizing: content-box;
         background-color: var(--bg-color);
+        box-shadow: 0px 0px 72px 9px transparent;
+        transition: border-color 0.22s, transform 0.22s, box-shadow 0.22s;
 
         @screen xl {
           @apply text-base;
         }
-
         &:hover {
           border-color: var(--border-color);
+          transform: scale(1.04);
+          box-shadow: 0px 0px 72px 9px var(--bg-color);
         }
       }
     }

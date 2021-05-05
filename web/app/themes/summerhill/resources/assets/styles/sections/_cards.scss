@@ -1,17 +1,35 @@
 .cards {
   &__card {
+    @apply flex flex-col items-center bg-grey-lightest text-center pt-12 pb-8 px-8 mt-8;
     width: 100%;
     border-radius: 15px;
 
+    @screen sm {
+      @apply pt-16 pb-10 px-16;
+    }
+
     @screen md {
+      @apply mt-0 px-6 pt-12 pb-6;
       width: calc(50% - 15px);
     }
 
-    p {
-      @apply mt-4;
+    @screen lg {
+      @apply pt-16 pb-10 px-16;
     }
-    p:first-of-type {
-      @apply mt-0;
+
+    &__content {
+      @apply mt-4 text-black text-sm font-main font-normal leading-medium;
+
+      @screen md {
+        @apply text-base leading-loose;
+      }
+
+      p {
+        @apply mt-4;
+      }
+      p:first-of-type {
+        @apply mt-0;
+      }
     }
   }
 }
