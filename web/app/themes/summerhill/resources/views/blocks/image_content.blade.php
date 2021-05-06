@@ -10,12 +10,12 @@ $is_reversed = get_sub_field('is_reversed');
 $contained_img = get_sub_field('contained_image');
 @endphp
 
-<section class="image_content {{ $bg }} py-12 md:py-20">
+<section class="image_content bg-{{ $bg }} py-12 md:py-20">
   <div class="container">
     <div class="flex flex-col-reverse {{ $is_reversed ? 'md:flex-row-reverse' : 'md:flex-row'}}">
 
       <div
-        class="flex flex-col justify-center md:{{ $proportions[1] }} {{ $is_reversed ? 'md:pl-8 xl:pl-16' : 'md:pr-8 xl:pr-16'}}">
+        class="flex flex-col justify-center md:w-1/2 lg:{{ $proportions[1] }} {{ $is_reversed ? 'md:pl-8 xl:pl-12' : 'md:pr-8 xl:pr-16'}}">
 
         <div class="flex flex-col mt-8 md:mt-0">
           {!! $content !!}
@@ -56,7 +56,7 @@ $contained_img = get_sub_field('contained_image');
       </div>
 
       <div
-        class="w-full md:{{ $proportions[0] }} {{ $is_reversed ? 'md:pr-8 xl:pr-16' : 'md:pl-8 xl:pl-16'}} {{ $contained_img ? 'is-contained' : ''}}">
+        class="w-full md:w-1/2 lg:{{ $proportions[0] }} {{ $is_reversed ? 'md:pr-8 xl:pr-16' : 'md:pl-8 xl:pl-16'}} {{ $contained_img ? 'is-contained' : ''}}">
         {!! wp_get_attachment_image($image, 'size_medium') !!}
       </div>
 
