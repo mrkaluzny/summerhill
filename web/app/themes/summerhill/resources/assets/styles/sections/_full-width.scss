@@ -44,7 +44,10 @@
     }
   }
 
-  p {
-    @apply mt-4;
+  p,
+  h5 {
+    &:last-of-type {
+      @apply mb-0;
+    }
   }
 }

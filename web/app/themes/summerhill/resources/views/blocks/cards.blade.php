@@ -7,7 +7,7 @@ $button = get_sub_field('button');
 <section class="cards w-full">
   <div class="container">
     <div class="py-6 md:pt-16 md:pb-10 flex flex-col">
-      <div class="mb-12">{!! $introduce_text !!}</div>
+      <div class="mb-12 max-w-xl mx-auto">{!! $introduce_text !!}</div>
 
       <div class="mt-0 flex flex-col md:flex-row md:justify-between">
         @foreach ($cards as $card)

@@ -13,6 +13,7 @@
       background-color: inherit;
       width: 130px;
       height: 100%;
+      z-index: -1;
     }
     &::before {
       left: -130px;
@@ -33,9 +34,9 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    @screen sm {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
+    // @screen sm {
+    //   grid-template-columns: repeat(4, minmax(0, 1fr));
+    // }
 
     @screen md {
       @apply pl-8 mt-0;
@@ -60,7 +61,7 @@
         padding-top: 100%;
       }
       a {
-        @apply text-black font-heading border-2 border-solid border-transparent rounded-full text-xs leading-normal text-center px-5 flex no-underline absolute flex-col justify-center items-center;
+        @apply text-black font-heading border-2 border-solid border-transparent rounded-full text-sm leading-normal text-center px-5 flex no-underline absolute flex-col justify-center items-center;
         top: 0;
         left: 0;
         right: 0;

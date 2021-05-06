@@ -10,7 +10,7 @@ $innerClass = $width === 'max-w-lg' ? 'fw fw--narrow' : 'fw fw--wide';
 
 <section class="{{ $bg == 'grey-lightest' ? 'my-12' : 'my-0'}} overflow-hidden">
   <div class="container">
-    <div class="full-width bg-{{ $bg }} {{ $innerClass }} py-24 relative flex flex-col">
+    <div class="bg-{{ $bg }} {{ $innerClass }} py-32 relative flex flex-col">
       @if ($content)
       {!! $content !!}
       @endif
