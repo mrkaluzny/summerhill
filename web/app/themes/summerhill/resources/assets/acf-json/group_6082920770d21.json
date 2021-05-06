@@ -403,6 +403,27 @@
                             "endpoint": 0
                         },
                         {
+                            "key": "field_60915f9ec4b84",
+                            "label": "Background Color",
+                            "name": "background_color",
+                            "type": "clone",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "clone": [
+                                "field_60915f5f7403a"
+                            ],
+                            "display": "seamless",
+                            "layout": "block",
+                            "prefix_label": 0,
+                            "prefix_name": 0
+                        },
+                        {
                             "key": "field_6082f55e4a027",
                             "label": "Reversed Order",
                             "name": "is_reversed",
@@ -465,27 +486,6 @@
                             "ui": 0,
                             "ui_on_text": "",
                             "ui_off_text": ""
-                        },
-                        {
-                            "key": "field_609383e4f99f3",
-                            "label": "Background Color",
-                            "name": "background_color",
-                            "type": "clone",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "clone": [
-                                "field_60915f5f7403a"
-                            ],
-                            "display": "seamless",
-                            "layout": "block",
-                            "prefix_label": 0,
-                            "prefix_name": 0
                         }
                     ],
                     "min": "",
@@ -934,7 +934,7 @@
                             "ui_off_text": ""
                         },
                         {
-                            "key": "field_6093839857872",
+                            "key": "field_6089c37fd0e13",
                             "label": "Background color",
                             "name": "background_color",
                             "type": "clone",
@@ -946,9 +946,7 @@
                                 "class": "",
                                 "id": ""
                             },
-                            "clone": [
-                                "field_60915f5f7403a"
-                            ],
+                            "clone": "",
                             "display": "seamless",
                             "layout": "block",
                             "prefix_label": 0,
@@ -988,5 +986,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1620280312
+    "modified": 1620285753
 }
