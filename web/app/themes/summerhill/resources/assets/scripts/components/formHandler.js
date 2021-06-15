@@ -61,7 +61,7 @@ if (droppedFiles) {
 }
 
 function handleFormSubmit(form) {
-  form.find('.form__message').fadeIn().addClass('form__message--active');
+  $('.form__message').fadeIn().addClass('form__message--active');
   var formName = form.attr('form-name');
   formURL = form.attr('action');
   var $input = form.find('input');
@@ -157,9 +157,9 @@ function sendEmail(data, file, form) {
 }
 
 function finishSendingEmail(html, form) {
-  form.find('.form__message__content').html(html);
-  form.find('.form__message__loader').fadeOut(function () {
-    form.find('.form__message__content').fadeIn();
+  $('.form__message__content').html(html);
+  $('.form__message__loader').fadeOut(function () {
+    $('.form__message__content').fadeIn();
   });
 
   if (form.parents('.form-addon').length) {
@@ -167,11 +167,8 @@ function finishSendingEmail(html, form) {
       $('.form-addon__form').removeClass('form-addon__form--active');
       setTimeout(function () {
         $('.form-addon__button').addClass('form-addon__button--active');
-        form.find('input, textarea').val('');
-        form
-          .find('.form__message')
-          .fadeOut()
-          .removeClass('form__message--active');
+        $('input, textarea').val('');
+        $('.form__message').fadeOut().removeClass('form__message--active');
       }, 300);
     }, 2000);
   }

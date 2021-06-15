@@ -43,6 +43,10 @@ $waterdown-serif-secondary: "SouvenirStd", serif;
       padding: 64px 130px;
     }
     @apply bg-grey-lightest rounded-lg;
+
+    br {
+      @apply hidden;
+    }
   }
 
   .form__label {
@@ -137,6 +141,10 @@ $waterdown-serif-secondary: "SouvenirStd", serif;
   &__checkboxes {
     @apply flex flex-wrap;
     gap: 1rem;
+
+    p {
+      @apply hidden;
+    }
   }
 }
 
