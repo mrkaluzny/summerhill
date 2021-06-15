@@ -13,8 +13,8 @@
           </div>
           <div class="form__half">
             <label for="email" class="form__label">Email address</label>
-            <input type="email" placeholder="Your email address" name="email" class="input input--email input--required"
-              required>
+            <input type="email" placeholder="Your email address" name="email"
+              class="input input--email inputgit statu--required" required>
           </div>
         </div>
         <div class="form__group">
