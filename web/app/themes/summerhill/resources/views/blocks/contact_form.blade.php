@@ -28,7 +28,6 @@
           <span>Would you like to tell us more about your needs?</span>
         </label>
 
-
         <div class="showMore__content">
           <div class="form__wrapper">
             <h2 class="form__title">Tell us about yourself</h2>
