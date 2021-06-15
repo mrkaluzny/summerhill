@@ -6,7 +6,7 @@ $shortcode = get_sub_field('shortcode');
   <div class="container">
     @include('components.FormMessage')
 
-    {!! do_shortcode($shortcode) !!}
+    {!! do_shortcode(get_sub_field('shortcode')) !!}
 
   </div>
 </section>
