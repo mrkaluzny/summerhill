@@ -1,3 +1,8 @@
+@php
+$shortcode = get_field('cf7_shortcode', 'option');
+@endphp
+
+{{-- {!! do_shortcode($shortcode) !!} --}}
 <div class="form-addon">
   <button class="form-addon__button">
     <span class="form-addon__button__icon"></span>
