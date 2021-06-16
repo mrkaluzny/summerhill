@@ -140,10 +140,34 @@ $waterdown-serif-secondary: "SouvenirStd", serif;
 
   &__checkboxes {
     @apply flex flex-wrap;
-    gap: 1rem;
 
-    p {
+    input {
       @apply hidden;
+
+      &:checked {
+        & + span,
+        & + span:hover {
+          @apply bg-blue text-white border-blue;
+        }
+      }
+    }
+
+    .wpcf7-list-item {
+      @apply m-0;
+    }
+
+    .wpcf7-list-item-label {
+      font-weight: 600;
+      border: 2px solid;
+      @apply block mb-4 mr-4 px-6 py-4 border-blue-dark text-blue-dark  cursor-pointer;
+      border-radius: 10px;
+      font-size: 0.8889rem;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease-in-out;
+
+      &:hover {
+        @apply bg-blue-dark text-white;
+      }
     }
   }
 }

@@ -42,3 +42,59 @@ if (form) {
     false
   );
 }
+
+const getCharacter = (string, charFromEnd) => {
+  return string[string.length - charFromEnd];
+};
+
+let childrens = 0;
+
+const incrementedLastChar = (string) => +string[string.length - 1] + 1;
+
+const addCalendars = (formClone = $('body')) => {
+  formClone
+    .find('.childBirthday, .childStartDate')
+    .removeClass('hasDatepicker')
+    .removeAttr('id')
+    .attr('autocomplete', 'negative')
+    .datepicker({
+      changeMonth: true,
+      changeYear: true,
+    });
+};
+const updateLabel = (formClone, name) => {
+  const lastChildName = $(name).last().attr('name');
+
+  formClone
+    .find(name)
+    .attr(
+      'name',
+      +getCharacter(lastChildName, 1)
+        ? lastChildName.slice(0, -1) + incrementedLastChar(lastChildName)
+        : lastChildName + '-1'
+    );
+};
+
+const updateLastPrograms = (formClone) => {
+  childrens = childrens + 1;
+
+  formClone
+    .find('.form__checkboxes')
+    .last()
+    .find('input[type="checkbox"]')
+    .each((id, el) => {
+      el.setAttribute('name', `intrested-in-${childrens}[]`);
+    });
+};
+
+$('#addChild').on('click', function (e) {
+  e.preventDefault();
+  const clone = $('.form__children').first().clone();
+  updateLabel(clone, '.childName');
+  updateLabel(clone, '.childBirthday');
+  updateLabel(clone, '.childStartDate');
+  addCalendars(clone);
+  updateLastPrograms(clone);
+  clone.appendTo('#childrenWrapper');
+});
+addCalendars();
