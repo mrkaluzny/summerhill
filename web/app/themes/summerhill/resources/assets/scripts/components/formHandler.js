@@ -51,6 +51,28 @@ let childrens = 0;
 
 const incrementedLastChar = (string) => +string[string.length - 1] + 1;
 
+const addButton = (buttonPane, input) => {
+  buttonPane
+    .find('button:nth-child(2)')
+    .text('Clear')
+    .unbind('click')
+    .bind('click', function () {
+      $.datepicker._clearDate(input);
+      $.datepicker._showDatepicker(input);
+    });
+
+  var btn = $(
+    '<button type="button" class="ui-datepicker-current ui-state-default ui-priority-secondary ui-corner-all">Close</button>'
+  );
+  btn.unbind('click').bind('click', function () {
+    // $.datepicker._clearDate(input);
+
+    $.datepicker._hideDatepicker();
+  });
+
+  btn.appendTo(buttonPane);
+};
+
 const addCalendars = (formClone = $('body')) => {
   formClone
     .find('.childBirthday, .childStartDate')
@@ -60,6 +82,33 @@ const addCalendars = (formClone = $('body')) => {
     .datepicker({
       changeMonth: true,
       changeYear: true,
+      showButtonPanel: true,
+      onChangeMonthYear: function (year, month, input) {
+        setTimeout(() => {
+          var buttonPane = $(input)
+            .datepicker('widget')
+            .find('.ui-datepicker-buttonpane');
+
+          addButton(buttonPane, input);
+        }, 1);
+      },
+      beforeShow: function (input) {
+        setTimeout(function () {
+          var buttonPane = $(input)
+            .datepicker('widget')
+            .find('.ui-datepicker-buttonpane');
+
+          buttonPane
+            .find('button:first-of-type')
+            .text('Today')
+            .bind('click', function () {
+              $.datepicker._hideDatepicker();
+              $.datepicker._setDateDatepicker(input, new Date());
+            });
+
+          addButton(buttonPane, input);
+        }, 1);
+      },
     });
 };
 const updateLabel = (formClone, name) => {
@@ -98,3 +147,10 @@ $('#addChild').on('click', function (e) {
   clone.appendTo('#childrenWrapper');
 });
 addCalendars();
+
+$(window).resize(function () {
+  var field = $(document.activeElement);
+  if (field.is('.hasDatepicker')) {
+    field.datepicker('hide');
+  }
+});

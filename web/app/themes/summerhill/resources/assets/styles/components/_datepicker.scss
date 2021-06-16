@@ -1,0 +1,113 @@
+#ui-datepicker-div {
+  @media only screen and (max-width: 600px) {
+    left: 15px !important;
+    width: calc(100vw - 30px);
+  }
+
+  @screen sm {
+    width: 380px;
+  }
+
+  th > span {
+    @apply font-light text-grey;
+  }
+
+  .ui-icon {
+    @apply block;
+    width: 0;
+    height: 0;
+    background-image: none;
+    border-top: 0.5em solid transparent;
+    border-bottom: 0.5em solid transparent;
+    border-left: 0.75em solid #0b7eaf;
+    border-right: 0;
+    transform: translateX(25%);
+  }
+
+  .ui-datepicker-title {
+    @apply inline-flex justify-between m-0 px-12 w-full;
+
+    .ui-datepicker-year,
+    .ui-datepicker-month {
+      border: 4px solid;
+      @apply font-secondary py-1 px-2 text-blue-dark bg-grey-lightest border-grey-lightest cursor-pointer;
+      width: 49%;
+
+      &:focus {
+        @apply outline-none;
+      }
+    }
+  }
+
+  .ui-datepicker-prev .ui-icon {
+    border-left: 0;
+    border-right: 0.75em solid #0b7eaf;
+  }
+
+  .ui-datepicker-next,
+  .ui-datepicker-prev {
+    @apply cursor-pointer;
+    top: 50% !important;
+    transform: translateY(-50%);
+  }
+
+  .ui-datepicker-next {
+    right: 6px;
+  }
+
+  .ui-datepicker-prev {
+    left: 5px;
+  }
+
+  .ui-datepicker-next-hover,
+  .ui-datepicker-prev-hover,
+  .ui-state-hover {
+    border: none;
+  }
+
+  td > a {
+    @apply flex justify-center items-center bg-grey-lightest border-none;
+    margin: 2px;
+    height: 30px;
+  }
+
+  .ui-datepicker-buttonpane {
+    @apply flex justify-around;
+
+    button {
+      @apply relative border-none bg-transparent font-light text-sm border-none text-grey-dark py-2;
+
+      &:focus {
+        @apply outline-none;
+      }
+
+      &::before {
+        content: "\2617";
+        @apply absolute block mr-1;
+        top: 50%;
+        transform: translateY(-50%);
+        left: -7px;
+        width: 12px;
+        height: 12px;
+        color: red;
+        font-size: 12px;
+      }
+      &:first-of-type::before {
+        color: blue;
+      }
+
+      &:last-of-type::before {
+        content: "x";
+        color: grey;
+      }
+    }
+  }
+
+  .ui-datepicker-current-day {
+    @apply bg-blue;
+
+    a {
+      @apply bg-blue text-white;
+    }
+  }
+}
