@@ -1,178 +1,168 @@
-/* eslint-disable */
+const form = document.querySelector('.wpcf7-form');
 
-var droppedFiles = false;
-
-if (jQuery.contains(document, $('.upload')[0])) {
-  var $upload = $('.upload');
-  var $input = $upload.find('input[type="file"]');
-
-  $upload
-    .on(
-      'drag dragstart dragend dragover dragenter dragleave drop',
-      function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    )
-    .on('dragover dragenter', function () {
-      $(this).addClass('upload--is-dragover');
-    })
-    .on('dragleave dragend drop', function () {
-      $(this).removeClass('upload--is-dragover');
-    })
-    .on('drop', function (e) {
-      droppedFiles = e.originalEvent.dataTransfer.files;
-      var $form = $(this);
-      $(this).find('.upload__success span').html(droppedFiles[0].name);
-      $(this).addClass('upload--is-uploaded');
-      $(this)
-        .find('.upload__content')
-        .fadeOut(function () {
-          $form.find('.upload__message').fadeIn();
-        });
-    });
-
-  $input.on('change', function (e) {
-    droppedFiles = e.target.files;
-    $form = $input.parents().find('.upload');
-    $form.find('.upload__success span').html(droppedFiles[0].name);
-    $form.addClass('upload--is-uploaded');
-    $form.find('.upload__content').fadeOut(function () {
-      $form.find('.upload__message').fadeIn();
-    });
+function finishSendingEmail(html) {
+  $('.form__message__content').html(html);
+  $('.form__message__loader').fadeOut(function () {
+    $('.form__message__content').fadeIn();
   });
 }
 
-if (jQuery.contains(document, $('.form__message')[0])) {
-  $('.form__message').fadeOut();
-}
-
-$(document).on('submit', 'form', function (e) {
-  e.preventDefault();
-  handleFormSubmit($(this));
-});
-
-var formData = [];
-var formURL;
-var attachement;
-
-if (droppedFiles) {
-  attachement = droppedFiles;
-}
-
-function handleFormSubmit(form) {
-  form.find('.form__message').fadeIn().addClass('form__message--active');
-  var formName = form.attr('form-name');
-  formURL = form.attr('action');
-  var $input = form.find('input');
-  var $textarea = form.find('textarea');
-  var $select = form.find('select');
-
-  formData.push(formName);
-
-  $input.each(function () {
-    if ($(this).attr('type') == 'file') {
-      attachement = $(this)[0].files[0];
-      if (droppedFiles) {
-        attachement = droppedFiles;
-      }
-    } else {
-      getFieldData($(this));
-    }
-  });
-
-  $textarea.each(function () {
-    getFieldData($(this));
-  });
-
-  $select.each(function () {
-    getFieldData($(this));
-  });
-
-  sendEmail(formData, attachement, form);
-}
-
-function getFieldData(field) {
-  if (field.attr('type') == 'checkbox') {
-    if (field.is(':checked')) {
-      var name = returnFieldName(field);
-      var value = field.val();
-      var newData = {
-        name: name,
-        value: value,
-      };
-      formData.push(newData);
-    }
-  } else {
-    var name = returnFieldName(field);
-    if (name !== false) {
-      var value = field.val();
-      var newData = {
-        name: name,
-        value: value,
-      };
-      formData.push(newData);
-    }
-  }
-}
-
-function returnFieldName(el) {
-  if (el.attr('name')) {
-    return el
-      .attr('name')
-      .replace('-', ' ')
-      .replace(/\b\w/g, function (l) {
-        return l.toUpperCase();
-      });
-  } else {
-    return false;
-  }
-}
-
-function sendEmail(data, file, form) {
-  var formDataData = new FormData(form[0]);
-  formDataData.append('content', JSON.stringify(data));
-  $.ajax({
-    type: 'POST',
-    url: formURL,
-    processData: false,
-    contentType: false,
-    data: formDataData,
-    cache: false,
-    complete: function (res) {
-      console.log(res);
-      if (res.status == 200) {
-        finishSendingEmail(
-          "<h2>Thank you for contacting Summerhill!</h2><p>We'll get back to you as soon as possible!</p>",
-          form
-        );
-      } else {
-        finishSendingEmail(
-          "<h2>Something went wrong..</h2><p>Unfortunatelly we haven't received your message. Please try again later.</p>",
-          form
-        );
+if (form) {
+  form.addEventListener(
+    'wpcf7submit',
+    function (ev) {
+      if (ev.target.dataset.status !== 'invalid') {
+        $('.form__message').fadeIn().addClass('form__message--active');
       }
     },
-  });
+    false
+  );
+
+  form.addEventListener(
+    'wpcf7mailsent',
+    function () {
+      setTimeout(() => {
+        finishSendingEmail(
+          '<h2>Thank you for contacting Summerhill!</h2><p>We will get back to you as soon as possible!</p>'
+        );
+      }, 1000);
+    },
+    false
+  );
+
+  form.addEventListener(
+    'wpcf7mailfailed',
+    function () {
+      setTimeout(() => {
+        finishSendingEmail(
+          '<h2>Something went wrong..</h2><p>Unfortunatelly we have not received your message. Please try again later.</p>'
+        );
+      }, 1000);
+    },
+    false
+  );
 }
 
-function finishSendingEmail(html, form) {
-  form.find('.form__message__content').html(html);
-  form.find('.form__message__loader').fadeOut(function () {
-    form.find('.form__message__content').fadeIn();
+const getCharacter = (string, charFromEnd) => {
+  return string[string.length - charFromEnd];
+};
+
+let childrens = 0;
+
+const incrementedLastChar = (string) => +string[string.length - 1] + 1;
+
+const addButton = (buttonPane, input) => {
+  buttonPane
+    .find('button:nth-child(2)')
+    .text('Clear')
+    .unbind('click')
+    .bind('click', function () {
+      $.datepicker._clearDate(input);
+      $.datepicker._showDatepicker(input);
+    });
+
+  var btn = $(
+    '<button type="button" class="ui-datepicker-current ui-state-default ui-priority-secondary ui-corner-all">Close</button>'
+  );
+  btn.unbind('click').bind('click', function () {
+    // $.datepicker._clearDate(input);
+
+    $.datepicker._hideDatepicker();
   });
 
-  if (form.parents('.form-addon').length) {
-    setTimeout(function () {
-      $('.form-addon__form').removeClass('form-addon__form--active');
-      setTimeout(function () {
-        $('.form-addon__button').addClass('form-addon__button--active');
-        form.find('input, textarea').val('');
-        form
-          .find('.form__message')
-          .fadeOut()
-          .removeClass('form__message--active');
-      }, 300);
-    }, 2000);
+  btn.appendTo(buttonPane);
+};
+
+const addCalendars = (formClone = $('body')) => {
+  formClone
+    .find('.childBirthday, .childStartDate')
+    .removeClass('hasDatepicker')
+    .removeAttr('id')
+    .attr('autocomplete', 'negative')
+    .datepicker({
+      changeMonth: true,
+      changeYear: true,
+      showButtonPanel: true,
+      onChangeMonthYear: function (year, month, input) {
+        setTimeout(() => {
+          var buttonPane = $(input)
+            .datepicker('widget')
+            .find('.ui-datepicker-buttonpane');
+
+          addButton(buttonPane, input);
+        }, 1);
+      },
+      beforeShow: function (input) {
+        setTimeout(function () {
+          var buttonPane = $(input)
+            .datepicker('widget')
+            .find('.ui-datepicker-buttonpane');
+
+          buttonPane
+            .find('button:first-of-type')
+            .text('Today')
+            .bind('click', function () {
+              $.datepicker._hideDatepicker();
+              $.datepicker._setDateDatepicker(input, new Date());
+            });
+
+          addButton(buttonPane, input);
+        }, 1);
+      },
+    });
+};
+const updateLabel = (formClone, name) => {
+  const lastChildName = $(name).last().attr('name');
+
+  formClone
+    .find(name)
+    .attr(
+      'name',
+      +getCharacter(lastChildName, 1)
+        ? lastChildName.slice(0, -1) + incrementedLastChar(lastChildName)
+        : lastChildName + '-1'
+    );
+};
+
+const updateLastPrograms = (formClone) => {
+  childrens = childrens + 1;
+
+  formClone
+    .find('.form__checkboxes')
+    .last()
+    .find('input[type="checkbox"]')
+    .each((id, el) => {
+      el.setAttribute('name', `intrested-in-${childrens}[]`);
+    });
+};
+
+$('#addChild').on('click', function (e) {
+  e.preventDefault();
+  console.log('add child');
+  const clone = $('.form__children').first().clone();
+  updateLabel(clone, '.childName');
+  updateLabel(clone, '.childBirthday');
+  updateLabel(clone, '.childStartDate');
+  addCalendars(clone);
+  updateLastPrograms(clone);
+  clone
+    .appendTo('#childrenWrapper')
+    .find('input')
+    .each(function () {
+      if ($(this).is('input:text')) {
+        $(this).val('');
+      } else {
+        $(this).prop('checked', false);
+      }
+    });
+
+  clone;
+});
+addCalendars();
+
+$(window).resize(function () {
+  var field = $(document.activeElement);
+  if (field.is('.hasDatepicker')) {
+    field.datepicker('hide');
   }
-}
+});

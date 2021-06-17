@@ -3,6 +3,9 @@
   @apply inline-block text-sm bg-primary border-primary px-8 py-4 rounded text-white leading-none no-underline text-center font-bold;
   border-radius: 41px;
   transition: background-color 0.22s, border-color 0.22s;
+  &:focus {
+    @apply outline-none;
+  }
 
   &:hover {
     @apply border-primary text-primary bg-transparent;

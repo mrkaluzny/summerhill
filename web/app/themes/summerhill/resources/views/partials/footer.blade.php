@@ -69,8 +69,8 @@ $school_name = get_field('school_name', 'options');
     <div class="footer__below">
       <span class="text-xs font-medium font-main text-white">{{ date('Y') }} {{ $school_name }} All rights
         reserved.</span>
-      <span class="text-xs font-normal font-main text-white opacity-75 mt-1">Designed and developed by <a
-          class="no-underline text-white" href="https://cleancommit.io">CleanCommit</a></span>
+      {{-- <span class="text-xs font-normal font-main text-white opacity-75 mt-1">Designed and developed by <a
+          class="no-underline text-white" href="https://cleancommit.io">CleanCommit</a></span> --}}
     </div>
 
   </div>

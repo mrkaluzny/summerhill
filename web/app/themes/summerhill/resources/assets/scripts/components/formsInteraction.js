@@ -3,6 +3,8 @@ var ChildToAdd = 2;
 $(document).on('click', '.button--child', function (e) {
   e.preventDefault();
 
+  console.log('Adding child');
+
   $('.form__child--first')
     .clone()
     .removeClass('form__child--first')

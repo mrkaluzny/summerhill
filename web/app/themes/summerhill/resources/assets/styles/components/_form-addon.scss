@@ -11,6 +11,10 @@ $waterdown-box-button: 0 3px 15px 0 rgba(0, 0, 0, 0.25);
   right: 25px;
   z-index: 99999;
 
+  .wpcf7-response-output {
+    display: none;
+  }
+
   .form__label {
     @apply text-base;
   }
@@ -110,14 +114,24 @@ $waterdown-box-button: 0 3px 15px 0 rgba(0, 0, 0, 0.25);
   &__content {
     @apply bg-white;
     padding: 20px;
-
-    p {
-      margin-bottom: 1rem;
-      line-height: 1.4em;
-    }
+  }
+  p {
+    background-color: white;
+    padding: 1rem 20px;
+    line-height: 1.4em;
   }
 
   .form__message__inner h2 {
     font-size: 1.6rem;
   }
+}
+
+.wpcf7-not-valid-tip {
+  @apply text-sm mt-2;
+}
+
+.wpcf7 form.invalid .wpcf7-response-output,
+.wpcf7 form.unaccepted .wpcf7-response-output {
+  @apply hidden;
+  // display: none !important;
 }

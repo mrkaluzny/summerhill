@@ -833,7 +833,27 @@
                     "name": "contact_form",
                     "label": "Contact Form",
                     "display": "block",
-                    "sub_fields": [],
+                    "sub_fields": [
+                        {
+                            "key": "field_60c88cd19563c",
+                            "label": "Shortcode",
+                            "name": "shortcode",
+                            "type": "text",
+                            "instructions": "",
+                            "required": 1,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
+                            "maxlength": ""
+                        }
+                    ],
                     "min": "",
                     "max": ""
                 },
@@ -1044,5 +1064,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1620293477
+    "modified": 1623756291
 }
