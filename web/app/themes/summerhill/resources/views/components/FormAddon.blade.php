@@ -2,7 +2,6 @@
 $shortcode = get_field('cf7_shortcode', 'option');
 @endphp
 
-{{-- {!! do_shortcode($shortcode) !!} --}}
 <div class="form-addon">
   <button class="form-addon__button">
     <span class="form-addon__button__icon"></span>
@@ -12,32 +11,14 @@ $shortcode = get_field('cf7_shortcode', 'option');
       <h2 class="form-addon__header__title">{{ the_field('instamessage_title', 'option') }}</h2>
       @include('icons.chevron')
     </header>
-    @include('components.FormMessage')
-    <p>{{ the_field('instamessage_content', 'option') }}</p>
-    <div class="form-addon__content">
-      {!! do_shortcode($shortcode) !!}
-
-      {{-- <form action="{{ get_template_directory_uri() }}/mailer/wp-mailer.php" class="form form-addon__formfield"
-      form-name="Form Addon">
-      <div class="form__group">
-        <label for="full-name" class="form__label">Name and surname</label>
-        <input type="text" name="full-name" placeholder="Your name and surname"
-          class="input input--text input--required" required>
-      </div>
-      <div class="form__group">
-        <label for="email" class="form__label">Email address</label>
-        <input type="email" name="email" placeholder="Your email address" class="input input--email input--required"
-          required>
-      </div>
-      <div class="form__group">
-        <label for="message" class="form__label">Your Message</label>
-        <textarea name="message" rows="8" cols="80" placeholder="Your message" class="input input--textarea"></textarea>
-      </div>
-
-      <div class="form__button">
-        <button role="submit" class="btn btn--primary">Send message</button>
-      </div>
-      </form> --}}
+    <div class="relative">
+      @include('components.FormMessage')
+      <p>{{ the_field('instamessage_content', 'option') }}</p>
+      @if ($shortcode)
+        <div class="form-addon__content">
+          {!! do_shortcode($shortcode) !!}
+        </div>
+      @endif
     </div>
   </div>
 </div>

@@ -138,13 +138,25 @@ const updateLastPrograms = (formClone) => {
 
 $('#addChild').on('click', function (e) {
   e.preventDefault();
+  console.log('add child');
   const clone = $('.form__children').first().clone();
   updateLabel(clone, '.childName');
   updateLabel(clone, '.childBirthday');
   updateLabel(clone, '.childStartDate');
   addCalendars(clone);
   updateLastPrograms(clone);
-  clone.appendTo('#childrenWrapper');
+  clone
+    .appendTo('#childrenWrapper')
+    .find('input')
+    .each(function () {
+      if ($(this).is('input:text')) {
+        $(this).val('');
+      } else {
+        $(this).prop('checked', false);
+      }
+    });
+
+  clone;
 });
 addCalendars();
 

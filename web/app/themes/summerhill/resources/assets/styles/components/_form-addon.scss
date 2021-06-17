@@ -11,6 +11,10 @@ $waterdown-box-button: 0 3px 15px 0 rgba(0, 0, 0, 0.25);
   right: 25px;
   z-index: 99999;
 
+  .wpcf7-response-output {
+    display: none;
+  }
+
   .form__label {
     @apply text-base;
   }
