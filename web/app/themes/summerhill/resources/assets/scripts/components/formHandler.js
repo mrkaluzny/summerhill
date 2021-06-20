@@ -1,12 +1,5 @@
 const form = document.querySelector('.wpcf7-form');
-
-function finishSendingEmail(html) {
-  $('.form__message__content').html(html);
-  $('.form__message__loader').fadeOut(function () {
-    $('.form__message__content').fadeIn();
-  });
-}
-
+// Event listiners
 if (form) {
   form.addEventListener(
     'wpcf7submit',
@@ -43,11 +36,18 @@ if (form) {
   );
 }
 
+function finishSendingEmail(html) {
+  $('.form__message__content').html(html);
+  $('.form__message__loader').fadeOut(function () {
+    $('.form__message__content').fadeIn();
+  });
+}
+
 const getCharacter = (string, charFromEnd) => {
   return string[string.length - charFromEnd];
 };
 
-let childrens = 0;
+let childrenAmount = 0;
 
 const incrementedLastChar = (string) => +string[string.length - 1] + 1;
 
@@ -125,14 +125,14 @@ const updateLabel = (formClone, name) => {
 };
 
 const updateLastPrograms = (formClone) => {
-  childrens = childrens + 1;
+  childrenAmount = childrenAmount + 1;
 
   formClone
     .find('.form__checkboxes')
     .last()
     .find('input[type="checkbox"]')
     .each((id, el) => {
-      el.setAttribute('name', `intrested-in-${childrens}[]`);
+      el.setAttribute('name', `intrested-in-${childrenAmount}[]`);
     });
 };
 

@@ -1,17 +1,17 @@
-'use strict' // eslint-disable-line
+'use strict'; // eslint-disable-line
 
-const { default: ImageminPlugin } = require('imagemin-webpack-plugin')
-const imageminMozjpeg = require('imagemin-mozjpeg')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const { default: ImageminPlugin } = require('imagemin-webpack-plugin');
+const imageminMozjpeg = require('imagemin-mozjpeg');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
-const glob = require('glob-all')
-const PurgecssPlugin = require('purgecss-webpack-plugin')
+const glob = require('glob-all');
+const PurgecssPlugin = require('purgecss-webpack-plugin');
 
-const config = require('./config')
+const config = require('./config');
 
 class TailwindExtractor {
   static extract(content) {
-    return content.match(/[A-z0-9-:\/]+/g) || []
+    return content.match(/[A-z0-9-:\/]+/g) || [];
   }
 }
 
@@ -65,4 +65,4 @@ module.exports = {
       },
     }),
   ],
-}
+};
