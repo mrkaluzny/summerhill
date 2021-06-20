@@ -23,6 +23,10 @@
 @import "common/grid";
 @import "common/global";
 
+/*! purgecss start ignore */
+@import "vendor/picker";
+/*! purgecss end ignore */
+
 /** Import theme styles */
 @import "components/buttons";
 @import "components/arrows";

@@ -54,6 +54,11 @@ $waterdown-serif-secondary: "SouvenirStd", serif;
   }
 }
 
+.form-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
 .form {
   position: relative;
 
@@ -281,87 +286,6 @@ $waterdown-serif-secondary: "SouvenirStd", serif;
   }
 }
 
-.upload {
-  border: 3px dashed #d4d4d4;
-  border-radius: 3px;
-  display: flex;
-  height: 280px;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-
-  &:hover {
-    background-color: rgba($waterdown-grey-light, 0.4);
-    .upload__label {
-      color: $waterdown-overlay-dark;
-    }
-  }
-
-  &--is-dragover {
-    @apply bg-blue-dark border-primary;
-  }
-
-  &--is-uploaded {
-    border-color: #869212;
-  }
-
-  &__label {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    text-align: center;
-    color: $waterdown-input-border;
-    font-weight: 400;
-    transition: all 0.3s ease-in-out;
-  }
-
-  &__input {
-    display: none !important;
-  }
-
-  &__info {
-    font-size: 1.111rem;
-    margin: 9px 0 16px;
-  }
-
-  &__break {
-    font-size: 0.8889rem;
-  }
-
-  &__button {
-    max-width: 200px;
-    margin-top: 15px;
-    padding: 13px 0 9px;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-  }
-
-  &__icon {
-    &--rotated {
-      transform: rotate(180deg);
-    }
-  }
-
-  &__message {
-    display: none;
-    transition: all 0.3s ease-in-out;
-  }
-
-  &__success {
-    font-size: 1.1rem;
-    @apply text-blue-dark;
-    span {
-      font-weight: 600;
-    }
-  }
-
-  &__drop {
-    display: none;
-  }
-}
-
 .checkbox {
   display: inline-block;
 
@@ -443,8 +367,4 @@ $cubeSize: 3em;
   }
   font-weight: 400;
   margin-left: 5px;
-
-  &__content {
-    display: none;
-  }
 }

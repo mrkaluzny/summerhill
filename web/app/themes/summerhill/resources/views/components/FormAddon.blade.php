@@ -11,7 +11,7 @@ $shortcode = get_field('cf7_shortcode', 'option');
       <h2 class="form-addon__header__title">{{ the_field('instamessage_title', 'option') }}</h2>
       @include('icons.chevron')
     </header>
-    <div class="relative">
+    <div class="form-wrapper">
       @include('components.FormMessage')
       <p>{{ the_field('instamessage_content', 'option') }}</p>
       @if ($shortcode)

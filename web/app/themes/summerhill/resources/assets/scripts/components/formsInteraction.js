@@ -1,4 +1,10 @@
 var ChildToAdd = 2;
+if (
+  jQuery.contains(document, $('.input--date')[0]) ||
+  jQuery.contains(document, $('.input--birthday')[0])
+) {
+  initiatePicker();
+}
 
 $(document).on('click', '.button--child', function (e) {
   e.preventDefault();
@@ -29,14 +35,6 @@ $(document).on('click', '.button--child', function (e) {
   ChildToAdd++;
 });
 
-$(document).on('click', '.showMore', function () {
-  if ($('#showMore').is(':checked')) {
-    $('.showMore__content').slideDown();
-  } else {
-    $('.showMore__content').slideUp();
-  }
-});
-
 function initiatePicker() {
   $('.input--date').pickadate();
 
@@ -49,12 +47,5 @@ function initiatePicker() {
   $('.input--visit').pickadate({
     min: true,
     disable: [1, 7],
-  });
-
-  $('.input--time').pickatime({
-    clear: 'Clear',
-    min: [8, 0],
-    max: [15, 0],
-    interval: 60,
   });
 }
