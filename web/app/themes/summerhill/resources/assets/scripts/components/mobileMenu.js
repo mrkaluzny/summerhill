@@ -1,15 +1,10 @@
-function handleMobileMenu() {
-  const hamburger = document.getElementById('hamburger');
-
-  hamburger.addEventListener('click', function () {
-    if (window.outerWidth > 1200) return;
-    this.parentNode.classList.toggle('is-menu-open');
-    const overflow = this.parentNode.classList.contains('is-menu-open')
-      ? 'hidden'
-      : 'scroll';
+export default function handleMobileMenu() {
+  console.log('Initiated mobile menu');
+  $('#hamburger').on('click', function () {
+    console.log('burger clicked');
+    let $parent = $(this).parent();
+    $parent.toggleClass('is-menu-open');
+    const overflow = $parent.hasClass('is-menu-open') ? 'hidden' : 'scroll';
     document.body.style.overflowY = overflow;
   });
-}
-export default function initMobile() {
-  handleMobileMenu();
 }

@@ -1,4 +1,5 @@
-import initMobile from '../components/mobileMenu';
+import handleMobileMenu from '../components/mobileMenu';
+import initMap from '../components/map';
 import initSlider from '../components/slider';
 import initFormAddon from '../components/formAddon';
 
@@ -7,11 +8,11 @@ export default {
     // JavaScript to be fired on all pages
   },
   finalize() {
-    initMobile();
+    handleMobileMenu();
     initSlider();
     initFormAddon();
     require('../components/formHandler');
-    require('../components/formsInteraction');
-    require('../components/map');
+    // require('../components/formsInteraction');
+    initMap();
   },
 };
