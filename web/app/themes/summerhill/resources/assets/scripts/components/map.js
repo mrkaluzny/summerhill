@@ -1,18 +1,20 @@
 /* eslint-disable */
 
-(function ($) {
+export default function initMap() {
+  const google = window.google;
+  console.log(google);
   if (jQuery.contains(document, $('#map')[0])) {
     function new_map($el) {
       var $markers = $el.find('.marker');
       var args = {
         zoom: 13,
-        center: new window.google.maps.LatLng(0, 0),
+        center: new google.maps.LatLng(0, 0),
         styles: mapStyle,
         disableDefaultUI: true,
-        mapTypeId: window.google.maps.MapTypeId.ROADMAP,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
       };
 
-      var map = new window.google.maps.Map($el[0], args);
+      var map = new google.maps.Map($el[0], args);
       map.markers = [];
       $markers.each(function () {
         add_marker($(this), map);
@@ -23,14 +25,14 @@
     }
 
     function add_marker($marker, map) {
-      var latlng = new window.google.maps.LatLng(
+      var latlng = new google.maps.LatLng(
         $marker.attr('data-lat'),
         $marker.attr('data-lng')
       );
       var icon =
         $marker.attr('data-icon') + '/assets/images/summerhill-map-marker.svg';
 
-      var marker = new window.google.maps.Marker({
+      var marker = new google.maps.Marker({
         position: latlng,
         map: map,
         icon: icon,
@@ -39,20 +41,20 @@
       map.markers.push(marker);
 
       if ($marker.html()) {
-        var infowindow = new window.google.maps.InfoWindow({
+        var infowindow = new google.maps.InfoWindow({
           content: $marker.html(),
         });
 
-        window.google.maps.event.addListener(marker, 'click', function () {
+        google.maps.event.addListener(marker, 'click', function () {
           infowindow.open(map, marker);
         });
       }
     }
 
     function center_map(map) {
-      var bounds = new window.google.maps.LatLngBounds();
+      var bounds = new google.maps.LatLngBounds();
       $.each(map.markers, function (i, marker) {
-        var latlng = new window.google.maps.LatLng(
+        var latlng = new google.maps.LatLng(
           marker.position.lat(),
           marker.position.lng()
         );
@@ -74,7 +76,7 @@
       });
     });
   }
-})(jQuery);
+}
 
 var mapStyle = [
   {

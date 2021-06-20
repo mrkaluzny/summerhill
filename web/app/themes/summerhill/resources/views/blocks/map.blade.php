@@ -1,6 +1,12 @@
 @php
 $location = get_sub_field('location');
 @endphp
+
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiN8Z_yXbPgum-N9AmrugwVd962ROQg3E&callback=initMap&libraries=&v=weekly"
+  async>
+</script>
+
 <section class="map">
   <div id="map">
     <div class="marker" data-lng="{{ $location['lng'] }}" data-lat="{{ $location['lat'] }}"
