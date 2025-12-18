@@ -31,6 +31,58 @@ class Remote
      * @var TableHelper
      */
     private $table_helper;
+    /**
+     * @var WPMDBRestAPIServer
+     */
+    private $rest_API_server;
+    /**
+     * @var FinalizeComplete
+     */
+    private $finalize_complete;
+    /**
+     * @var BackupExport
+     */
+    private $backup_export;
+    /**
+     * @var Table
+     */
+    private $table;
+    /**
+     * @var MigrationManager
+     */
+    private $migration_manager;
+    /**
+     * @var FormData
+     */
+    private $form_data;
+    /**
+     * @var Properties
+     */
+    private $props;
+    /**
+     * @var ErrorLog
+     */
+    private $error_log;
+    /**
+     * @var Helper
+     */
+    private $http_helper;
+    /**
+     * @var Http
+     */
+    private $http;
+    /**
+     * @var MigrationStateManager
+     */
+    private $migration_state_manager;
+    /**
+     * @var array
+     */
+    private $settings;
+    /**
+     * @var Scramble
+     */
+    private $scrambler;
 
     public function __construct(
         Scramble $scrambler,
@@ -105,6 +157,8 @@ class Remote
             'domain_current_site' => 'text',
             'prefix'              => 'string',
             'sig'                 => 'string',
+            'source_prefix'       => 'string',
+            'destination_prefix'  => 'string',
         );
 
         $state_data = Persistence::setRemotePostData($key_rules, __METHOD__);
@@ -113,10 +167,12 @@ class Remote
             return wp_send_json_error($state_data->get_error_message());
         }
 
-        $state_data['find_replace_pairs'] = unserialize(base64_decode($state_data['find_replace_pairs']));
+        $state_data['find_replace_pairs'] = json_decode(base64_decode($state_data['find_replace_pairs']), true);
         $state_data['form_data']          = base64_decode($state_data['form_data']);
-        $state_data['site_details']       = unserialize(base64_decode($state_data['site_details']));
+        $state_data['site_details']       = json_decode(base64_decode($state_data['site_details']), true);
         $state_data['primary_keys']       = base64_decode($state_data['primary_keys']);
+        $state_data['source_prefix']      = base64_decode($state_data['source_prefix']);
+        $state_data['destination_prefix'] = base64_decode($state_data['destination_prefix']);
 
         $this->form_data->parse_and_save_migration_form_data($state_data['form_data']);
 
@@ -145,12 +201,14 @@ class Remote
                 'path_current_site',
                 'domain_current_site',
                 'prefix',
+                'source_prefix',
+                'destination_prefix',
             )
         );
 
         $sig_data = $filtered_post;
         // find_replace_pairs and form_data weren't used to create the migration signature
-        unset ($sig_data['find_replace_pairs'], $sig_data['form_data']);
+        unset ($sig_data['find_replace_pairs'], $sig_data['form_data'], $sig_data['source_prefix'], $sig_data['destination_prefix']);
 
 
         if (!$this->http_helper->verify_signature($sig_data, $this->settings['key'])) {
@@ -281,7 +339,7 @@ class Remote
             'table'               => 'string',
             'form_data'           => 'string',
             'stage'               => 'key',
-            //            'prefix'              => 'string',
+            'prefix'              => 'string',
             'current_row'         => 'string',
             'last_table'          => 'string',
             'gzip'                => 'string',

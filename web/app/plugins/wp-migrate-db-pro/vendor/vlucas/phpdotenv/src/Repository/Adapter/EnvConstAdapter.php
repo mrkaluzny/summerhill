@@ -4,7 +4,7 @@ namespace DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter;
 
 use DeliciousBrains\WPMDB\Container\PhpOption\None;
 use DeliciousBrains\WPMDB\Container\PhpOption\Some;
-class EnvConstAdapter implements \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\AvailabilityInterface, \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\ReaderInterface, \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\WriterInterface
+class EnvConstAdapter implements AvailabilityInterface, ReaderInterface, WriterInterface
 {
     /**
      * Determines if the adapter is supported.
@@ -18,22 +18,31 @@ class EnvConstAdapter implements \DeliciousBrains\WPMDB\Container\Dotenv\Reposit
     /**
      * Get an environment variable, if it exists.
      *
-     * @param string $name
+     * @param non-empty-string $name
      *
      * @return \PhpOption\Option<string|null>
      */
     public function get($name)
     {
-        if (\array_key_exists($name, $_ENV)) {
-            return \DeliciousBrains\WPMDB\Container\PhpOption\Some::create($_ENV[$name]);
+        if (!\array_key_exists($name, $_ENV)) {
+            return None::create();
         }
-        return \DeliciousBrains\WPMDB\Container\PhpOption\None::create();
+        $value = $_ENV[$name];
+        if (\is_scalar($value)) {
+            /** @var \PhpOption\Option<string|null> */
+            return Some::create((string) $value);
+        }
+        if (null === $value) {
+            /** @var \PhpOption\Option<string|null> */
+            return Some::create(null);
+        }
+        return None::create();
     }
     /**
      * Set an environment variable.
      *
-     * @param string      $name
-     * @param string|null $value
+     * @param non-empty-string $name
+     * @param string|null      $value
      *
      * @return void
      */
@@ -44,7 +53,7 @@ class EnvConstAdapter implements \DeliciousBrains\WPMDB\Container\Dotenv\Reposit
     /**
      * Clear an environment variable.
      *
-     * @param string $name
+     * @param non-empty-string $name
      *
      * @return void
      */

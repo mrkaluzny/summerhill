@@ -10,11 +10,11 @@ use Yoast\WP\SEO\Presenters\Abstract_Indexable_Tag_Presenter;
 class Google_Presenter extends Abstract_Indexable_Tag_Presenter {
 
 	/**
-	 * The tag format including placeholders.
+	 * The tag key name.
 	 *
 	 * @var string
 	 */
-	protected $tag_format = '<meta name="google-site-verification" content="%s" />';
+	protected $key = 'google-site-verification';
 
 	/**
 	 * Retrieves the webmaster tool site verification value from the settings.
@@ -22,6 +22,7 @@ class Google_Presenter extends Abstract_Indexable_Tag_Presenter {
 	 * @return string The webmaster tool site verification value.
 	 */
 	public function get() {
+
 		return $this->helpers->options->get( 'googleverify', '' );
 	}
 }

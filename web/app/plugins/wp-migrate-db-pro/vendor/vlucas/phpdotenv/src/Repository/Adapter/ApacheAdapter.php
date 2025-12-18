@@ -3,7 +3,7 @@
 namespace DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter;
 
 use DeliciousBrains\WPMDB\Container\PhpOption\None;
-class ApacheAdapter implements \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\AvailabilityInterface, \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\ReaderInterface, \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\WriterInterface
+class ApacheAdapter implements AvailabilityInterface, ReaderInterface, WriterInterface
 {
     /**
      * Determines if the adapter is supported.
@@ -22,34 +22,35 @@ class ApacheAdapter implements \DeliciousBrains\WPMDB\Container\Dotenv\Repositor
      * This is intentionally not implemented, since this adapter exists only as
      * a means to overwrite existing apache environment variables.
      *
-     * @param string $name
+     * @param non-empty-string $name
      *
      * @return \PhpOption\Option<string|null>
      */
     public function get($name)
     {
-        return \DeliciousBrains\WPMDB\Container\PhpOption\None::create();
+        return None::create();
     }
     /**
      * Set an environment variable.
      *
      * Only if an existing apache variable exists do we overwrite it.
      *
-     * @param string      $name
-     * @param string|null $value
+     * @param non-empty-string $name
+     * @param string|null      $value
      *
      * @return void
      */
     public function set($name, $value = null)
     {
-        if (\apache_getenv($name) !== \false) {
-            \apache_setenv($name, (string) $value);
+        if (\apache_getenv($name) === \false) {
+            return;
         }
+        \apache_setenv($name, (string) $value);
     }
     /**
      * Clear an environment variable.
      *
-     * @param string $name
+     * @param non-empty-string $name
      *
      * @return void
      */
