@@ -1,14 +1,16 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
+defined( 'ABSPATH' ) || exit;
 
-if ( defined( 'WP_ROCKET_VERSION' ) ) {
+$plugins_list = get_plugins();
+
+if ( isset( $plugins_list['wp-rocket/wp-rocket.php'] ) ) {
 	return '';
 }
 
 $notice  = 'wp-rocket';
 $user_id = get_current_user_id();
 $notices = get_user_meta( $user_id, '_imagify_ignore_ads', true );
-$notices = $notices && is_array( $notices ) ? array_flip( $notices ) : array();
+$notices = $notices && is_array( $notices ) ? array_flip( $notices ) : [];
 
 if ( isset( $notices[ $notice ] ) ) {
 	return;
@@ -28,8 +30,8 @@ $dismiss_url      = wp_nonce_url( admin_url( 'admin-post.php?action=imagify_dism
 
 		<p class="imagify-sidebar-description">
 			<?php
-			/* translators: 1 is a "bold" tag opening, 2 is the "bold" tag closing. Please use a non-breaking space for WP Rocket. */
-			printf( __( 'WP Rocket is a %1$sspeed optimization plugin for WordPress%2$s helping you to implement a variety of speed-boosting features to your WordPress site.', 'imagify' ), '<strong>', '</strong>' );
+			/* translators: 1 is a "bold" tag opening, 2 is the "bold" tag closing. Please use a non-breaking space for WP Rocket. */
+			printf( __( 'WP Rocket is a %1$sspeed optimization plugin for WordPress%2$s helping you to implement a variety of speed-boosting features to your WordPress site.', 'imagify' ), '<strong>', '</strong>' );
 			?>
 		</p>
 
@@ -52,5 +54,3 @@ $dismiss_url      = wp_nonce_url( admin_url( 'admin-post.php?action=imagify_dism
 	<a class="imagify-sidebar-close" href="<?php echo esc_url( $dismiss_url ); ?>"><span class="screen-reader-text"><?php _e( 'Remove the ad', 'imagify' ); ?></span><i class="dashicons dashicons-no-alt" aria-hidden="true"></i></a>
 	</div>
 </div>
-
-<?php

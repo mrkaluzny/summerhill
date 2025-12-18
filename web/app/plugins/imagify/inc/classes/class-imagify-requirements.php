@@ -1,4 +1,7 @@
 <?php
+
+use Imagify\User\User;
+
 defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
 
 /**
@@ -94,11 +97,6 @@ class Imagify_Requirements {
 
 		return self::$supports['image_editor'];
 	}
-
-
-	/** ----------------------------------------------------------------------------------------- */
-	/** WORDPRESS =============================================================================== */
-	/** ----------------------------------------------------------------------------------------- */
 
 	/**
 	 * Test for the uploads directory.
@@ -303,7 +301,7 @@ class Imagify_Requirements {
 			return self::$supports['over_quota'];
 		}
 
-		$user = new Imagify_User();
+		$user = new User();
 
 		self::$supports['over_quota'] = $user->get_error() ? false : $user->is_over_quota();
 

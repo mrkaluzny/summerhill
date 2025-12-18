@@ -42,13 +42,11 @@ class Smush implements Subscriber_Interface {
 			];
 		}
 
-		$prefix = rocket_get_constant( 'WP_SMUSH_PREFIX', 'wp-smush-' );
-
 		return [
-			"update_option_{$prefix}settings"              => [ 'maybe_deactivate_rocket_lazyload', 11 ],
-			"update_site_option_{$prefix}settings"         => [ 'maybe_deactivate_rocket_lazyload', 11 ],
-			"update_option_{$prefix}lazy_load"             => [ 'maybe_deactivate_rocket_lazyload', 11 ],
-			"update_site_option_{$prefix}lazy_load"        => [ 'maybe_deactivate_rocket_lazyload', 11 ],
+			'update_option_wp-smush-settings'              => [ 'maybe_deactivate_rocket_lazyload', 11 ],
+			'update_site_option_wp-smush-settings'         => [ 'maybe_deactivate_rocket_lazyload', 11 ],
+			'update_option_wp-smush-lazy_load'             => [ 'maybe_deactivate_rocket_lazyload', 11 ],
+			'update_site_option_wp-smush-lazy_load'        => [ 'maybe_deactivate_rocket_lazyload', 11 ],
 			'rocket_maybe_disable_lazyload_helper'         => 'is_smush_lazyload_active',
 			'rocket_maybe_disable_iframes_lazyload_helper' => 'is_smush_iframes_lazyload_active',
 		];
@@ -137,8 +135,8 @@ class Smush implements Subscriber_Interface {
 	 * @since 3.5.5
 	 *
 	 * @return array {
-	 *     @var bool $images  True when lazyload is enabled for images. False otherwise.
-	 *     @var bool $iframes True when lazyload is enabled for iframes. False otherwise.
+	 *     bool $images  True when lazyload is enabled for images. False otherwise.
+	 *     bool $iframes True when lazyload is enabled for iframes. False otherwise.
 	 * }
 	 */
 	private function is_smush_lazyload_enabled() {
@@ -151,7 +149,7 @@ class Smush implements Subscriber_Interface {
 			return $enabled;
 		}
 
-		if ( ! method_exists( '\Smush\Core\Settings', 'get_instance' ) ) {
+		if ( ! method_exists( '\Smush\Core\Settings', 'get_instance' ) ) { // @phpstan-ignore-line
 			return $enabled;
 		}
 
@@ -165,8 +163,7 @@ class Smush implements Subscriber_Interface {
 			return $enabled;
 		}
 
-		$prefix  = rocket_get_constant( 'WP_SMUSH_PREFIX', 'wp-smush-' );
-		$formats = $smush_settings->get_setting( $prefix . 'lazy_load' );
+		$formats = $smush_settings->get_setting( 'wp-smush-lazy_load' );
 		$formats = ! empty( $formats['format'] ) && is_array( $formats['format'] ) ? array_filter( $formats['format'] ) : [];
 
 		$image_formats = array_intersect_key(

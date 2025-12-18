@@ -1,18 +1,20 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
+
+use Imagify\User\User;
+use Imagify\Dependencies\WPMedia\PluginFamily\Model\PluginFamily;
+
 
 /**
  * Class that handles templates and menus.
  *
- * @since  1.7
- * @author Grégory Viguier
+ * @since 1.7
  */
 class Imagify_Views {
 
 	/**
 	 * Class version.
 	 *
-	 * @var   string
+	 * @var string
 	 * @since 1.7
 	 */
 	const VERSION = '1.1';
@@ -20,66 +22,65 @@ class Imagify_Views {
 	/**
 	 * Slug used for the settings page URL.
 	 *
-	 * @var    string
-	 * @since  1.7
-	 * @access protected
+	 * @var string
+	 * @since 1.7
 	 */
 	protected $slug_settings;
 
 	/**
 	 * Slug used for the bulk optimization page URL.
 	 *
-	 * @var    string
-	 * @since  1.7
-	 * @access protected
+	 * @var string
+	 * @since 1.7
 	 */
 	protected $slug_bulk;
 
 	/**
 	 * Slug used for the "custom folders" page URL.
 	 *
-	 * @var    string
-	 * @since  1.7
-	 * @access protected
+	 * @var string
+	 * @since 1.7
 	 */
 	protected $slug_files;
 
 	/**
 	 * A list of JS templates to print at the end of the page.
 	 *
-	 * @var    array
-	 * @since  1.9
-	 * @access protected
+	 * @var array
+	 * @since 1.9
 	 */
 	protected $templates_in_footer = [];
 
 	/**
 	 * Stores the "custom folders" files list instance.
 	 *
-	 * @var    object Imagify_Files_List_Table
-	 * @since  1.7
-	 * @access protected
+	 * @var Imagify_Files_List_Table
+	 * @since 1.7
 	 */
 	protected $list_table;
 
 	/**
 	 * Filesystem object.
 	 *
-	 * @var    object Imagify_Filesystem
-	 * @since  1.7.1
-	 * @access protected
-	 * @author Grégory Viguier
+	 * @var Imagify_Filesystem
+	 * @since 1.7.1
 	 */
 	protected $filesystem;
 
 	/**
 	 * The single instance of the class.
 	 *
-	 * @var    object
-	 * @since  1.7
-	 * @access protected
+	 * @var object
+	 * @since 1.7
 	 */
 	protected static $_instance;
+
+	/**
+	 * Imagify admin bar menu.
+	 *
+	 * @var bool
+	 */
+	private $admin_menu_is_present = false;
 
 
 	/** ----------------------------------------------------------------------------------------- */
@@ -89,9 +90,7 @@ class Imagify_Views {
 	/**
 	 * The constructor.
 	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access protected
+	 * @since 1.7
 	 */
 	protected function __construct() {
 		$this->slug_settings = IMAGIFY_SLUG;
@@ -103,9 +102,7 @@ class Imagify_Views {
 	/**
 	 * Get the main Instance.
 	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.7
 	 *
 	 * @return object Main instance.
 	 */
@@ -120,9 +117,7 @@ class Imagify_Views {
 	/**
 	 * Launch the hooks.
 	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.7
 	 */
 	public function init() {
 		// Menu items.
@@ -132,16 +127,13 @@ class Imagify_Views {
 			add_action( 'network_admin_menu', [ $this, 'add_network_menus' ] );
 		}
 
-		// Action links in plugins list.
-		$basename = plugin_basename( IMAGIFY_FILE );
-		add_filter( 'plugin_action_links_' . $basename,               [ $this, 'plugin_action_links' ] );
-		add_filter( 'network_admin_plugin_action_links_' . $basename, [ $this, 'plugin_action_links' ] );
-
 		// Save the "per page" option value from the files list screen.
 		add_filter( 'set-screen-option', [ 'Imagify_Files_List_Table', 'save_screen_options' ], 10, 3 );
 
 		// JS templates in footer.
 		add_action( 'admin_print_footer_scripts', [ $this, 'print_js_templates' ] );
+		add_action( 'admin_footer', [ $this, 'print_modal_payment' ] );
+		add_action( 'wp_before_admin_bar_render', [ $this, 'maybe_print_modal_payment' ] );
 	}
 
 
@@ -152,9 +144,7 @@ class Imagify_Views {
 	/**
 	 * Add sub-menus for all sites.
 	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.7
 	 */
 	public function add_site_menus() {
 		$wp_context = imagify_get_context( 'wp' );
@@ -187,9 +177,7 @@ class Imagify_Views {
 	/**
 	 * Add menu and sub-menus in the network admin when Imagify is network-activated.
 	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.7
 	 */
 	public function add_network_menus() {
 		global $submenu;
@@ -215,7 +203,7 @@ class Imagify_Views {
 
 		// Change the sub-menu label.
 		if ( ! empty( $submenu[ $this->get_bulk_page_slug() ] ) ) {
-			$submenu[ $this->get_bulk_page_slug() ][0][0] = __( 'Bulk Optimization', 'imagify' ); // WPCS: override ok.
+			$submenu[ $this->get_bulk_page_slug() ][0][0] = __( 'Bulk Optimization', 'imagify' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		}
 
 		if ( $screen_id ) {
@@ -224,29 +212,6 @@ class Imagify_Views {
 		}
 	}
 
-
-	/** ----------------------------------------------------------------------------------------- */
-	/** PLUGIN ACTION LINKS ===================================================================== */
-	/** ----------------------------------------------------------------------------------------- */
-
-	/**
-	 * Add links to the plugin row in the plugins list.
-	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access public
-	 *
-	 * @param  array $actions An array of action links.
-	 * @return array
-	 */
-	public function plugin_action_links( $actions ) {
-		array_unshift( $actions, sprintf( '<a href="%s" target="_blank">%s</a>', esc_url( imagify_get_external_url( 'documentation' ) ), __( 'Documentation', 'imagify' ) ) );
-		array_unshift( $actions, sprintf( '<a href="%s">%s</a>', esc_url( get_imagify_admin_url( 'bulk-optimization' ) ), __( 'Bulk Optimization', 'imagify' ) ) );
-		array_unshift( $actions, sprintf( '<a href="%s">%s</a>', esc_url( get_imagify_admin_url() ), __( 'Settings', 'imagify' ) ) );
-		return $actions;
-	}
-
-
 	/** ----------------------------------------------------------------------------------------- */
 	/** MAIN PAGE TEMPLATES ===================================================================== */
 	/** ----------------------------------------------------------------------------------------- */
@@ -254,20 +219,23 @@ class Imagify_Views {
 	/**
 	 * The main settings page.
 	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.7
 	 */
 	public function display_settings_page() {
-		$this->print_template( 'page-settings' );
+		$plugin_family = new PluginFamily();
+		$plugins_array = $plugin_family->get_filtered_plugins( 'imagify/imagify' );
+
+		$data = [
+			'plugin_family' => $plugins_array['uncategorized'],
+		];
+
+		$this->print_template( 'page-settings', $data );
 	}
 
 	/**
 	 * The bulk optimization page.
 	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.7
 	 */
 	public function display_bulk_page() {
 		$types = array();
@@ -288,7 +256,15 @@ class Imagify_Views {
 				$types['library|wp'] = 1;
 			}
 
-			if ( imagify_can_optimize_custom_folders() && ( imagify_is_active_for_network() && is_network_admin() || ! imagify_is_active_for_network() ) ) {
+			if (
+				imagify_can_optimize_custom_folders()
+				&&
+				(
+					( imagify_is_active_for_network() && is_network_admin() )
+					||
+					! imagify_is_active_for_network()
+				)
+			) {
 				/**
 				 * Custom folders: in network admin only if network activated, in each site otherwise.
 				 */
@@ -326,7 +302,6 @@ class Imagify_Views {
 
 		if ( isset( $types['custom-folders|custom-folders'] ) ) {
 			if ( ! Imagify_Folders_DB::get_instance()->has_items() ) {
-				// New Feature!
 				$data['no-custom-folders'] = true;
 			} elseif ( Imagify_Folders_DB::get_instance()->has_active_folders() ) {
 				// Group.
@@ -341,9 +316,15 @@ class Imagify_Views {
 		}
 
 		// Add generic stats.
-		$data = array_merge( $data, imagify_get_bulk_stats( $types, array(
-			'fullset' => true,
-		) ) );
+		$data = array_merge(
+			$data,
+			imagify_get_bulk_stats(
+				$types,
+				[
+					'fullset' => true,
+				]
+			)
+		);
 
 		/**
 		 * Filter the data to use on the bulk optimization page.
@@ -363,9 +344,7 @@ class Imagify_Views {
 	/**
 	 * The page displaying the "custom folders" files.
 	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.7
 	 */
 	public function display_files_list() {
 		$this->print_template( 'page-files-list' );
@@ -374,15 +353,15 @@ class Imagify_Views {
 	/**
 	 * Initiate the "custom folders" list table data.
 	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.7
 	 */
 	public function load_files_list() {
 		// Instantiate the list.
-		$this->list_table = new Imagify_Files_List_Table( array(
-			'screen' => 'imagify-files',
-		) );
+		$this->list_table = new Imagify_Files_List_Table(
+			[
+				'screen' => 'imagify-files',
+			]
+		);
 
 		// Query the Items.
 		$this->list_table->prepare_items();
@@ -396,9 +375,7 @@ class Imagify_Views {
 	/**
 	 * Get the settings page slug.
 	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.7
 	 *
 	 * @return string
 	 */
@@ -409,9 +386,7 @@ class Imagify_Views {
 	/**
 	 * Get the bulk optimization page slug.
 	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.7
 	 *
 	 * @return string
 	 */
@@ -422,9 +397,7 @@ class Imagify_Views {
 	/**
 	 * Get the "custom folders" files page slug.
 	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.7
 	 *
 	 * @return string
 	 */
@@ -440,16 +413,14 @@ class Imagify_Views {
 	/**
 	 * Tell if we’re displaying the settings page.
 	 *
-	 * @since  1.9
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.9
 	 *
 	 * @return bool
 	 */
 	public function is_settings_page() {
 		global $pagenow;
 
-		$page = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_STRING );
+		$page = htmlspecialchars( wp_unslash( $_GET['page'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended
 
 		if ( $this->get_settings_page_slug() !== $page ) {
 			return false;
@@ -465,16 +436,14 @@ class Imagify_Views {
 	/**
 	 * Tell if we’re displaying the bulk optimization page.
 	 *
-	 * @since  1.9
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.9
 	 *
 	 * @return bool
 	 */
 	public function is_bulk_page() {
 		global $pagenow;
 
-		$page = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_STRING );
+		$page = htmlspecialchars( wp_unslash( $_GET['page'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended
 
 		return 'upload.php' === $pagenow && $this->get_bulk_page_slug() === $page;
 	}
@@ -482,16 +451,14 @@ class Imagify_Views {
 	/**
 	 * Tell if we’re displaying the custom files list page.
 	 *
-	 * @since  1.9
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.9
 	 *
 	 * @return bool
 	 */
 	public function is_files_page() {
 		global $pagenow;
 
-		$page = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_STRING );
+		$page = htmlspecialchars( wp_unslash( $_GET['page'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended
 
 		return 'upload.php' === $pagenow && $this->get_files_page_slug() === $page;
 	}
@@ -499,26 +466,20 @@ class Imagify_Views {
 	/**
 	 * Tell if we’re displaying the WP media library page.
 	 *
-	 * @since  1.9
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.9
 	 *
 	 * @return bool
 	 */
 	public function is_wp_library_page() {
 		global $pagenow;
 
-		$page = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_STRING );
-
-		return 'upload.php' === $pagenow && ! $page;
+		return 'upload.php' === $pagenow && ! isset( $_GET['page'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	}
 
 	/**
 	 * Tell if we’re displaying a media page.
 	 *
-	 * @since  1.9
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.9
 	 *
 	 * @return bool
 	 */
@@ -536,9 +497,7 @@ class Imagify_Views {
 	/**
 	 * Get the remaining quota in percent.
 	 *
-	 * @since  1.8.1
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.8.1
 	 *
 	 * @return int
 	 */
@@ -549,7 +508,7 @@ class Imagify_Views {
 			return $quota;
 		}
 
-		$user  = new Imagify_User();
+		$user  = new User();
 		$quota = $user->get_percent_unconsumed_quota();
 
 		return $quota;
@@ -558,9 +517,7 @@ class Imagify_Views {
 	/**
 	 * Get the HTML class used for the quota (to change the color when out of quota for example).
 	 *
-	 * @since  1.8.1
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.8.1
 	 *
 	 * @return string
 	 */
@@ -588,9 +545,7 @@ class Imagify_Views {
 	/**
 	 * Get the HTML tag used for the quota (the weather-like icon).
 	 *
-	 * @since  1.8.1
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.8.1
 	 *
 	 * @return string
 	 */
@@ -604,7 +559,7 @@ class Imagify_Views {
 		$quota = $this->get_quota_percent();
 
 		if ( $quota <= 20 ) {
-			$icon = '<img src="' . IMAGIFY_ASSETS_IMG_URL . 'stormy.svg" width="64" height="63" alt="" />';
+			$icon = '<img src="' . IMAGIFY_ASSETS_IMG_URL . 'stormy.svg" width="40" height="63" alt="" />';
 		} elseif ( $quota <= 50 ) {
 			$icon = '<img src="' . IMAGIFY_ASSETS_IMG_URL . 'cloudy-sun.svg" width="63" height="64" alt="" />';
 		} else {
@@ -622,15 +577,13 @@ class Imagify_Views {
 	/**
 	 * Get a template contents.
 	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.7
 	 *
 	 * @param  string $template The template name.
 	 * @param  mixed  $data     Some data to pass to the template.
 	 * @return string|bool      The page contents. False if the template doesn't exist.
 	 */
-	public function get_template( $template, $data = array() ) {
+	public function get_template( $template, $data = array() ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 		$path = str_replace( '_', '-', $template );
 		$path = IMAGIFY_PATH . 'views/' . $template . '.php';
 
@@ -648,9 +601,7 @@ class Imagify_Views {
 	/**
 	 * Print a template.
 	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.7
 	 *
 	 * @param string $template The template name.
 	 * @param mixed  $data     Some data to pass to the template.
@@ -662,9 +613,7 @@ class Imagify_Views {
 	/**
 	 * Add a template to the list of JS templates to print at the end of the page.
 	 *
-	 * @since  1.7
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.7
 	 *
 	 * @param string $template The template name.
 	 */
@@ -691,9 +640,7 @@ class Imagify_Views {
 	/**
 	 * Print the JS templates that have been added to the "queue".
 	 *
-	 * @since  1.9
-	 * @author Grégory Viguier
-	 * @access public
+	 * @since 1.9
 	 */
 	public function print_js_templates() {
 		if ( ! $this->templates_in_footer ) {
@@ -709,6 +656,67 @@ class Imagify_Views {
 		}
 	}
 
+	/**
+	 * Get imagify user info
+	 *
+	 * @return bool
+	 */
+	private function get_user_info(): bool {
+		$user             = new User();
+		$unconsumed_quota = $user->get_percent_unconsumed_quota();
+
+		return ( ! $user->is_infinite() && $unconsumed_quota <= 20 )
+			|| ( $user->is_free() && $unconsumed_quota > 20 );
+	}
+
+	/**
+	 * Start print the payment modal process.
+	 */
+	public function maybe_print_modal_payment() {
+		if ( $this->get_user_info() ) {
+			global $wp_admin_bar;
+			$this->admin_menu_is_present = $wp_admin_bar && $wp_admin_bar->get_node( 'imagify' );
+
+			return;
+		}
+
+		$this->admin_menu_is_present = false;
+	}
+
+	/**
+	 * Print the payment modal.
+	 *
+	 * @return void
+	 */
+	public function print_modal_payment() {
+		if ( is_admin_bar_showing() && $this->admin_menu_is_present ) {
+			$this->print_template(
+				'modal-payment',
+				[
+					'attachments_number' => $this->get_attachments_number_modal(),
+				]
+			);
+		}
+	}
+
+	/**
+	 * Get the number of attachments to display in the payment modal.
+	 *
+	 * @return int
+	 */
+	private function get_attachments_number_modal() {
+		$transient = get_transient( 'imagify_attachments_number_modal' );
+
+		if ( false !== $transient ) {
+			return $transient;
+		}
+
+		$attachments_number = imagify_count_attachments() + Imagify_Files_Stats::count_all_files();
+
+		set_transient( 'imagify_attachments_number_modal', $attachments_number, 1 * DAY_IN_SECONDS );
+
+		return $attachments_number;
+	}
 
 	/** ----------------------------------------------------------------------------------------- */
 	/** TOOLS =================================================================================== */
@@ -717,9 +725,7 @@ class Imagify_Views {
 	/**
 	 * Create HTML attributes from an array.
 	 *
-	 * @since  1.9
-	 * @access public
-	 * @author Grégory Viguier
+	 * @since 1.9
 	 *
 	 * @param  array $attributes A list of attribute pairs.
 	 * @return string            HTML attributes.

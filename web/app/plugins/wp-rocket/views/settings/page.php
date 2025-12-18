@@ -41,19 +41,23 @@ settings_errors( $data['slug'] ); ?>
 			</form>
 			<?php
 			if ( rocket_valid_key() ) {
-				if ( ! \Imagify_Partner::has_imagify_api_key() ) {
+				if (
+					! \Imagify_Partner::has_imagify_api_key()
+					&&
+					! rocket_get_constant( 'WP_ROCKET_WHITE_LABEL_ACCOUNT' )
+				) {
 					$this->render_imagify_section();
 				}
-
 				$this->render_tools_section();
 				$this->render_tutorials_section();
+				$this->render_plugin_section();
 				?>
 			<div class="wpr-Content-tips">
 				<div class="wpr-radio wpr-radio--reverse wpr-radio--tips">
 					<input type="checkbox" class="wpr-js-tips" id="wpr-js-tips" value="1" checked>
 					<label for="wpr-js-tips">
-						<span data-l10n-active="<?php echo esc_attr_x( 'On', 'Active state of checkbox', 'rocket' ); ?>"
-							data-l10n-inactive="<?php echo esc_attr_x( 'Off', 'Inactive state of checkbox', 'rocket' ); ?>" class="wpr-radio-ui"></span>
+						<span data-l10n-active="On"
+							data-l10n-inactive="Off" class="wpr-radio-ui"></span>
 						<?php esc_html_e( 'Show Sidebar', 'rocket' ); ?></label>
 				</div>
 			</div>
@@ -80,10 +84,11 @@ settings_errors( $data['slug'] ); ?>
 			?>
 			</p>
 			<?php echo rocket_data_collection_preview_table(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Dynamic content is properly escaped in the view. ?>
+
 			<div class="wpr-Popin-flex">
 				<p><?php esc_html_e( 'WP Rocket will never transmit any domain names or email addresses (except for license validation), IP addresses, or third-party API keys.', 'rocket' ); ?></p>
 				<div>
-					<button class="wpr-button wpr-button--small wpr-button--icon wpr-icon-check wpr-button--blue"><?php esc_html_e( 'Activate Rocket analytics', 'rocket' ); ?></button>
+					<button class="wpr-button wpr-button--small wpr-button--icon wpr-icon-check wpr-button--blue wpr-rocket-analytics-cta<?php echo get_rocket_option( 'analytics_enabled' ) ? ' wpr-isHidden' : ''; ?>"><?php esc_html_e( 'Activate Rocket analytics', 'rocket' ); ?></button>
 				</div>
 			</div>
 		</div>

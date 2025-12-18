@@ -1,5 +1,5 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
+defined( 'ABSPATH' ) || exit;
 
 $html_atts = '';
 
@@ -18,11 +18,11 @@ if ( ! isset( $data['atts']['data-processing-label'] ) ) {
 }
 
 $level_labels = [
-	__( 'Normal', 'imagify' ),
-	__( 'Aggressive', 'imagify' ),
-	__( 'Ultra', 'imagify' ),
+	0 => __( 'Lossless', 'imagify' ),
+	1 => __( 'Smart', 'imagify' ),
+	2 => __( 'Smart', 'imagify' ),
 ];
-$level_label = $level_labels[ $data['optimization_level'] ];
+$level_label  = $level_labels[ $data['optimization_level'] ];
 
 $html_atts = $this->build_attributes( $data['atts'] );
 ?>
@@ -33,7 +33,7 @@ $html_atts = $this->build_attributes( $data['atts'] );
 		<?php
 		printf(
 			/* translators: %s is an optimization level. */
-			esc_html__( 'Re-Optimize to %s', 'imagify' ),
+			esc_html__( 'Re-Optimize with %s compression', 'imagify' ),
 			'</span>' . esc_html( $level_label ) . '<span class="imagify-hide-if-small">'
 		);
 		?>

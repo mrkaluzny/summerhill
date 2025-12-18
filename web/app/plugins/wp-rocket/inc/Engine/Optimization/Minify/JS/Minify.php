@@ -3,6 +3,7 @@ namespace WP_Rocket\Engine\Optimization\Minify\JS;
 
 use WP_Rocket\Dependencies\Minify as Minifier;
 use WP_Rocket\Engine\Optimization\Minify\ProcessorInterface;
+use WP_Rocket\Engine\Support\CommentTrait;
 use WP_Rocket\Logger\Logger;
 
 /**
@@ -11,6 +12,8 @@ use WP_Rocket\Logger\Logger;
  * @since 3.1
  */
 class Minify extends AbstractJSOptimization implements ProcessorInterface {
+	use CommentTrait;
+
 	/**
 	 * Minifies JS files
 	 *
@@ -111,7 +114,7 @@ class Minify extends AbstractJSOptimization implements ProcessorInterface {
 			$html = $this->replace_script( $script, $minify_url, $html );
 		}
 
-		return $html;
+		return $this->add_meta_comment( 'minify_js', $html );
 	}
 
 	/**
@@ -210,7 +213,7 @@ class Minify extends AbstractJSOptimization implements ProcessorInterface {
 		}
 
 		$is_external_url = $this->is_external_file( $url );
-		$file_path       = $is_external_url ? $this->local_cache->get_filepath( $url ) : $this->get_file_path( $url );
+		$file_path       = $is_external_url ? $this->local_cache->get_filepath( rocket_add_url_protocol( $url ) ) : $this->get_file_path( $url );
 
 		if ( ! $file_path ) {
 			Logger::error(
@@ -332,10 +335,10 @@ class Minify extends AbstractJSOptimization implements ProcessorInterface {
 		$minified_content = $minifier->minify();
 
 		if ( empty( $minified_content ) ) {
-			return '';
+			return ''; // phpcs:ignore Universal.CodeAnalysis.ConstructorDestructorReturn.ReturnValueFound
 		}
 
-		return $minified_content;
+		return $minified_content; // phpcs:ignore Universal.CodeAnalysis.ConstructorDestructorReturn.ReturnValueFound
 	}
 
 	/**

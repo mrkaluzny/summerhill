@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace WP_Rocket\Engine\Optimization\GoogleFonts;
 
+use WP_Rocket\Engine\Optimization\RegexTrait;
 use WP_Rocket\Logger\Logger;
 
 /**
@@ -10,11 +12,12 @@ use WP_Rocket\Logger\Logger;
  * @since  3.1
  */
 class Combine extends AbstractGFOptimization {
+	use RegexTrait;
+
 	/**
 	 * Found fonts
 	 *
-	 * @since  3.1
-	 * @author Remy Perona
+	 * @since 3.1
 	 *
 	 * @var string
 	 */
@@ -23,12 +26,18 @@ class Combine extends AbstractGFOptimization {
 	/**
 	 * Found subsets
 	 *
-	 * @since  3.1
-	 * @author Remy Perona
+	 * @since 3.1
 	 *
 	 * @var string
 	 */
 	protected $subsets = '';
+
+	/**
+	 * Font urls.
+	 *
+	 * @var array
+	 */
+	protected $font_urls = [];
 
 	/**
 	 * Combines multiple Google Fonts links into one
@@ -39,7 +48,8 @@ class Combine extends AbstractGFOptimization {
 	 *
 	 * @return string
 	 */
-	public function optimize( $html ) {
+	public function optimize( $html ): string {
+		$this->font_urls = [];
 		Logger::info( 'GOOGLE FONTS COMBINE PROCESS STARTED.', [ 'GF combine process' ] );
 
 		$html_nocomments = $this->hide_comments( $html );
@@ -55,21 +65,26 @@ class Combine extends AbstractGFOptimization {
 
 		$this->has_google_fonts = true;
 
-		$num_fonts = count( $fonts );
+		$exclusions = $this->get_exclusions();
+
+		$filtered_fonts = array_filter(
+			$fonts,
+			function ( $font ) use ( $exclusions ) {
+				return ! $this->is_excluded( $font[0], $exclusions );
+			}
+		);
+
+		$num_fonts = count( $filtered_fonts );
 
 		Logger::debug(
-			"Found {$num_fonts} Google Fonts.",
+			"Found {$num_fonts} Google Fonts after exclusions.",
 			[
 				'GF combine process',
-				'tags' => $fonts,
+				'tags' => $filtered_fonts,
 			]
 		);
 
-		if ( 1 === $num_fonts ) {
-			return str_replace( $fonts[0][0], $this->get_font_with_display( $fonts[0] ), $html );
-		}
-
-		$this->parse( $fonts );
+		$this->parse( $filtered_fonts );
 
 		if ( empty( $this->fonts ) ) {
 			Logger::debug( 'No Google Fonts left to combine.', [ 'GF combine process' ] );
@@ -77,9 +92,9 @@ class Combine extends AbstractGFOptimization {
 			return $html;
 		}
 
-		$html = preg_replace( '@<\/title>@i', '$0' . $this->get_combine_tag(), $html, 1 );
+		$this->font_urls[] = $this->get_combined_url();
 
-		foreach ( $fonts as $font ) {
+		foreach ( $filtered_fonts as $font ) {
 			$html = str_replace( $font[0], '', $html );
 		}
 
@@ -134,17 +149,58 @@ class Combine extends AbstractGFOptimization {
 	}
 
 	/**
-	 * Returns the combined Google fonts link tag
+	 * Returns the combined Google fonts URL
 	 *
-	 * @since  3.3.5 Add support for the display parameter
-	 * @since  3.1
+	 * @since  3.9.1
 	 *
 	 * @return string
 	 */
-	private function get_combine_tag() {
-		return sprintf(
-			'<link rel="stylesheet" href="%s" />', // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
-			esc_url( "https://fonts.googleapis.com/css?family={$this->fonts}{$this->subsets}&display=swap" )
-		);
+	private function get_combined_url(): string {
+		$display = $this->get_font_display_value();
+
+		return esc_url( "https://fonts.googleapis.com/css?family={$this->fonts}{$this->subsets}&display={$display}" );
+	}
+
+	/**
+	 * Get font urls, getter method for font_urls property.
+	 *
+	 * @return array
+	 */
+	public function get_font_urls(): array {
+		return $this->font_urls;
+	}
+
+	/**
+	 * Insert font stylesheets into head.
+	 *
+	 * @param array $items Head elements.
+	 * @return mixed
+	 */
+	public function insert_font_stylesheet_into_head( $items ) {
+		$font_urls = $this->get_font_urls();
+		if ( empty( $font_urls ) ) {
+			return $items;
+		}
+
+		return $this->prepare_stylesheet_fonts_to_head( $font_urls, $items );
+	}
+
+	/**
+	 * Insert font preloads into head.
+	 *
+	 * @param array $items Head elements.
+	 * @return mixed
+	 */
+	public function insert_font_preload_into_head( $items ) {
+		$font_urls = $this->get_font_urls();
+		if ( empty( $font_urls ) ) {
+			return $items;
+		}
+
+		if ( ! $this->is_preload_enabled() ) {
+			return $items;
+		}
+
+		return $this->prepare_preload_fonts_to_head( $font_urls, $items );
 	}
 }
