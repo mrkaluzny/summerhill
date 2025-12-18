@@ -10,18 +10,11 @@ use Yoast\WP\SEO\Presentations\Indexable_Presentation;
 class Canonical_Presenter extends Abstract_Indexable_Tag_Presenter {
 
 	/**
-	 * The tag key name.
-	 *
-	 * @var string
-	 */
-	protected $key = 'canonical';
-
-	/**
 	 * The tag format including placeholders.
 	 *
 	 * @var string
 	 */
-	protected $tag_format = self::LINK_REL_HREF;
+	protected $tag_format = '<link rel="canonical" href="%s" />';
 
 	/**
 	 * The method of escaping to use.
@@ -43,9 +36,10 @@ class Canonical_Presenter extends Abstract_Indexable_Tag_Presenter {
 		/**
 		 * Filter: 'wpseo_canonical' - Allow filtering of the canonical URL put out by Yoast SEO.
 		 *
-		 * @param string                 $canonical    The canonical URL.
+		 * @api string $canonical The canonical URL.
+		 *
 		 * @param Indexable_Presentation $presentation The presentation of an indexable.
 		 */
-		return \urldecode( \trim( (string) \apply_filters( 'wpseo_canonical', $this->presentation->canonical, $this->presentation ) ) );
+		return \urldecode( (string) \trim( \apply_filters( 'wpseo_canonical', $this->presentation->canonical, $this->presentation ) ) );
 	}
 }

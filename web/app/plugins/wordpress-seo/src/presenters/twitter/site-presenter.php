@@ -11,11 +11,11 @@ use Yoast\WP\SEO\Presenters\Abstract_Indexable_Tag_Presenter;
 class Site_Presenter extends Abstract_Indexable_Tag_Presenter {
 
 	/**
-	 * The tag key name.
+	 * The tag format including placeholders.
 	 *
 	 * @var string
 	 */
-	protected $key = 'twitter:site';
+	protected $tag_format = '<meta name="twitter:site" content="%s" />';
 
 	/**
 	 * Run the Twitter site through the `wpseo_twitter_site` filter.
@@ -26,7 +26,8 @@ class Site_Presenter extends Abstract_Indexable_Tag_Presenter {
 		/**
 		 * Filter: 'wpseo_twitter_site' - Allow changing the Twitter site account as output in the Twitter card by Yoast SEO.
 		 *
-		 * @param string                 $twitter_site Twitter site account string.
+		 * @api string $twitter_site Twitter site account string.
+		 *
 		 * @param Indexable_Presentation $presentation The presentation of an indexable.
 		 */
 		$twitter_site = \apply_filters( 'wpseo_twitter_site', $this->presentation->twitter_site, $this->presentation );

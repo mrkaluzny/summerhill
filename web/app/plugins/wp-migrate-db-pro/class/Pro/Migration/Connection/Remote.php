@@ -195,18 +195,18 @@ class Remote
          */
         if (!isset($filtered_post['version']) || version_compare($filtered_post['version'], $this->props->plugin_version, '!=')) {
             if (!isset($filtered_post['version'])) {
-                $return['message'] = sprintf(__('<b>Version Mismatch</b> &mdash; We\'ve detected you have version %1$s of WP Migrate at %2$s but are using an outdated version here. Please go to the Plugins page on both installs and check for updates.', 'wp-migrate-db'), $GLOBALS['wpmdb_meta'][$this->props->plugin_slug]['version'], $this->util->get_short_home_address_from_url(Util::home_url()));
+                $return['message'] = sprintf(__('<b>Version Mismatch</b> &mdash; We\'ve detected you have version %1$s of WP Migrate DB Pro at %2$s but are using an outdated version here. Please go to the Plugins page on both installs and check for updates.', 'wp-migrate-db'), $GLOBALS['wpmdb_meta'][$this->props->plugin_slug]['version'], $this->util->get_short_home_address_from_url(home_url()));
             } else {
                 if (version_compare($filtered_post['version'], $this->props->plugin_version, '>')) {
-                    $return['message'] = sprintf(__('<b>Version Mismatch</b> &mdash; We\'ve detected you have version %1$s of WP Migrate at %2$s but are using %3$s here. (#196)', 'wp-migrate-db'), $GLOBALS['wpmdb_meta'][$this->props->plugin_slug]['version'], $this->util->get_short_home_address_from_url(Util::home_url()), $filtered_post['version']);
+                    $return['message'] = sprintf(__('<b>Version Mismatch</b> &mdash; We\'ve detected you have version %1$s of WP Migrate DB Pro at %2$s but are using %3$s here. (#196)', 'wp-migrate-db'), $GLOBALS['wpmdb_meta'][$this->props->plugin_slug]['version'], $this->util->get_short_home_address_from_url(home_url()), $filtered_post['version']);
                 } else {
-                    $return['message'] = sprintf(__('<b>Version Mismatch</b> &mdash; We\'ve detected you have version %1$s of WP Migrate at %2$s but are using %3$s here. Please go to the Plugins page on both installs and check for updates.', 'wp-migrate-db'), $GLOBALS['wpmdb_meta'][$this->props->plugin_slug]['version'], $this->util->get_short_home_address_from_url(Util::home_url()), $filtered_post['version']);
+                    $return['message'] = sprintf(__('<b>Version Mismatch</b> &mdash; We\'ve detected you have version %1$s of WP Migrate DB Pro at %2$s but are using %3$s here. Please go to the Plugins page on both installs and check for updates.', 'wp-migrate-db'), $GLOBALS['wpmdb_meta'][$this->props->plugin_slug]['version'], $this->util->get_short_home_address_from_url(home_url()), $filtered_post['version']);
 
                     // If the other site is pre-2.0, we need to serialize the response.
                     if (version_compare($filtered_post['version'], '2.0b1', '<')) {
                         $return['error']    = 1;
                         $return['error_id'] = 'version_mismatch';
-                        $return             = json_encode($return);
+                        $return             = serialize($return);
                         return $this->http->end_ajax($return, false, true);
                     }
                 }
@@ -224,12 +224,12 @@ class Remote
          * Do license check
          */
         if (!$this->license->is_valid_licence()) {
-            $local_host = $this->util->get_short_home_address_from_url(Util::home_url());
+            $local_host = $this->util->get_short_home_address_from_url(home_url());
 
             return $this->http->end_ajax(
                 new \WP_Error(
                     'wpmdb-license-not-valid',
-                    sprintf(__("<b>Activate Remote License</b> &mdash; Looks like you don't have a WP Migrate license active at %s (#195).", 'wp-migrate-db'), $local_host)
+                    sprintf(__("<b>Activate Remote License</b> &mdash; Looks like you don't have a WP Migrate DB Pro license active at %s (#195).", 'wp-migrate-db'), $local_host)
                 )
             );
         }
@@ -260,8 +260,8 @@ class Remote
         $return['table_sizes']            = $this->table->get_table_sizes();
         $return['table_rows']             = $this->table->get_table_row_count();
         $return['table_sizes_hr']         = array_map(array($this->table, 'format_table_sizes'), $this->table->get_table_sizes());
-        $return['path']                   = Util::get_absolute_root_file_path();
-        $return['url']                    = Util::home_url();
+        $return['path']                   = $this->util->get_absolute_root_file_path();
+        $return['url']                    = home_url();
         $return['prefix']                 = $site_details['prefix']; // TODO: Remove backwards compatibility.
         $return['bottleneck']             = $this->util->get_bottleneck();
         $return['delay_between_requests'] = $this->settings['delay_between_requests'];
@@ -274,20 +274,15 @@ class Remote
         $return['post_types']             = $this->table->get_post_types();
         // TODO: Use WP_Filesystem API.
         $return['write_permissions']      = (is_writeable($this->filesystem->get_upload_info('path')) ? 'true' : 'false');
-        $return['themes_permissions']     = is_writeable(WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'themes') ? 'true' : 'false';
-        $return['plugins_permissions']    = is_writeable(WP_PLUGIN_DIR) ? 'true' : 'false';
-        $return['muplugins_permissions']  = is_writeable(WPMU_PLUGIN_DIR) ? 'true' : 'false';
-        $return['others_permissions']     = is_writeable(WP_CONTENT_DIR) ? 'true' : 'false';
         $return['upload_dir_long']        = $this->filesystem->get_upload_info('path');
         $return['wp_upload_dir']          = $this->filesystem->get_wp_upload_dir();
         $return['temp_prefix']            = $this->props->temp_prefix;
         $return['lower_case_table_names'] = $this->table->get_lower_case_table_names_setting();
         $return['subsites']               = $site_details['subsites']; // TODO: Remove backwards compatibility.
-        $return['site_details']           = $site_details;
+        $return['site_details']           = $this->util->site_details();
         $return['beta_optin']             = BetaManager::has_beta_optin($this->settings);
-        $return['firewall_plugins']       = $site_details['firewall_plugins'];
         $return                           = apply_filters('wpmdb_establish_remote_connection_data', $return);
-        $result                           = $this->http->end_ajax(json_encode($return), false, true);
+        $result                           = $this->http->end_ajax($return, false, true);
 
         return $result;
     }
@@ -397,9 +392,9 @@ class Remote
 
         UsageTracking::log_usage($state_data['intent'] . '-remote');
 
-        $state_data['site_details'] = json_decode(
+        $state_data['site_details'] = Util::unserialize(
             base64_decode($filtered_post['site_details']),
-            true
+            __METHOD__
         );
 
         // ***+=== @TODO - revisit usage of parse_migration_form_data
@@ -424,7 +419,6 @@ class Remote
             $state,
             false
         );
-        do_action('wpmdb_respond_remote_initiate', $state_data);
 
         return wp_send_json_success($result);
     }

@@ -17,8 +17,7 @@ class Flamingo_Contacts_List_Table extends WP_List_Table {
 		);
 
 		$columns = apply_filters(
-			'manage_flamingo_contact_posts_columns', $columns
-		);
+			'manage_flamingo_contact_posts_columns', $columns );
 
 		return $columns;
 	}
@@ -49,17 +48,15 @@ class Flamingo_Contacts_List_Table extends WP_List_Table {
 		}
 
 		if ( ! empty( $_REQUEST['orderby'] ) ) {
-			if ( 'email' === $_REQUEST['orderby'] ) {
+			if ( 'email' == $_REQUEST['orderby'] ) {
 				$args['meta_key'] = '_email';
-			} elseif ( 'name' === $_REQUEST['orderby'] ) {
+			} elseif ( 'name' == $_REQUEST['orderby'] ) {
 				$args['meta_key'] = '_name';
 			}
 		}
 
-		if (
-			! empty( $_REQUEST['order'] ) and
-			'asc' === strtolower( $_REQUEST['order'] )
-		) {
+		if ( ! empty( $_REQUEST['order'] )
+		and 'asc' == strtolower( $_REQUEST['order'] ) ) {
 			$args['order'] = 'ASC';
 		}
 
@@ -118,9 +115,7 @@ class Flamingo_Contacts_List_Table extends WP_List_Table {
 <div class="alignleft actions">
 <?php
 		if ( 'top' == $which ) {
-			$filters = array();
-
-			$filters[] = wp_dropdown_categories( array(
+			wp_dropdown_categories( array(
 				'taxonomy' => Flamingo_Contact::contact_tag_taxonomy,
 				'name' => 'contact_tag_id',
 				'show_option_all' => __( 'View all tags', 'flamingo' ),
@@ -130,11 +125,8 @@ class Flamingo_Contacts_List_Table extends WP_List_Table {
 				'selected' => $tag,
 			) );
 
-			if ( array_filter( $filters ) ) {
-				submit_button( __( 'Filter', 'flamingo' ),
-					'secondary', false, false, array( 'id' => 'post-query-submit' )
-				);
-			}
+			submit_button( __( 'Filter', 'flamingo' ),
+				'secondary', false, false, array( 'id' => 'post-query-submit' ) );
 
 			submit_button( __( 'Export', 'flamingo' ), 'secondary', 'export', false );
 		}
@@ -158,18 +150,20 @@ class Flamingo_Contacts_List_Table extends WP_List_Table {
 	}
 
 	protected function column_email( $item ) {
-		$edit_link = add_query_arg( array(
-			'post' => $item->id(),
-			'action' => 'edit',
-		), menu_page_url( 'flamingo', false ) );
+		$edit_link = add_query_arg(
+			array(
+				'post' => $item->id(),
+				'action' => 'edit',
+			),
+			menu_page_url( 'flamingo', false )
+		);
 
 		if ( current_user_can( 'flamingo_edit_contact', $item->id() ) ) {
 			return sprintf(
 				'<strong><a class="row-title" href="%1$s" aria-label="%2$s">%3$s</a></strong>',
 				esc_url( $edit_link ),
 				esc_attr( sprintf(
-					/* translators: %s: Item title. */
-					__( '&#8220;%s&#8221; (Edit)', 'flamingo' ),
+					__( 'Edit &#8220;%s&#8221;', 'flamingo' ),
 					$item->email
 				) ),
 				esc_html( $item->email )
@@ -189,10 +183,13 @@ class Flamingo_Contacts_List_Table extends WP_List_Table {
 
 		$actions = array();
 
-		$link = add_query_arg( array(
-			'post' => $item->id(),
-			'action' => 'edit',
-		), menu_page_url( 'flamingo', false ) );
+		$link = add_query_arg(
+			array(
+				'post' => $item->id(),
+				'action' => 'edit',
+			),
+			menu_page_url( 'flamingo', false )
+		);
 
 		if ( current_user_can( 'flamingo_edit_contact', $item->id() ) ) {
 			$actions['edit'] = sprintf(
@@ -218,8 +215,7 @@ class Flamingo_Contacts_List_Table extends WP_List_Table {
 
 		foreach ( (array) $item->tags as $tag ) {
 			$term = get_term_by( 'name', $tag,
-				Flamingo_Contact::contact_tag_taxonomy
-			);
+				Flamingo_Contact::contact_tag_taxonomy );
 
 			if ( empty( $term ) or is_wp_error( $term ) ) {
 				continue;
@@ -229,9 +225,12 @@ class Flamingo_Contacts_List_Table extends WP_List_Table {
 				$output .= ', ';
 			}
 
-			$link = add_query_arg( array(
-				'contact_tag_id' => $term->term_id,
-			), menu_page_url( 'flamingo', false ) );
+			$link = add_query_arg(
+				array(
+					'contact_tag_id' => $term->term_id,
+				),
+				menu_page_url( 'flamingo', false )
+			);
 
 			$output .= sprintf( '<a href="%1$s" aria-label="%2$s">%3$s</a>',
 				esc_url( $link ),
@@ -271,7 +270,6 @@ class Flamingo_Contacts_List_Table extends WP_List_Table {
 			$history[] = sprintf(
 				'<a href="%2$s">%1$s</a>',
 				esc_html( sprintf(
-					/* translators: %d: Number of comments. */
 					__( 'Comment (%d)', 'flamingo' ),
 					$comment_count
 				) ),
@@ -280,9 +278,7 @@ class Flamingo_Contacts_List_Table extends WP_List_Table {
 		}
 
 		// Contact channels
-		$terms = get_terms( array(
-			'taxonomy' => Flamingo_Inbound_Message::channel_taxonomy,
-		) );
+		$terms = get_terms( Flamingo_Inbound_Message::channel_taxonomy );
 
 		if ( ! empty( $terms ) and ! is_wp_error( $terms ) ) {
 			foreach ( (array) $terms as $term ) {
@@ -297,10 +293,13 @@ class Flamingo_Contacts_List_Table extends WP_List_Table {
 					continue;
 				}
 
-				$link = add_query_arg( array(
-					'channel' => $term->slug,
-					's' => $item->email,
-				), menu_page_url( 'flamingo_inbound', false ) );
+				$link = add_query_arg(
+					array(
+						'channel' => $term->slug,
+						's' => $item->email,
+					),
+					menu_page_url( 'flamingo_inbound', false )
+				);
 
 				$history[] = sprintf(
 					'<a href="%2$s">%1$s</a>',
@@ -325,10 +324,8 @@ class Flamingo_Contacts_List_Table extends WP_List_Table {
 	}
 
 	protected function column_last_contacted( $item ) {
-		if (
-			empty( $item->last_contacted ) or
-			'0000-00-00 00:00:00' === $item->last_contacted
-		) {
+		if ( empty( $item->last_contacted )
+		or '0000-00-00 00:00:00' === $item->last_contacted ) {
 			return '';
 		}
 

@@ -21,21 +21,20 @@ if ( ! function_exists( '_yoast_display_notifications' ) ) {
 	/**
 	 * Create the notifications HTML with restore/dismiss button.
 	 *
-	 * @param array  $notifications_list List of notifications.
-	 * @param string $status             Status of the notifications (active/dismissed).
+	 * @param array  $list   List of notifications.
+	 * @param string $status Status of the notifications (active/dismissed).
 	 *
 	 * @return string The output to render.
 	 */
-	function _yoast_display_notifications( $notifications_list, $status ) {
+	function _yoast_display_notifications( $list, $status ) {
 		$notifications = '';
 
-		foreach ( $notifications_list as $notification ) {
+		foreach ( $list as $notification ) {
 
 			switch ( $status ) {
 				case 'active':
 					$button = sprintf(
 						'<button type="button" class="button dismiss"><span class="screen-reader-text">%1$s</span><span class="dashicons dashicons-hidden"></span></button>',
-						/* translators: Hidden accessibility text. */
 						esc_html__( 'Hide this item.', 'wordpress-seo' )
 					);
 					break;
@@ -43,7 +42,6 @@ if ( ! function_exists( '_yoast_display_notifications' ) ) {
 				case 'dismissed':
 					$button = sprintf(
 						'<button type="button" class="button restore"><span class="screen-reader-text">%1$s</span><span class="dashicons yoast-svg-icon-eye"></span></button>',
-						/* translators: Hidden accessibility text. */
 						esc_html__( 'Show this item.', 'wordpress-seo' )
 					);
 					break;

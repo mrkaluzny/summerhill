@@ -245,7 +245,7 @@ class Mailer extends MailerAbstract {
 			 */
 			try {
 				if ( is_file( $attachment[0] ) && is_readable( $attachment[0] ) ) {
-					$file = file_get_contents( $attachment[0] );
+					$file = file_get_contents( $attachment[0] ); // phpcs:ignore
 				}
 			} catch ( \Exception $e ) {
 				$file = false;
@@ -256,7 +256,7 @@ class Mailer extends MailerAbstract {
 			}
 
 			$data[] = [
-				'content' => base64_encode( $file ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+				'content' => base64_encode( $file ), // phpcs:ignore
 				'name'    => $attachment[2],
 			];
 		}
@@ -320,7 +320,7 @@ class Mailer extends MailerAbstract {
 	 *
 	 * @return string
 	 */
-	public function get_response_error() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
+	public function get_response_error() {
 
 		$body = (array) wp_remote_retrieve_body( $this->response );
 

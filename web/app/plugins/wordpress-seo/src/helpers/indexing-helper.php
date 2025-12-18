@@ -6,13 +6,10 @@ use Yoast\WP\SEO\Actions\Indexing\Indexable_General_Indexation_Action;
 use Yoast\WP\SEO\Actions\Indexing\Indexable_Post_Indexation_Action;
 use Yoast\WP\SEO\Actions\Indexing\Indexable_Post_Type_Archive_Indexation_Action;
 use Yoast\WP\SEO\Actions\Indexing\Indexable_Term_Indexation_Action;
-use Yoast\WP\SEO\Actions\Indexing\Indexation_Action_Interface;
-use Yoast\WP\SEO\Actions\Indexing\Limited_Indexing_Action_Interface;
 use Yoast\WP\SEO\Actions\Indexing\Post_Link_Indexing_Action;
 use Yoast\WP\SEO\Actions\Indexing\Term_Link_Indexing_Action;
 use Yoast\WP\SEO\Config\Indexing_Reasons;
 use Yoast\WP\SEO\Integrations\Admin\Indexing_Notification_Integration;
-use Yoast\WP\SEO\Repositories\Indexable_Repository;
 use Yoast_Notification_Center;
 
 /**
@@ -42,25 +39,46 @@ class Indexing_Helper {
 	protected $notification_center;
 
 	/**
-	 * The indexation actions.
+	 * The post indexing action.
 	 *
-	 * @var Indexation_Action_Interface[]|Limited_Indexing_Action_Interface[]
+	 * @var Indexable_Post_Indexation_Action
 	 */
-	protected $indexing_actions;
+	protected $post_indexation;
 
 	/**
-	 * The indexation actions that can be done in the background.
+	 * The term indexing action.
 	 *
-	 * @var Indexation_Action_Interface[]|Limited_Indexing_Action_Interface[]
+	 * @var Indexable_Term_Indexation_Action
 	 */
-	protected $background_indexing_actions;
+	protected $term_indexation;
 
 	/**
-	 * The indexable repository.
+	 * The post type archive indexing action.
 	 *
-	 * @var Indexable_Repository
+	 * @var Indexable_Post_Type_Archive_Indexation_Action
 	 */
-	protected $indexable_repository;
+	protected $post_type_archive_indexation;
+
+	/**
+	 * The post link indexing action.
+	 *
+	 * @var Post_Link_Indexing_Action
+	 */
+	protected $post_link_indexing_action;
+
+	/**
+	 * The term link indexing action.
+	 *
+	 * @var Term_Link_Indexing_Action
+	 */
+	protected $term_link_indexing_action;
+
+	/**
+	 * Represents the general indexing.
+	 *
+	 * @var Indexable_General_Indexation_Action
+	 */
+	protected $general_indexation;
 
 	/**
 	 * Indexing_Helper constructor.
@@ -90,8 +108,6 @@ class Indexing_Helper {
 	 * @param Indexable_General_Indexation_Action           $general_indexation           The general indexing (homepage etc) action.
 	 * @param Post_Link_Indexing_Action                     $post_link_indexing_action    The post crosslink indexing action.
 	 * @param Term_Link_Indexing_Action                     $term_link_indexing_action    The term crossling indexing action.
-	 *
-	 * @return void
 	 */
 	public function set_indexing_actions(
 		Indexable_Post_Indexation_Action $post_indexation,
@@ -101,42 +117,22 @@ class Indexing_Helper {
 		Post_Link_Indexing_Action $post_link_indexing_action,
 		Term_Link_Indexing_Action $term_link_indexing_action
 	) {
-		$this->indexing_actions = [
-			$post_indexation,
-			$term_indexation,
-			$post_type_archive_indexation,
-			$general_indexation,
-			$post_link_indexing_action,
-			$term_link_indexing_action,
-		];
-
-		// Coincidentally, the background indexing actions are the same with the Free indexing actions for now.
-		$this->background_indexing_actions = $this->indexing_actions;
+		$this->post_indexation              = $post_indexation;
+		$this->term_indexation              = $term_indexation;
+		$this->post_type_archive_indexation = $post_type_archive_indexation;
+		$this->general_indexation           = $general_indexation;
+		$this->post_link_indexing_action    = $post_link_indexing_action;
+		$this->term_link_indexing_action    = $term_link_indexing_action;
 	}
 
 	/**
-	 * Sets the indexable repository for the indexing helper class.
-	 *
-	 * @required
-	 *
-	 * @param Indexable_Repository $indexable_repository The indexable repository.
+	 * Sets several database options when the indexing process is started.
 	 *
 	 * @return void
 	 */
-	public function set_indexable_repository( Indexable_Repository $indexable_repository ) {
-		$this->indexable_repository = $indexable_repository;
-	}
-
-	/**
-	 * Prepares the indexing process by setting several database options and removing the indexing notification.
-	 *
-	 * @return void
-	 */
-	public function prepare() {
+	public function start() {
 		$this->set_first_time( false );
 		$this->set_started( $this->date_helper->current_time() );
-		$this->remove_indexing_notification();
-		// Do not set_reason here; if the process is cancelled, the reason to start indexing is still valid.
 	}
 
 	/**
@@ -144,7 +140,7 @@ class Indexing_Helper {
 	 *
 	 * @return void
 	 */
-	public function complete() {
+	public function finish() {
 		$this->set_reason( '' );
 		$this->set_started( null );
 	}
@@ -168,15 +164,11 @@ class Indexing_Helper {
 	 */
 	public function set_reason( $reason ) {
 		$this->options_helper->set( 'indexing_reason', $reason );
-		$this->remove_indexing_notification();
-	}
 
-	/**
-	 * Removes any pre-existing notification, so that a new notification (with a possible new reason) can be added.
-	 *
-	 * @return void
-	 */
-	protected function remove_indexing_notification() {
+		/*
+		 * Remove any pre-existing notification, so that a new notification
+		 * (with a possible new reason) can be added.
+		 */
 		$this->notification_center->remove_notification_by_id(
 			Indexing_Notification_Integration::NOTIFICATION_ID
 		);
@@ -243,63 +235,19 @@ class Indexing_Helper {
 	}
 
 	/**
-	 * Gets a boolean that indicates whether or not the indexing of the indexables has completed.
-	 *
-	 * @return bool Whether the indexing of the indexables has completed.
-	 */
-	public function is_finished_indexables_indexing() {
-		return $this->options_helper->get( 'indexables_indexing_completed', false );
-	}
-
-	/**
 	 * Returns the total number of unindexed objects.
 	 *
 	 * @return int The total number of unindexed objects.
 	 */
 	public function get_unindexed_count() {
-		$unindexed_count = 0;
-
-		foreach ( $this->indexing_actions as $indexing_action ) {
-			$unindexed_count += $indexing_action->get_total_unindexed();
-		}
+		$unindexed_count  = $this->post_indexation->get_total_unindexed();
+		$unindexed_count += $this->term_indexation->get_total_unindexed();
+		$unindexed_count += $this->general_indexation->get_total_unindexed();
+		$unindexed_count += $this->post_type_archive_indexation->get_total_unindexed();
+		$unindexed_count += $this->post_link_indexing_action->get_total_unindexed();
+		$unindexed_count += $this->term_link_indexing_action->get_total_unindexed();
 
 		return $unindexed_count;
-	}
-
-	/**
-	 * Returns the amount of un-indexed posts expressed in percentage, which will be needed to set a threshold.
-	 *
-	 * @param int $unindexed_count The number of unindexed objects.
-	 *
-	 * @return int The amount of unindexed posts expressed in percentage.
-	 */
-	public function get_unindexed_percentage( $unindexed_count ) {
-		// Gets the amount of indexed objects in the site.
-		$indexed_count = $this->indexable_repository->get_total_number_of_indexables();
-		// The total amount of objects in the site.
-		$total_objects_count = ( $indexed_count + $unindexed_count );
-
-		return ( ( $unindexed_count / $total_objects_count ) * 100 );
-	}
-
-	/**
-	 * Returns whether the SEO optimization button should show.
-	 *
-	 * @return bool Whether the SEO optimization button should show.
-	 */
-	public function should_show_optimization_button() {
-		// Gets the amount of unindexed objects in the site.
-		$unindexed_count = $this->get_filtered_unindexed_count();
-
-		// If the amount of unidexed posts is <10 don't show configuration button.
-		if ( $unindexed_count <= 10 ) {
-			return false;
-		}
-		// If the amount of unidexed posts is >10, but the total amount of unidexed posts is ≤4% of the total amount of objects in the site, don't show configuration button.
-		if ( $this->get_unindexed_percentage( $unindexed_count ) <= 4 ) {
-			return false;
-		}
-		return true;
 	}
 
 	/**
@@ -308,88 +256,11 @@ class Indexing_Helper {
 	 * @return int The total number of unindexed objects.
 	 */
 	public function get_filtered_unindexed_count() {
-		$unindexed_count = $this->get_unindexed_count();
-
 		/**
 		 * Filter: 'wpseo_indexing_get_unindexed_count' - Allow changing the amount of unindexed objects.
 		 *
 		 * @param int $unindexed_count The amount of unindexed objects.
 		 */
-		return \apply_filters( 'wpseo_indexing_get_unindexed_count', $unindexed_count );
-	}
-
-	/**
-	 * Returns a limited number of unindexed objects.
-	 *
-	 * @param int                                                               $limit   Limit the number of unindexed objects that are counted.
-	 * @param Indexation_Action_Interface[]|Limited_Indexing_Action_Interface[] $actions The actions whose counts will be calculated.
-	 *
-	 * @return int The total number of unindexed objects.
-	 */
-	public function get_limited_unindexed_count( $limit, $actions = [] ) {
-		$unindexed_count = 0;
-
-		if ( empty( $actions ) ) {
-			$actions = $this->indexing_actions;
-		}
-
-		foreach ( $actions as $action ) {
-			$unindexed_count += $action->get_limited_unindexed_count( $limit - $unindexed_count + 1 );
-			if ( $unindexed_count > $limit ) {
-				return $unindexed_count;
-			}
-		}
-
-		return $unindexed_count;
-	}
-
-	/**
-	 * Returns the total number of unindexed objects and applies a filter for third party integrations.
-	 *
-	 * @param int $limit Limit the number of unindexed objects that are counted.
-	 *
-	 * @return int The total number of unindexed objects.
-	 */
-	public function get_limited_filtered_unindexed_count( $limit ) {
-		$unindexed_count = $this->get_limited_unindexed_count( $limit, $this->indexing_actions );
-
-		if ( $unindexed_count > $limit ) {
-			return $unindexed_count;
-		}
-
-		/**
-		 * Filter: 'wpseo_indexing_get_limited_unindexed_count' - Allow changing the amount of unindexed objects,
-		 * and allow for a maximum number of items counted to improve performance.
-		 *
-		 * @param int       $unindexed_count The amount of unindexed objects.
-		 * @param int|false $limit           Limit the number of unindexed objects that need to be counted.
-		 *                                   False if it doesn't need to be limited.
-		 */
-		return \apply_filters( 'wpseo_indexing_get_limited_unindexed_count', $unindexed_count, $limit );
-	}
-
-	/**
-	 * Returns the total number of unindexed objects that can be indexed in the background and applies a filter for third party integrations.
-	 *
-	 * @param int $limit Limit the number of unindexed objects that are counted.
-	 *
-	 * @return int The total number of unindexed objects that can be indexed in the background.
-	 */
-	public function get_limited_filtered_unindexed_count_background( $limit ) {
-		$unindexed_count = $this->get_limited_unindexed_count( $limit, $this->background_indexing_actions );
-
-		if ( $unindexed_count > $limit ) {
-			return $unindexed_count;
-		}
-
-		/**
-		 * Filter: 'wpseo_indexing_get_limited_unindexed_count_background' - Allow changing the amount of unindexed objects that can be indexed in the background,
-		 * and allow for a maximum number of items counted to improve performance.
-		 *
-		 * @param int       $unindexed_count The amount of unindexed objects.
-		 * @param int|false $limit           Limit the number of unindexed objects that need to be counted.
-		 *                                   False if it doesn't need to be limited.
-		 */
-		return \apply_filters( 'wpseo_indexing_get_limited_unindexed_count_background', $unindexed_count, $limit );
+		return \apply_filters( 'wpseo_indexing_get_unindexed_count', $this->get_unindexed_count() );
 	}
 }

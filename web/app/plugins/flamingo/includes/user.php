@@ -1,15 +1,11 @@
 <?php
 /**
- * Module for WordPress users handling
- */
-
+** Module for WordPress user.
+**/
 
 add_action( 'profile_update', 'flamingo_user_profile_update', 10, 1 );
 add_action( 'user_register', 'flamingo_user_profile_update', 10, 1 );
 
-/**
- * Creates a Flamingo_Contact record for the given user.
- */
 function flamingo_user_profile_update( $user_id ) {
 	$user = new WP_User( $user_id );
 
@@ -31,15 +27,12 @@ function flamingo_user_profile_update( $user_id ) {
 	}
 }
 
-
+/* Collect contact info from existing users when activating plugin */
 add_action( 'activate_' . FLAMINGO_PLUGIN_BASENAME,
 	'flamingo_collect_contacts_from_users',
 	10, 0
 );
 
-/**
- * Creates Flamingo_Contact records for existing users.
- */
 function flamingo_collect_contacts_from_users() {
 	$users = get_users( array(
 		'number' => 20,

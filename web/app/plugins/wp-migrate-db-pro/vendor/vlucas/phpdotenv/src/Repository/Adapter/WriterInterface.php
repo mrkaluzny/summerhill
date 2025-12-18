@@ -2,13 +2,13 @@
 
 namespace DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter;
 
-interface WriterInterface extends AvailabilityInterface
+interface WriterInterface extends \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\AvailabilityInterface
 {
     /**
      * Set an environment variable.
      *
-     * @param non-empty-string $name
-     * @param string|null      $value
+     * @param string      $name
+     * @param string|null $value
      *
      * @return void
      */
@@ -16,7 +16,7 @@ interface WriterInterface extends AvailabilityInterface
     /**
      * Clear an environment variable.
      *
-     * @param non-empty-string $name
+     * @param string $name
      *
      * @return void
      */

@@ -2,9 +2,7 @@
 
 namespace Yoast\WP\Lib;
 
-use Exception;
 use JsonSerializable;
-use ReturnTypeWillChange;
 
 /**
  * Make Model compatible with WordPress.
@@ -23,14 +21,14 @@ class Model implements JsonSerializable {
 	 *
 	 * @var string
 	 */
-	public const DEFAULT_ID_COLUMN = 'id';
+	const DEFAULT_ID_COLUMN = 'id';
 
 	/**
 	 * Default foreign key suffix used by relationship methods.
 	 *
 	 * @var string
 	 */
-	public const DEFAULT_FOREIGN_KEY_SUFFIX = '_id';
+	const DEFAULT_FOREIGN_KEY_SUFFIX = '_id';
 
 	/**
 	 * Set a prefix for model names. This can be a namespace or any other
@@ -88,13 +86,6 @@ class Model implements JsonSerializable {
 	 * @var array
 	 */
 	protected $int_columns = [];
-
-	/**
-	 * Which columns contain float values.
-	 *
-	 * @var array
-	 */
-	protected $float_columns = [];
 
 	/**
 	 * Hacks around the Model to provide WordPress prefix to tables.
@@ -163,22 +154,20 @@ class Model implements JsonSerializable {
 	 * class or the property does not exist, returns the default
 	 * value supplied as the third argument (which defaults to null).
 	 *
-	 * @param string     $class_name    The target class name.
-	 * @param string     $property      The property to get the value for.
-	 * @param mixed|null $default_value Default value when property does not exist.
+	 * @param string      $class_name The target class name.
+	 * @param string      $property   The property to get the value for.
+	 * @param string|null $default    Default value when property does not exist.
 	 *
-	 * @return mixed|null The value of the property.
+	 * @return string The value of the property.
 	 */
-	protected static function get_static_property( $class_name, $property, $default_value = null ) {
+	protected static function get_static_property( $class_name, $property, $default = null ) {
 		if ( ! \class_exists( $class_name ) || ! \property_exists( $class_name, $property ) ) {
-			return $default_value;
+			return $default;
 		}
 
-		if ( ! isset( $class_name::${$property} ) ) {
-			return $default_value;
-		}
+		$properties = \get_class_vars( $class_name );
 
-		return $class_name::${$property};
+		return $properties[ $property ];
 	}
 
 	/**
@@ -331,10 +320,10 @@ class Model implements JsonSerializable {
 	 *
 	 * @return ORM Instance of the ORM.
 	 *
-	 * @throws Exception When ID of current model has a null value.
+	 * @throws \Exception When ID of current model has a null value.
 	 */
 	protected function has_one_or_many( $associated_class_name, $foreign_key_name = null, $foreign_key_name_in_current_models_table = null ) {
-		$base_table_name  = static::get_table_name_for_class( static::class );
+		$base_table_name  = static::get_table_name_for_class( \get_class( $this ) );
 		$foreign_key_name = static::build_foreign_key_name( $foreign_key_name, $base_table_name );
 
 		/*
@@ -363,7 +352,7 @@ class Model implements JsonSerializable {
 	 *
 	 * @return ORM Instance of the ORM.
 	 *
-	 * @throws Exception  When ID of current model has a null value.
+	 * @throws \Exception  When ID of current model has a null value.
 	 */
 	protected function has_one( $associated_class_name, $foreign_key_name = null, $foreign_key_name_in_current_models_table = null ) {
 		return $this->has_one_or_many( $associated_class_name, $foreign_key_name, $foreign_key_name_in_current_models_table );
@@ -379,7 +368,7 @@ class Model implements JsonSerializable {
 	 *
 	 * @return ORM Instance of the ORM.
 	 *
-	 * @throws Exception When ID has a null value.
+	 * @throws \Exception When ID has a null value.
 	 */
 	protected function has_many( $associated_class_name, $foreign_key_name = null, $foreign_key_name_in_current_models_table = null ) {
 		$this->set_table_name( $associated_class_name );
@@ -403,7 +392,7 @@ class Model implements JsonSerializable {
 		$associated_table_name = static::get_table_name_for_class( static::$auto_prefix_models . $associated_class_name );
 		$foreign_key_name      = static::build_foreign_key_name( $foreign_key_name, $associated_table_name );
 		$associated_object_id  = $this->{$foreign_key_name};
-
+		$desired_record        = null;
 		if ( $foreign_key_name_in_associated_models_table === null ) {
 			/*
 			 * Comparison: "{$associated_table_name}.primary_key = {$associated_object_id}".
@@ -432,7 +421,7 @@ class Model implements JsonSerializable {
 	 * @return ORM Instance of the ORM.
 	 */
 	protected function has_many_through( $associated_class_name, $join_class_name = null, $key_to_base_table = null, $key_to_associated_table = null, $key_in_base_table = null, $key_in_associated_table = null ) {
-		$base_class_name = static::class;
+		$base_class_name = \get_class( $this );
 
 		/*
 		 * The class name of the join model, if not supplied, is formed by
@@ -516,9 +505,6 @@ class Model implements JsonSerializable {
 		if ( $value !== null && \in_array( $property, $this->int_columns, true ) ) {
 			return (int) $value;
 		}
-		if ( $value !== null && \in_array( $property, $this->float_columns, true ) ) {
-			return (float) $value;
-		}
 
 		return $value;
 	}
@@ -536,9 +522,6 @@ class Model implements JsonSerializable {
 			$value = ( $value ) ? '1' : '0';
 		}
 		if ( $value !== null && \in_array( $property, $this->int_columns, true ) ) {
-			$value = (string) $value;
-		}
-		if ( $value !== null && \in_array( $property, $this->float_columns, true ) ) {
 			$value = (string) $value;
 		}
 
@@ -561,7 +544,6 @@ class Model implements JsonSerializable {
 	 *
 	 * @return array The data of this object.
 	 */
-	#[ReturnTypeWillChange]
 	public function jsonSerialize() {
 		return $this->orm->as_array();
 	}
@@ -572,11 +554,7 @@ class Model implements JsonSerializable {
 	 * @return array
 	 */
 	public function __debugInfo() {
-		if ( $this->orm ) {
-			return $this->orm->as_array();
-		}
-
-		return [];
+		return $this->orm->as_array();
 	}
 
 	/**
@@ -663,7 +641,7 @@ class Model implements JsonSerializable {
 	/**
 	 * Save the data associated with this model instance to the database.
 	 *
-	 * @return bool True on success.
+	 * @return null Nothing.
 	 */
 	public function save() {
 		if ( $this->uses_timestamps ) {
@@ -679,7 +657,7 @@ class Model implements JsonSerializable {
 	/**
 	 * Delete the database row associated with this model instance.
 	 *
-	 * @return bool|int Response of wpdb::query.
+	 * @return null Nothing.
 	 */
 	public function delete() {
 		return $this->orm->delete();
@@ -690,7 +668,7 @@ class Model implements JsonSerializable {
 	 *
 	 * @return int The database ID of the models instance.
 	 *
-	 * @throws Exception When the ID is a null value.
+	 * @throws \Exception When the ID is a null value.
 	 */
 	public function id() {
 		return $this->orm->id();
@@ -723,7 +701,7 @@ class Model implements JsonSerializable {
 			return [];
 		}
 
-		$model = static::factory( static::class );
+		$model = static::factory( \get_called_class() );
 
 		return \call_user_func_array( [ $model, $method ], $arguments );
 	}

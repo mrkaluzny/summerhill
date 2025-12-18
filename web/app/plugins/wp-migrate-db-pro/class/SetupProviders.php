@@ -15,7 +15,11 @@ class SetupProviders
 
 		if ( $pro ) {
 			$pro_classes       = [
-				\DeliciousBrains\WPMDB\Pro\ClassMap::class
+				\DeliciousBrains\WPMDB\Pro\ClassMap::class,
+				\DeliciousBrains\WPMDBMST\ClassMap::class,
+				\DeliciousBrains\WPMDBCli\ClassMap::class,
+				\DeliciousBrains\WPMDBMF\ClassMap::class,
+				\DeliciousBrains\WPMDBTP\ClassMap::class,
 			];
 			$potential_classes = array_merge( $pro_classes, $potential_classes );
 		} else {

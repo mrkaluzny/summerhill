@@ -1,46 +1,65 @@
 <?php
+
 /**
- * Cron job functionality
+ * The file that defines the cron job functionality
  *
  * @since 2.1
+ *
  */
 
 
-add_action( 'admin_init', 'flamingo_schedule_activation', 10, 0 );
+// call when WP loads
+add_action( 'wp', 'flamingo_schedule_activation', 10, 0 );
 
 /**
- * Creates a scheduled event, if it does not exist.
+ * Create schedule event for cron job, if its already not exists
  *
  * @since 2.1
+ *
+ * @see wp_next_scheduled(), wp_schedule_event()
+ *
  */
 function flamingo_schedule_activation() {
-	if ( ! wp_next_scheduled( 'flamingo_hourly_cron_job' ) ) {
-		wp_schedule_event( time(), 'hourly', 'flamingo_hourly_cron_job' );
+	if ( ! wp_next_scheduled( 'flamingo_daily_cron_job' ) ) {
+		wp_schedule_event( time(), 'daily', 'flamingo_daily_cron_job' );
 	}
 }
 
 
-add_action( 'flamingo_hourly_cron_job', 'flamingo_schedule_function', 10, 0 );
+// deactivate cron job on deactivation of the plugin on plugin's deactivation
+register_deactivation_hook( __FILE__, 'flamingo_schedule_deactivate' );
 
 /**
- * The cron job.
+ * Function to deactivate the cron job
  *
  * @since 2.1
+ *
+ * @see wp_next_scheduled(), wp_unschedule_event()
+ *
  */
-function flamingo_schedule_function() {
-	flamingo_schedule_move_trash();
+function flamingo_schedule_deactivate() {
+
+	// when the last event was scheduled
+	$timestamp = wp_next_scheduled( 'flamingo_daily_cron_job' );
+
+	// unschedule previous event if any
+	wp_unschedule_event( $timestamp, 'flamingo_daily_cron_job' );
 }
 
 
-// Unscheduling cron jobs on plugin deactivation.
-register_deactivation_hook( FLAMINGO_PLUGIN, 'flamingo_schedule_deactivate' );
+// hook flamingo_schedule_function to schedule event
+add_action( 'flamingo_daily_cron_job', 'flamingo_schedule_function', 10, 0 );
 
 /**
- * Unschedules cron jobs.
+ * Function to run for cron job
  *
  * @since 2.1
+ *
+ * @see flamingo_schedule_move_trash()
+ *
  */
-function flamingo_schedule_deactivate() {
-	wp_clear_scheduled_hook( 'flamingo_hourly_cron_job' );
-	wp_clear_scheduled_hook( 'flamingo_daily_cron_job' );
+function flamingo_schedule_function() {
+
+	// run function move spam to trash
+	flamingo_schedule_move_trash();
 }

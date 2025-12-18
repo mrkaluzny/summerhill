@@ -38,7 +38,7 @@ var WPMailSMTPConnect = window.WPMailSMTPConnect || ( function( document, window
 		 */
 		init: function() {
 
-			$( app.ready );
+			$( document ).ready( app.ready );
 		},
 
 		/**
@@ -87,6 +87,9 @@ var WPMailSMTPConnect = window.WPMailSMTPConnect || ( function( document, window
 			return {
 				title: wp_mail_smtp_connect.text.almost_done,
 				content: res.data.message,
+				useBootstrap: false,
+				theme: 'modern',
+				boxWidth: '550px',
 				icon: '"></i><img src="' + wp_mail_smtp_connect.plugin_url + '/assets/images/font-awesome/check-circle-solid-green.svg" style="width: 40px; height: 40px;"><i class="',
 				type: 'green',
 				buttons: {
@@ -128,6 +131,9 @@ var WPMailSMTPConnect = window.WPMailSMTPConnect || ( function( document, window
 					$.alert( {
 						title: wp_mail_smtp_connect.text.oops,
 						content: res.data.message,
+						useBootstrap: false,
+						theme: 'modern',
+						boxWidth: '550px',
 						icon: '"></i><img src="' + wp_mail_smtp_connect.plugin_url + '/assets/images/font-awesome/exclamation-circle-solid-orange.svg" style="width: 40px; height: 40px;"><i class="',
 						type: 'orange',
 						buttons: {
@@ -156,6 +162,9 @@ var WPMailSMTPConnect = window.WPMailSMTPConnect || ( function( document, window
 			$.alert( {
 				title: wp_mail_smtp_connect.text.oops,
 				content: wp_mail_smtp_connect.text.server_error + '<br>' + xhr.status + ' ' + xhr.statusText + ' ' + xhr.responseText,
+				useBootstrap: false,
+				theme: 'modern',
+				boxWidth: '550px',
 				icon: '"></i><img src="' + wp_mail_smtp_connect.plugin_url + '/assets/images/font-awesome/exclamation-circle-regular-red.svg" style="width: 40px; height: 40px;"><i class="',
 				type: 'red',
 				buttons: {

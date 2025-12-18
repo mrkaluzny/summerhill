@@ -2,8 +2,6 @@
 
 namespace Yoast\WP\SEO\Generators\Schema;
 
-use Yoast\WP\SEO\Config\Schema_IDs;
-
 /**
  * Returns schema HowTo data.
  */
@@ -38,8 +36,6 @@ class HowTo extends Abstract_Schema_Piece {
 	 *
 	 * @param array $data       Our How-To schema data.
 	 * @param array $attributes The block data attributes.
-	 *
-	 * @return void
 	 */
 	private function add_duration( &$data, $attributes ) {
 		if ( empty( $attributes['hasDuration'] ) ) {
@@ -60,8 +56,6 @@ class HowTo extends Abstract_Schema_Piece {
 	 *
 	 * @param array $data  Our How-To schema data.
 	 * @param array $steps Our How-To block's steps.
-	 *
-	 * @return void
 	 */
 	private function add_steps( &$data, $steps ) {
 		foreach ( $steps as $step ) {
@@ -117,8 +111,6 @@ class HowTo extends Abstract_Schema_Piece {
 	 *
 	 * @param array  $schema_step Our Schema output for the Step.
 	 * @param string $json_text   The step text.
-	 *
-	 * @return void
 	 */
 	private function add_step_description( &$schema_step, $json_text ) {
 		$schema_step['itemListElement'] = [
@@ -134,15 +126,11 @@ class HowTo extends Abstract_Schema_Piece {
 	 *
 	 * @param array $schema_step Our Schema output for the Step.
 	 * @param array $step        The step block data.
-	 *
-	 * @return void
 	 */
 	private function add_step_image( &$schema_step, $step ) {
-		if ( isset( $step['text'] ) && \is_array( $step['text'] ) ) {
-			foreach ( $step['text'] as $line ) {
-				if ( \is_array( $line ) && isset( $line['type'] ) && $line['type'] === 'img' ) {
-					$schema_step['image'] = $this->get_image_schema( \esc_url( $line['props']['src'] ) );
-				}
+		foreach ( $step['text'] as $line ) {
+			if ( \is_array( $line ) && isset( $line['type'] ) && $line['type'] === 'img' ) {
+				$schema_step['image'] = $this->get_image_schema( \esc_url( $line['props']['src'] ) );
 			}
 		}
 	}
@@ -153,8 +141,6 @@ class HowTo extends Abstract_Schema_Piece {
 	 * @param array $graph Our Schema data.
 	 * @param array $block The How-To block content.
 	 * @param int   $index The index of the current block.
-	 *
-	 * @return void
 	 */
 	protected function add_how_to( &$graph, $block, $index ) {
 		$data = [
@@ -165,19 +151,12 @@ class HowTo extends Abstract_Schema_Piece {
 			'description'      => '',
 		];
 
-		if ( $this->context->has_article ) {
-			$data['mainEntityOfPage'] = [ '@id' => $this->context->main_schema_id . Schema_IDs::ARTICLE_HASH ];
-		}
-
 		if ( isset( $block['attrs']['jsonDescription'] ) ) {
 			$data['description'] = $this->helpers->schema->html->sanitize( $block['attrs']['jsonDescription'] );
 		}
 
 		$this->add_duration( $data, $block['attrs'] );
-
-		if ( isset( $block['attrs']['steps'] ) ) {
-			$this->add_steps( $data, $block['attrs']['steps'] );
-		}
+		$this->add_steps( $data, $block['attrs']['steps'] );
 
 		$data = $this->helpers->schema->language->add_piece_language( $data );
 

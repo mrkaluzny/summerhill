@@ -11,18 +11,18 @@ use Yoast\WP\SEO\Presenters\Abstract_Indexable_Tag_Presenter;
 class Image_Presenter extends Abstract_Indexable_Tag_Presenter {
 
 	/**
-	 * The tag key name.
+	 * The tag format including placeholders.
 	 *
 	 * @var string
 	 */
-	protected $key = 'twitter:image';
+	protected $tag_format = '<meta name="twitter:image" content="%s" />';
 
 	/**
 	 * The method of escaping to use.
 	 *
 	 * @var string
 	 */
-	protected $escaping = 'url';
+	protected $escaping = 'attribute';
 
 	/**
 	 * Run the Twitter image value through the `wpseo_twitter_image` filter.
@@ -33,8 +33,9 @@ class Image_Presenter extends Abstract_Indexable_Tag_Presenter {
 		/**
 		 * Filter: 'wpseo_twitter_image' - Allow changing the Twitter Card image.
 		 *
-		 * @param string                 $twitter_image Image URL string.
-		 * @param Indexable_Presentation $presentation  The presentation of an indexable.
+		 * @param Indexable_Presentation $presentation The presentation of an indexable.
+		 *
+		 * @api string $twitter_image Image URL string.
 		 */
 		return (string) \apply_filters( 'wpseo_twitter_image', $this->presentation->twitter_image, $this->presentation );
 	}

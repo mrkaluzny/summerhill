@@ -2,6 +2,12 @@
 
 namespace WPMailSMTP\Helpers;
 
+// WP 5.2+ already load Sodium Compat polyfill for libsodium-fallback.
+// We need to do the same for under 5.2 versions (4.9-5.1).
+if ( ! version_compare( get_bloginfo( 'version' ), '5.2', '>=' ) && ! function_exists( 'sodium_crypto_box' ) ) {
+	require_once dirname( WPMS_PLUGIN_FILE ) . '/vendor/paragonie/sodium_compat/autoload.php';
+}
+
 /**
  * Class for encryption functionality.
  *
@@ -36,9 +42,9 @@ class Crypto {
 		if ( $create ) {
 			// We don't have a secret, so let's generate one.
 			try {
-				$secret_key = sodium_crypto_secretbox_keygen(); // phpcs:ignore PHPCompatibility.FunctionUse.NewFunctions.sodium_crypto_secretbox_keygenFound
+				$secret_key = sodium_crypto_secretbox_keygen(); // phpcs:ignore
 			} catch ( \Exception $e ) {
-				$secret_key = wp_generate_password( SODIUM_CRYPTO_SECRETBOX_KEYBYTES ); // phpcs:ignore PHPCompatibility.Constants.NewConstants.sodium_crypto_secretbox_keybytesFound
+				$secret_key = wp_generate_password( SODIUM_CRYPTO_SECRETBOX_KEYBYTES ); // phpcs:ignore
 			}
 
 			add_option( 'wp_mail_smtp_mail_key', base64_encode( $secret_key ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
@@ -67,8 +73,7 @@ class Crypto {
 		}
 
 		// Create a nonce for this operation. It will be stored and recovered in the message itself.
-		// phpcs:ignore PHPCompatibility.FunctionUse.NewFunctions.random_bytesFound, PHPCompatibility.Constants.NewConstants.sodium_crypto_secretbox_noncebytesFound
-		$nonce = random_bytes( SODIUM_CRYPTO_SECRETBOX_NONCEBYTES );
+		$nonce = random_bytes( SODIUM_CRYPTO_SECRETBOX_NONCEBYTES ); // phpcs:ignore
 
 		if ( empty( $key ) ) {
 			$key = self::get_secret_key( true );
@@ -77,7 +82,7 @@ class Crypto {
 		// Encrypt message and combine with nonce.
 		$cipher = base64_encode( // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 			$nonce .
-			sodium_crypto_secretbox( // phpcs:ignore PHPCompatibility.FunctionUse.NewFunctions.sodium_crypto_secretboxFound
+			sodium_crypto_secretbox( // phpcs:ignore
 				$message,
 				$nonce,
 				$key
@@ -85,8 +90,8 @@ class Crypto {
 		);
 
 		try {
-			sodium_memzero( $message ); // phpcs:ignore PHPCompatibility.FunctionUse.NewFunctions.sodium_memzeroFound
-			sodium_memzero( $key ); // phpcs:ignore PHPCompatibility.FunctionUse.NewFunctions.sodium_memzeroFound
+			sodium_memzero( $message ); // phpcs:ignore
+			sodium_memzero( $key ); // phpcs:ignore
 		} catch ( \Exception $e ) {
 			return $cipher;
 		}
@@ -106,7 +111,7 @@ class Crypto {
 	 * @return string
 	 * @throws \Exception The exception object.
 	 */
-	public static function decrypt( $encrypted, $key = '' ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+	public static function decrypt( $encrypted, $key = '' ) {
 
 		if ( apply_filters( 'wp_mail_smtp_helpers_crypto_stop', false ) ) {
 			return $encrypted;
@@ -119,19 +124,13 @@ class Crypto {
 			return $encrypted;
 		}
 
-		// Include polyfill if mbstring PHP extension is not enabled.
-		if ( ! function_exists( 'mb_strlen' ) || ! function_exists( 'mb_substr' ) ) {
-			Helpers::include_mbstring_polyfill();
-		}
-
-		// phpcs:ignore PHPCompatibility.Constants.NewConstants.sodium_crypto_secretbox_noncebytesFound, PHPCompatibility.Constants.NewConstants.sodium_crypto_secretbox_macbytesFound
-		if ( mb_strlen( $decoded, '8bit' ) < ( SODIUM_CRYPTO_SECRETBOX_NONCEBYTES + SODIUM_CRYPTO_SECRETBOX_MACBYTES ) ) {
+		if ( mb_strlen( $decoded, '8bit' ) < ( SODIUM_CRYPTO_SECRETBOX_NONCEBYTES + SODIUM_CRYPTO_SECRETBOX_MACBYTES ) ) { // phpcs:ignore
 			return $encrypted;
 		}
 
 		// Pull nonce and ciphertext out of unpacked message.
-		$nonce      = mb_substr( $decoded, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, '8bit' ); // phpcs:ignore PHPCompatibility.Constants.NewConstants.sodium_crypto_secretbox_noncebytesFound
-		$ciphertext = mb_substr( $decoded, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, null, '8bit' ); // phpcs:ignore PHPCompatibility.Constants.NewConstants.sodium_crypto_secretbox_noncebytesFound
+		$nonce      = mb_substr( $decoded, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, '8bit' ); // phpcs:ignore
+		$ciphertext = mb_substr( $decoded, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, null, '8bit' ); // phpcs:ignore
 
 		$key = empty( $key ) ? self::get_secret_key() : $key;
 
@@ -140,7 +139,7 @@ class Crypto {
 		}
 
 		// Decrypt it.
-		$message = sodium_crypto_secretbox_open( // phpcs:ignore PHPCompatibility.FunctionUse.NewFunctions.sodium_crypto_secretbox_openFound
+		$message = sodium_crypto_secretbox_open( // phpcs:ignore
 			$ciphertext,
 			$nonce,
 			$key
@@ -152,8 +151,8 @@ class Crypto {
 		}
 
 		try {
-			sodium_memzero( $ciphertext ); // phpcs:ignore PHPCompatibility.FunctionUse.NewFunctions.sodium_memzeroFound
-			sodium_memzero( $key ); // phpcs:ignore PHPCompatibility.FunctionUse.NewFunctions.sodium_memzeroFound
+			sodium_memzero( $ciphertext ); // phpcs:ignore
+			sodium_memzero( $key ); // phpcs:ignore
 		} catch ( \Exception $e ) {
 			return $message;
 		}

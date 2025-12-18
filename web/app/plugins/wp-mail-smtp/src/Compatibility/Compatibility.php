@@ -2,14 +2,7 @@
 
 namespace WPMailSMTP\Compatibility;
 
-use WPMailSMTP\Compatibility\Plugin\WPML;
-use WPMailSMTP\Compatibility\Plugin\WPForms;
-use WPMailSMTP\Compatibility\Plugin\Polylang;
-use WPMailSMTP\Compatibility\Plugin\Admin2020;
-use WPMailSMTP\Compatibility\Plugin\PolylangPro;
-use WPMailSMTP\Compatibility\Plugin\WooCommerce;
-use WPMailSMTP\Compatibility\Plugin\WPFormsLite;
-use WPMailSMTP\Compatibility\Plugin\PluginAbstract;
+use WPMailSMTP\WP;
 
 /**
  * Compatibility.
@@ -35,7 +28,10 @@ class Compatibility {
 	 */
 	public function init() {
 
-		$this->setup_compatibility();
+		// Setup compatibility only in admin area.
+		if ( WP::in_wp_admin() ) {
+			$this->setup_compatibility();
+		}
 	}
 
 	/**
@@ -46,13 +42,8 @@ class Compatibility {
 	public function setup_compatibility() {
 
 		$plugins = [
-			'admin-2020'   => Admin2020::class,
-			'wpforms-lite' => WPFormsLite::class,
-			'wpforms'      => WPForms::class,
-			'woocommerce'  => WooCommerce::class,
-			'wpml'         => WPML::class,
-			'polylang'     => Polylang::class,
-			'polylang-pro' => PolylangPro::class,
+			'admin-2020'      => '\WPMailSMTP\Compatibility\Plugin\Admin2020',
+			'wishlist-member' => '\WPMailSMTP\Compatibility\Plugin\WishListMember',
 		];
 
 		foreach ( $plugins as $key => $classname ) {
@@ -71,7 +62,7 @@ class Compatibility {
 	 *
 	 * @param string $key Plugin key.
 	 *
-	 * @return PluginAbstract|false
+	 * @return \WPMailSMTP\Compatibility\Plugin\PluginAbstract | false
 	 */
 	public function get_plugin( $key ) {
 

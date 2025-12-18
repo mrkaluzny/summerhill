@@ -3,11 +3,9 @@
 namespace Yoast\WP\SEO\WordPress;
 
 use wpdb;
-use WPSEO_Addon_Manager;
 use WPSEO_Admin_Asset_Manager;
 use WPSEO_Replace_Vars;
-use WPSEO_Shortlinker;
-use WPSEO_Utils;
+use WPSEO_Addon_Manager;
 
 /**
  * Wrapper class for WordPress globals.
@@ -52,23 +50,5 @@ class Wrapper {
 	 */
 	public static function get_addon_manager() {
 		return new WPSEO_Addon_Manager();
-	}
-
-	/**
-	 * Factory function for the shortlinker.
-	 *
-	 * @return WPSEO_Shortlinker
-	 */
-	public static function get_shortlinker() {
-		return new WPSEO_Shortlinker();
-	}
-
-	/**
-	 * Factory function for the utils class.
-	 *
-	 * @return WPSEO_Utils
-	 */
-	public static function get_utils() {
-		return new WPSEO_Utils();
 	}
 }

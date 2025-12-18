@@ -4,12 +4,12 @@ namespace DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter;
 
 use DeliciousBrains\WPMDB\Container\PhpOption\None;
 use DeliciousBrains\WPMDB\Container\PhpOption\Some;
-class ArrayAdapter implements AvailabilityInterface, ReaderInterface, WriterInterface
+class ArrayAdapter implements \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\AvailabilityInterface, \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\ReaderInterface, \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\WriterInterface
 {
     /**
      * The variables and their values.
      *
-     * @var array<non-empty-string,string|null>
+     * @var array<string,string|null>
      */
     private $variables = [];
     /**
@@ -24,22 +24,22 @@ class ArrayAdapter implements AvailabilityInterface, ReaderInterface, WriterInte
     /**
      * Get an environment variable, if it exists.
      *
-     * @param non-empty-string $name
+     * @param string $name
      *
      * @return \PhpOption\Option<string|null>
      */
     public function get($name)
     {
-        if (!\array_key_exists($name, $this->variables)) {
-            return None::create();
+        if (\array_key_exists($name, $this->variables)) {
+            return \DeliciousBrains\WPMDB\Container\PhpOption\Some::create($this->variables[$name]);
         }
-        return Some::create($this->variables[$name]);
+        return \DeliciousBrains\WPMDB\Container\PhpOption\None::create();
     }
     /**
      * Set an environment variable.
      *
-     * @param non-empty-string $name
-     * @param string|null      $value
+     * @param string      $name
+     * @param string|null $value
      *
      * @return void
      */
@@ -50,7 +50,7 @@ class ArrayAdapter implements AvailabilityInterface, ReaderInterface, WriterInte
     /**
      * Clear an environment variable.
      *
-     * @param non-empty-string $name
+     * @param string $name
      *
      * @return void
      */

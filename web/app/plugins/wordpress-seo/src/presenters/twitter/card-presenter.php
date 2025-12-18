@@ -11,11 +11,11 @@ use Yoast\WP\SEO\Presenters\Abstract_Indexable_Tag_Presenter;
 class Card_Presenter extends Abstract_Indexable_Tag_Presenter {
 
 	/**
-	 * The tag key name.
+	 * The tag format including placeholders.
 	 *
 	 * @var string
 	 */
-	protected $key = 'twitter:card';
+	protected $tag_format = '<meta name="twitter:card" content="%s" />';
 
 	/**
 	 * Runs the card type through the `wpseo_twitter_card_type` filter.
@@ -26,7 +26,8 @@ class Card_Presenter extends Abstract_Indexable_Tag_Presenter {
 		/**
 		 * Filter: 'wpseo_twitter_card_type' - Allow changing the Twitter card type.
 		 *
-		 * @param string $card_type The card type.
+		 * @api string $card_type The card type.
+		 *
 		 * @param Indexable_Presentation $presentation The presentation of an indexable.
 		 */
 		return \trim( \apply_filters( 'wpseo_twitter_card_type', $this->presentation->twitter_card, $this->presentation ) );

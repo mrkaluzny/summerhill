@@ -2,6 +2,8 @@
 
 namespace Yoast\WP\SEO\Generators\Schema;
 
+use Yoast\WP\SEO\Config\Schema_IDs;
+
 /**
  * Returns schema Author data.
  */
@@ -49,7 +51,7 @@ class Author extends Person {
 		// If this is an author page, the Person object is the main object, so we set it as such here.
 		if ( $this->context->indexable->object_type === 'user' ) {
 			$data['mainEntityOfPage'] = [
-				'@id' => $this->context->main_schema_id,
+				'@id' => $this->context->canonical . Schema_IDs::WEBPAGE_HASH,
 			];
 		}
 
@@ -82,7 +84,7 @@ class Author extends Person {
 		/**
 		 * Filter: 'wpseo_schema_person_user_id' - Allows filtering of user ID used for person output.
 		 *
-		 * @param int|bool $user_id The user ID currently determined.
+		 * @api int|bool $user_id The user ID currently determined.
 		 */
 		$user_id = \apply_filters( 'wpseo_schema_person_user_id', $user_id );
 
@@ -96,16 +98,14 @@ class Author extends Person {
 	/**
 	 * An author should not have an image from options, this only applies to persons.
 	 *
-	 * @param array        $data      The Person schema.
-	 * @param string       $schema_id The string used in the `@id` for the schema.
-	 * @param bool         $add_hash  Whether or not the person's image url hash should be added to the image id.
-	 * @param WP_User|null $user_data User data.
+	 * @param array  $data      The Person schema.
+	 * @param string $schema_id The string used in the `@id` for the schema.
 	 *
 	 * @return array The Person schema.
 	 */
-	protected function set_image_from_options( $data, $schema_id, $add_hash = false, $user_data = null ) {
-		if ( $this->site_represents_current_author( $user_data ) ) {
-			return parent::set_image_from_options( $data, $schema_id, $add_hash, $user_data );
+	protected function set_image_from_options( $data, $schema_id ) {
+		if ( $this->site_represents_current_author() ) {
+			return parent::set_image_from_options( $data, $schema_id );
 		}
 
 		return $data;

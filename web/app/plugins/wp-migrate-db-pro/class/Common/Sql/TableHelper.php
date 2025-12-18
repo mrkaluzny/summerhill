@@ -150,10 +150,9 @@ class TableHelper
 
     function format_dump_name($dump_name)
     {
-        $state_data          = $this->migration_state_manager->set_post_data();
-        $form_data           = $this->form_data->getFormData();
-        $extension           = '.sql';
-        $is_full_site_export = isset($state_data['full_site_export']) ? $state_data['full_site_export'] : false;
+        $state_data = $this->migration_state_manager->set_post_data();
+        $form_data  = $this->form_data->getFormData();
+        $extension  = '.sql';
 
         if (empty($form_data) && empty($state_data)) {
             return $dump_name . $extension;
@@ -168,7 +167,7 @@ class TableHelper
                 $extension .= '.gz';
             }
         } else {
-            if (Util::gzip() && $form_data['gzip_file'] && !$is_full_site_export) {
+            if (Util::gzip() && $form_data['gzip_file']) {
                 $extension .= '.gz';
             }
         }
@@ -196,11 +195,10 @@ class TableHelper
      * @param string $scope         Optional type of table to match against, default is 'table'.
      * @param string $new_prefix    Optional new prefix already added to $given_table.
      * @param int    $blog_id       Optional Only used with 'blog' scope to test against a specific subsite's tables other than current for $wpdb.
-     * @param string $source_prefix Optional prefix from source site already added to $given_table.
      *
      * @return boolean
      */
-    function table_is($desired_table, $given_table, $scope = 'table', $new_prefix = '', $blog_id = 0, $source_prefix = '')
+    function table_is($desired_table, $given_table, $scope = 'table', $new_prefix = '', $blog_id = 0)
     {
         global $wpdb;
 
@@ -219,7 +217,7 @@ class TableHelper
         }
 
         $match                 = false;
-        $prefix_escaped        = $source_prefix ? preg_quote($source_prefix, '/') : preg_quote($wpdb->base_prefix, '/');
+        $prefix_escaped        = preg_quote($wpdb->base_prefix, '/');
         $desired_table_escaped = preg_quote($desired_table, '/');
 
         if ('table' === $scope) {
@@ -240,10 +238,6 @@ class TableHelper
             }
 
             if (!empty($tables)) {
-                if ($source_prefix) {
-                    $local_prefix = preg_quote($wpdb->base_prefix, '/');
-                    $tables       = Util::change_tables_prefix($tables, $local_prefix, $source_prefix);
-                }
                 foreach ($tables as $table_name) {
                     if (!empty($table_name) && strtolower($table_name) === strtolower($given_table)) {
                         $match = true;

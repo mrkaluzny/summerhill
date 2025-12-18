@@ -26,7 +26,7 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 	 *
 	 * {@internal Note: Some of the default values are added via the translate_defaults() method.}}
 	 *
-	 * @var string[]
+	 * @var array
 	 */
 	protected $defaults = [
 		// Form fields.
@@ -61,6 +61,7 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 		'disable-date'                     => false,
 		'disable-post_format'              => false,
 		'disable-attachment'               => true,
+		'is-media-purge-relevant'          => false,
 
 		'breadcrumbs-404crumb'             => '', // Text field.
 		'breadcrumbs-display-blog-page'    => true,
@@ -70,7 +71,7 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 		'breadcrumbs-home'                 => '', // Text field.
 		'breadcrumbs-prefix'               => '', // Text field.
 		'breadcrumbs-searchprefix'         => '', // Text field.
-		'breadcrumbs-sep'                  => '»', // Text field.
+		'breadcrumbs-sep'                  => '&raquo;', // Text field.
 
 		'website_name'                     => '',
 		'person_name'                      => '',
@@ -82,7 +83,6 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 		'company_logo_meta'                => false,
 		'person_logo_meta'                 => false,
 		'company_name'                     => '',
-		'company_alternate_name'           => '',
 		'company_or_person'                => 'company',
 		'company_or_person_user_id'        => false,
 
@@ -92,28 +92,6 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 		'open_graph_frontpage_desc'        => '', // Text field.
 		'open_graph_frontpage_image'       => '', // Text field.
 		'open_graph_frontpage_image_id'    => 0,
-
-		'publishing_principles_id'         => 0,
-		'ownership_funding_info_id'        => 0,
-		'actionable_feedback_policy_id'    => 0,
-		'corrections_policy_id'            => 0,
-		'ethics_policy_id'                 => 0,
-		'diversity_policy_id'              => 0,
-		'diversity_staffing_report_id'     => 0,
-
-		'org-description'                  => '',
-		'org-email'                        => '',
-		'org-phone'                        => '',
-		'org-legal-name'                   => '',
-		'org-founding-date'                => '',
-		'org-number-employees'             => '',
-
-		'org-vat-id'                       => '',
-		'org-tax-id'                       => '',
-		'org-iso'                          => '',
-		'org-duns'                         => '',
-		'org-leicode'                      => '',
-		'org-naics'                        => '',
 
 		/*
 		 * Uses enrich_defaults to add more along the lines of:
@@ -140,14 +118,14 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 	/**
 	 * Used for "caching" during pageload.
 	 *
-	 * @var string[]|null
+	 * @var array
 	 */
 	protected $enriched_defaults = null;
 
 	/**
 	 * Array of variable option name patterns for the option.
 	 *
-	 * @var string[]
+	 * @var array
 	 */
 	protected $variable_array_key_patterns = [
 		'title-',
@@ -163,13 +141,12 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 		'social-description-',
 		'social-image-url-',
 		'social-image-id-',
-		'org-',
 	];
 
 	/**
 	 * Array of sub-options which should not be overloaded with multi-site defaults.
 	 *
-	 * @var string[]
+	 * @var array
 	 */
 	public $ms_exclude = [
 		'forcerewritetitle',
@@ -197,8 +174,6 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 
 	/**
 	 * Make sure we can recognize the right action for the double cleaning.
-	 *
-	 * @return void
 	 */
 	public function end_of_init() {
 		do_action( 'wpseo_double_clean_titles' );
@@ -220,7 +195,7 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 	/**
 	 * Get the available separator options.
 	 *
-	 * @return string[]
+	 * @return array
 	 */
 	public function get_separator_options() {
 		$separators = wp_list_pluck( self::get_separator_option_list(), 'option' );
@@ -228,7 +203,7 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 		/**
 		 * Allow altering the array with separator options.
 		 *
-		 * @param array $separator_options Array with the separator options.
+		 * @api array $separator_options Array with the separator options.
 		 */
 		$filtered_separators = apply_filters( 'wpseo_separator_options', $separators );
 
@@ -242,7 +217,7 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 	/**
 	 * Get the available separator options aria-labels.
 	 *
-	 * @return string[] Array with the separator options aria-labels.
+	 * @return array Array with the separator options aria-labels.
 	 */
 	public function get_separator_options_for_display() {
 		$separators     = $this->get_separator_options();
@@ -251,7 +226,7 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 		$separator_options = [];
 
 		foreach ( $separators as $key => $label ) {
-			$aria_label = ( $separator_list[ $key ]['label'] ?? '' );
+			$aria_label = isset( $separator_list[ $key ]['label'] ) ? $separator_list[ $key ]['label'] : '';
 
 			$separator_options[ $key ] = [
 				'label'      => $label,
@@ -315,7 +290,7 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 				$enriched_defaults[ 'display-metabox-pt-' . $pt->name ]      = true;
 				$enriched_defaults[ 'post_types-' . $pt->name . '-maintax' ] = 0; // Select box.
 				$enriched_defaults[ 'schema-page-type-' . $pt->name ]        = 'WebPage';
-				$enriched_defaults[ 'schema-article-type-' . $pt->name ]     = ( $pt->name === 'post' ) ? 'Article' : 'None';
+				$enriched_defaults[ 'schema-article-type-' . $pt->name ]     = ( YoastSEO()->helpers->schema->article->is_article_post_type( $pt->name ) ) ? 'Article' : 'None';
 
 				if ( $pt->name !== 'attachment' ) {
 					$enriched_defaults[ 'social-title-' . $pt->name ]       = '%%title%%'; // Text field.
@@ -356,7 +331,9 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 				$enriched_defaults[ 'social-image-url-tax-' . $tax->name ]   = ''; // Hidden input field.
 				$enriched_defaults[ 'social-image-id-tax-' . $tax->name ]    = 0; // Hidden input field.
 
-				$enriched_defaults[ 'taxonomy-' . $tax->name . '-ptparent' ] = 0; // Select box;.
+				if ( ! $tax->_builtin ) {
+					$enriched_defaults[ 'taxonomy-' . $tax->name . '-ptparent' ] = 0; // Select box;.
+				}
 			}
 		}
 
@@ -380,11 +357,11 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 	/**
 	 * Validate the option.
 	 *
-	 * @param string[] $dirty New value for the option.
-	 * @param string[] $clean Clean value for the option, normally the defaults.
-	 * @param string[] $old   Old value of the option.
+	 * @param array $dirty New value for the option.
+	 * @param array $clean Clean value for the option, normally the defaults.
+	 * @param array $old   Old value of the option.
 	 *
-	 * @return string[] Validated clean value for the option to be saved to the database.
+	 * @return array Validated clean value for the option to be saved to the database.
 	 */
 	protected function validate_option( $dirty, $clean, $old ) {
 		$allowed_post_types = $this->get_allowed_post_types();
@@ -430,7 +407,6 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 				 *  'social-title-author-wpseo', 'social-title-archive-wpseo'
 				 *  'open_graph_frontpage_title'
 				 */
-				case 'org-':
 				case 'website_name':
 				case 'alternate_website_name':
 				case 'title-':
@@ -494,7 +470,6 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 				case 'metadesc-':
 				case 'bctitle-ptarchive-':
 				case 'company_name':
-				case 'company_alternate_name':
 				case 'person_name':
 				case 'social-description-':
 				case 'open_graph_frontpage_desc':
@@ -605,13 +580,6 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 				case 'person_logo_id':
 				case 'social-image-id-':
 				case 'open_graph_frontpage_image_id':
-				case 'publishing_principles_id':
-				case 'ownership_funding_info_id':
-				case 'actionable_feedback_policy_id':
-				case 'corrections_policy_id':
-				case 'ethics_policy_id':
-				case 'diversity_policy_id':
-				case 'diversity_staffing_report_id':
 					if ( isset( $dirty[ $key ] ) ) {
 						$int = WPSEO_Utils::validate_int( $dirty[ $key ] );
 						if ( $int !== false && $int >= 0 ) {
@@ -625,6 +593,7 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 						}
 					}
 					break;
+
 				/* Separator field - Radio. */
 				case 'separator':
 					if ( isset( $dirty[ $key ] ) && $dirty[ $key ] !== '' ) {
@@ -653,14 +622,7 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 					break;
 				case 'schema-article-type-':
 					if ( isset( $dirty[ $key ] ) && is_string( $dirty[ $key ] ) ) {
-						/**
-						 * Filter: 'wpseo_schema_article_types' - Allow developers to filter the available article types.
-						 *
-						 * Make sure when you filter this to also filter `wpseo_schema_article_types_labels`.
-						 *
-						 * @param array $schema_article_types The available schema article types.
-						 */
-						if ( array_key_exists( $dirty[ $key ], apply_filters( 'wpseo_schema_article_types', Schema_Types::ARTICLE_TYPES ) ) ) {
+						if ( array_key_exists( $dirty[ $key ], Schema_Types::ARTICLE_TYPES ) ) {
 							$clean[ $key ] = $dirty[ $key ];
 						}
 						else {
@@ -696,6 +658,7 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 				 *  'breadcrumbs-boldlast'
 				 *  'breadcrumbs-enable'
 				 *  'stripcategorybase'
+				 *  'is-media-purge-relevant'
 				 */
 				default:
 					$clean[ $key ] = ( isset( $dirty[ $key ] ) ? WPSEO_Utils::validate_bool( $dirty[ $key ] ) : false );
@@ -712,7 +675,7 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 	 *
 	 * {@internal Don't make static as new types may still be registered.}}
 	 *
-	 * @return string[]
+	 * @return array
 	 */
 	protected function get_allowed_post_types() {
 		$allowed_post_types = [];
@@ -740,11 +703,14 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 	/**
 	 * Clean a given option value.
 	 *
-	 * @param string[]      $option_value          Old (not merged with defaults or filtered) option value to clean according to the rules for this option.
-	 * @param string[]|null $current_version       Optional. Version from which to upgrade, if not set, version specific upgrades will be disregarded.
-	 * @param string[]|null $all_old_option_values Optional. Only used when importing old options to have access to the real old values, in contrast to the saved ones.
+	 * @param array       $option_value          Old (not merged with defaults or filtered) option value to
+	 *                                           clean according to the rules for this option.
+	 * @param string|null $current_version       Optional. Version from which to upgrade, if not set,
+	 *                                           version specific upgrades will be disregarded.
+	 * @param array|null  $all_old_option_values Optional. Only used when importing old options to have
+	 *                                           access to the real old values, in contrast to the saved ones.
 	 *
-	 * @return string[] Cleaned option.
+	 * @return array Cleaned option.
 	 */
 	protected function clean_option( $option_value, $current_version = null, $all_old_option_values = null ) {
 		static $original = null;
@@ -793,10 +759,12 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 		}
 		unset( $old_option );
 
+
 		// Fix wrongness created by buggy version 1.2.2.
 		if ( isset( $option_value['title-home'] ) && $option_value['title-home'] === '%%sitename%% - %%sitedesc%% - 12345' ) {
 			$option_value['title-home-wpseo'] = '%%sitename%% - %%sitedesc%%';
 		}
+
 
 		/*
 		 * Renaming these options to avoid ever overwritting these if a (bloody stupid) user /
@@ -826,11 +794,12 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 		}
 		unset( $rename, $old, $new );
 
+
 		/*
 		 * {@internal This clean-up action can only be done effectively once the taxonomies
 		 *            and post_types have been registered, i.e. at the end of the init action.}}
 		 */
-		if ( ( isset( $original ) && current_filter() === 'wpseo_double_clean_titles' ) || did_action( 'wpseo_double_clean_titles' ) > 0 ) {
+		if ( isset( $original ) && current_filter() === 'wpseo_double_clean_titles' || did_action( 'wpseo_double_clean_titles' ) > 0 ) {
 			$rename = [
 				'title-'           => 'title-tax-',
 				'metadesc-'        => 'metadesc-tax-',
@@ -860,8 +829,10 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 							if ( ! isset( $post_type_names[ $tax ] ) && isset( $option_value[ $old_prefix . $tax ] ) ) {
 								unset( $option_value[ $old_prefix . $tax ] );
 							}
-							elseif ( isset( $post_type_names[ $tax ] ) && ! isset( $option_value[ $old_prefix . $tax ] ) ) {
-								$option_value[ $old_prefix . $tax ] = $original[ $old_prefix . $tax ];
+							else {
+								if ( isset( $post_type_names[ $tax ] ) && ! isset( $option_value[ $old_prefix . $tax ] ) ) {
+									$option_value[ $old_prefix . $tax ] = $original[ $old_prefix . $tax ];
+								}
 							}
 
 							if ( $old_prefix === 'tax-hideeditbox-' ) {
@@ -872,6 +843,46 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 				}
 			}
 			unset( $rename, $taxonomy_names, $post_type_names, $defaults, $tax, $old_prefix, $new_prefix );
+		}
+
+		/*
+		 * Make sure the values of the variable option key options are cleaned as they
+		 * may be retained and would not be cleaned/validated then.
+		 */
+		if ( is_array( $option_value ) && $option_value !== [] ) {
+			foreach ( $option_value as $key => $value ) {
+				$switch_key = $this->get_switch_key( $key );
+
+				// Similar to validation routine - any changes made there should be made here too.
+				switch ( $switch_key ) {
+					/* Text fields. */
+					case 'title-':
+					case 'metadesc-':
+					case 'bctitle-ptarchive-':
+						$option_value[ $key ] = WPSEO_Utils::sanitize_text_field( $value );
+						break;
+
+					case 'separator':
+						if ( ! array_key_exists( $value, $this->get_separator_options() ) ) {
+							$option_value[ $key ] = false;
+						}
+						break;
+
+					/*
+					 * Boolean fields.
+					 */
+
+					/*
+					 * Covers:
+					 *  'noindex-'
+					 *  'hideeditbox-'
+					 */
+					default:
+						$option_value[ $key ] = WPSEO_Utils::validate_bool( $value );
+						break;
+				}
+			}
+			unset( $key, $value, $switch_key );
 		}
 
 		return $option_value;
@@ -885,12 +896,12 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 	 *            variable key does not get removed. IMPORTANT: keep this method in line with
 	 *            the parent on which it is based!}}
 	 *
-	 * @param string[] $dirty Original option as retrieved from the database.
-	 * @param string[] $clean Filtered option where any options which shouldn't be in our option
+	 * @param array $dirty Original option as retrieved from the database.
+	 * @param array $clean Filtered option where any options which shouldn't be in our option
 	 *                     have already been removed and any options which weren't set
 	 *                     have been set to their defaults.
 	 *
-	 * @return string[]
+	 * @return array
 	 */
 	protected function retain_variable_keys( $dirty, $clean ) {
 		if ( ( is_array( $this->variable_array_key_patterns ) && $this->variable_array_key_patterns !== [] ) && ( is_array( $dirty ) && $dirty !== [] ) ) {
@@ -902,7 +913,7 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 			/**
 			 * Allow altering the array with variable array key patterns.
 			 *
-			 * @param array $patterns Array with the variable array key patterns.
+			 * @api  array  $patterns  Array with the variable array key patterns.
 			 */
 			$patterns = apply_filters( 'wpseo_option_titles_variable_array_key_patterns', $patterns );
 
@@ -928,7 +939,7 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 	/**
 	 * Retrieves a list of separator options.
 	 *
-	 * @return string[] An array of the separator options.
+	 * @return array An array of the separator options.
 	 */
 	protected static function get_separator_option_list() {
 		$separators = [
@@ -937,11 +948,11 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 				'label'  => __( 'Dash', 'wordpress-seo' ),
 			],
 			'sc-ndash'  => [
-				'option' => '&#8211;',
+				'option' => '&ndash;',
 				'label'  => __( 'En dash', 'wordpress-seo' ),
 			],
 			'sc-mdash'  => [
-				'option' => '&#8212;',
+				'option' => '&mdash;',
 				'label'  => __( 'Em dash', 'wordpress-seo' ),
 			],
 			'sc-colon'  => [
@@ -949,11 +960,11 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 				'label'  => __( 'Colon', 'wordpress-seo' ),
 			],
 			'sc-middot' => [
-				'option' => '&#183;',
+				'option' => '&middot;',
 				'label'  => __( 'Middle dot', 'wordpress-seo' ),
 			],
 			'sc-bull'   => [
-				'option' => '&#8226;',
+				'option' => '&bull;',
 				'label'  => __( 'Bullet', 'wordpress-seo' ),
 			],
 			'sc-star'   => [
@@ -973,19 +984,19 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 				'label'  => __( 'Small tilde', 'wordpress-seo' ),
 			],
 			'sc-laquo'  => [
-				'option' => '&#171;',
+				'option' => '&laquo;',
 				'label'  => __( 'Left angle quotation mark', 'wordpress-seo' ),
 			],
 			'sc-raquo'  => [
-				'option' => '&#187;',
+				'option' => '&raquo;',
 				'label'  => __( 'Right angle quotation mark', 'wordpress-seo' ),
 			],
 			'sc-lt'     => [
-				'option' => '&#062;',
+				'option' => '&lt;',
 				'label'  => __( 'Less than sign', 'wordpress-seo' ),
 			],
 			'sc-gt'     => [
-				'option' => '&#060;',
+				'option' => '&gt;',
 				'label'  => __( 'Greater than sign', 'wordpress-seo' ),
 			],
 		];
@@ -993,7 +1004,7 @@ class WPSEO_Option_Titles extends WPSEO_Option {
 		/**
 		 * Allows altering the separator options array.
 		 *
-		 * @param array $separators Array with the separator options.
+		 * @api array $separators Array with the separator options.
 		 */
 		$separator_list = apply_filters( 'wpseo_separator_option_list', $separators );
 

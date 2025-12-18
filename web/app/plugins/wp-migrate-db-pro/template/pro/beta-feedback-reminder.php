@@ -1,4 +1,3 @@
-<?php defined( 'ABSPATH' ) || exit; ?>
 <div class="below-title beta-feedback warning inline-message">
 	<strong>Thanks again for testing the 2.0 beta!</strong>
 

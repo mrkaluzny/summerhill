@@ -3,7 +3,6 @@
 namespace WPMailSMTP\UsageTracking;
 
 use WPMailSMTP\Tasks\Task;
-use WPMailSMTP\Tasks\Tasks;
 
 /**
  * Class SendUsageTask.
@@ -53,8 +52,12 @@ class SendUsageTask extends Task {
 		// Register the action handler.
 		add_action( self::ACTION, [ $this, 'process' ] );
 
+		if ( ! function_exists( 'as_next_scheduled_action' ) ) {
+			return;
+		}
+
 		// Add new if none exists.
-		if ( Tasks::is_scheduled( self::ACTION ) !== false ) {
+		if ( as_next_scheduled_action( self::ACTION ) !== false ) {
 			return;
 		}
 

@@ -1,16 +1,13 @@
 <?php
 
-declare (strict_types=1);
 namespace WPMailSMTP\Vendor\GuzzleHttp\Promise;
 
 /**
  * Promises/A+ implementation that avoids recursion when possible.
  *
- * @see https://promisesaplus.com/
- *
- * @final
+ * @link https://promisesaplus.com/
  */
-class Promise implements PromiseInterface
+class Promise implements \WPMailSMTP\Vendor\GuzzleHttp\Promise\PromiseInterface
 {
     private $state = self::PENDING;
     private $result;
@@ -22,15 +19,15 @@ class Promise implements PromiseInterface
      * @param callable $waitFn   Fn that when invoked resolves the promise.
      * @param callable $cancelFn Fn that when invoked cancels the promise.
      */
-    public function __construct(?callable $waitFn = null, ?callable $cancelFn = null)
+    public function __construct(callable $waitFn = null, callable $cancelFn = null)
     {
         $this->waitFn = $waitFn;
         $this->cancelFn = $cancelFn;
     }
-    public function then(?callable $onFulfilled = null, ?callable $onRejected = null) : PromiseInterface
+    public function then(callable $onFulfilled = null, callable $onRejected = null)
     {
         if ($this->state === self::PENDING) {
-            $p = new Promise(null, [$this, 'cancel']);
+            $p = new \WPMailSMTP\Vendor\GuzzleHttp\Promise\Promise(null, [$this, 'cancel']);
             $this->handlers[] = [$p, $onFulfilled, $onRejected];
             $p->waitList = $this->waitList;
             $p->waitList[] = $this;
@@ -38,22 +35,22 @@ class Promise implements PromiseInterface
         }
         // Return a fulfilled promise and immediately invoke any callbacks.
         if ($this->state === self::FULFILLED) {
-            $promise = Create::promiseFor($this->result);
+            $promise = \WPMailSMTP\Vendor\GuzzleHttp\Promise\Create::promiseFor($this->result);
             return $onFulfilled ? $promise->then($onFulfilled) : $promise;
         }
         // It's either cancelled or rejected, so return a rejected promise
         // and immediately invoke any callbacks.
-        $rejection = Create::rejectionFor($this->result);
+        $rejection = \WPMailSMTP\Vendor\GuzzleHttp\Promise\Create::rejectionFor($this->result);
         return $onRejected ? $rejection->then(null, $onRejected) : $rejection;
     }
-    public function otherwise(callable $onRejected) : PromiseInterface
+    public function otherwise(callable $onRejected)
     {
         return $this->then(null, $onRejected);
     }
-    public function wait(bool $unwrap = \true)
+    public function wait($unwrap = \true)
     {
         $this->waitIfPending();
-        if ($this->result instanceof PromiseInterface) {
+        if ($this->result instanceof \WPMailSMTP\Vendor\GuzzleHttp\Promise\PromiseInterface) {
             return $this->result->wait($unwrap);
         }
         if ($unwrap) {
@@ -61,14 +58,14 @@ class Promise implements PromiseInterface
                 return $this->result;
             }
             // It's rejected so "unwrap" and throw an exception.
-            throw Create::exceptionFor($this->result);
+            throw \WPMailSMTP\Vendor\GuzzleHttp\Promise\Create::exceptionFor($this->result);
         }
     }
-    public function getState() : string
+    public function getState()
     {
         return $this->state;
     }
-    public function cancel() : void
+    public function cancel()
     {
         if ($this->state !== self::PENDING) {
             return;
@@ -81,23 +78,25 @@ class Promise implements PromiseInterface
                 $fn();
             } catch (\Throwable $e) {
                 $this->reject($e);
+            } catch (\Exception $e) {
+                $this->reject($e);
             }
         }
         // Reject the promise only if it wasn't rejected in a then callback.
         /** @psalm-suppress RedundantCondition */
         if ($this->state === self::PENDING) {
-            $this->reject(new CancellationException('Promise has been cancelled'));
+            $this->reject(new \WPMailSMTP\Vendor\GuzzleHttp\Promise\CancellationException('Promise has been cancelled'));
         }
     }
-    public function resolve($value) : void
+    public function resolve($value)
     {
         $this->settle(self::FULFILLED, $value);
     }
-    public function reject($reason) : void
+    public function reject($reason)
     {
         $this->settle(self::REJECTED, $reason);
     }
-    private function settle(string $state, $value) : void
+    private function settle($state, $value)
     {
         if ($this->state !== self::PENDING) {
             // Ignore calls with the same resolution.
@@ -124,21 +123,21 @@ class Promise implements PromiseInterface
         if (!\is_object($value) || !\method_exists($value, 'then')) {
             $id = $state === self::FULFILLED ? 1 : 2;
             // It's a success, so resolve the handlers in the queue.
-            Utils::queue()->add(static function () use($id, $value, $handlers) : void {
+            \WPMailSMTP\Vendor\GuzzleHttp\Promise\Utils::queue()->add(static function () use($id, $value, $handlers) {
                 foreach ($handlers as $handler) {
                     self::callHandler($id, $value, $handler);
                 }
             });
-        } elseif ($value instanceof Promise && Is::pending($value)) {
+        } elseif ($value instanceof \WPMailSMTP\Vendor\GuzzleHttp\Promise\Promise && \WPMailSMTP\Vendor\GuzzleHttp\Promise\Is::pending($value)) {
             // We can just merge our handlers onto the next promise.
             $value->handlers = \array_merge($value->handlers, $handlers);
         } else {
             // Resolve the handlers when the forwarded promise is resolved.
-            $value->then(static function ($value) use($handlers) : void {
+            $value->then(static function ($value) use($handlers) {
                 foreach ($handlers as $handler) {
                     self::callHandler(1, $value, $handler);
                 }
-            }, static function ($reason) use($handlers) : void {
+            }, static function ($reason) use($handlers) {
                 foreach ($handlers as $handler) {
                     self::callHandler(2, $reason, $handler);
                 }
@@ -152,13 +151,13 @@ class Promise implements PromiseInterface
      * @param mixed $value   Value to pass to the callback.
      * @param array $handler Array of handler data (promise and callbacks).
      */
-    private static function callHandler(int $index, $value, array $handler) : void
+    private static function callHandler($index, $value, array $handler)
     {
         /** @var PromiseInterface $promise */
         $promise = $handler[0];
         // The promise may have been cancelled or resolved before placing
         // this thunk in the queue.
-        if (Is::settled($promise)) {
+        if (\WPMailSMTP\Vendor\GuzzleHttp\Promise\Is::settled($promise)) {
             return;
         }
         try {
@@ -181,9 +180,11 @@ class Promise implements PromiseInterface
             }
         } catch (\Throwable $reason) {
             $promise->reject($reason);
+        } catch (\Exception $reason) {
+            $promise->reject($reason);
         }
     }
-    private function waitIfPending() : void
+    private function waitIfPending()
     {
         if ($this->state !== self::PENDING) {
             return;
@@ -195,19 +196,19 @@ class Promise implements PromiseInterface
             // If there's no wait function, then reject the promise.
             $this->reject('Cannot wait on a promise that has ' . 'no internal wait function. You must provide a wait ' . 'function when constructing the promise to be able to ' . 'wait on a promise.');
         }
-        Utils::queue()->run();
+        \WPMailSMTP\Vendor\GuzzleHttp\Promise\Utils::queue()->run();
         /** @psalm-suppress RedundantCondition */
         if ($this->state === self::PENDING) {
             $this->reject('Invoking the wait callback did not resolve the promise');
         }
     }
-    private function invokeWaitFn() : void
+    private function invokeWaitFn()
     {
         try {
             $wfn = $this->waitFn;
             $this->waitFn = null;
             $wfn(\true);
-        } catch (\Throwable $reason) {
+        } catch (\Exception $reason) {
             if ($this->state === self::PENDING) {
                 // The promise has not been resolved yet, so reject the promise
                 // with the exception.
@@ -219,7 +220,7 @@ class Promise implements PromiseInterface
             }
         }
     }
-    private function invokeWaitList() : void
+    private function invokeWaitList()
     {
         $waitList = $this->waitList;
         $this->waitList = null;
@@ -227,8 +228,8 @@ class Promise implements PromiseInterface
             do {
                 $result->waitIfPending();
                 $result = $result->result;
-            } while ($result instanceof Promise);
-            if ($result instanceof PromiseInterface) {
+            } while ($result instanceof \WPMailSMTP\Vendor\GuzzleHttp\Promise\Promise);
+            if ($result instanceof \WPMailSMTP\Vendor\GuzzleHttp\Promise\PromiseInterface) {
                 $result->wait(\false);
             }
         }

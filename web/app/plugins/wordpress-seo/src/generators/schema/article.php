@@ -2,7 +2,6 @@
 
 namespace Yoast\WP\SEO\Generators\Schema;
 
-use WP_User;
 use Yoast\WP\SEO\Config\Schema_IDs;
 
 /**
@@ -31,7 +30,8 @@ class Article extends Abstract_Schema_Piece {
 		}
 
 		if ( $this->context->schema_article_type !== 'None' ) {
-			$this->context->has_article = true;
+			$this->context->main_schema_id = $this->context->canonical . Schema_IDs::ARTICLE_HASH;
+
 			return true;
 		}
 
@@ -44,25 +44,17 @@ class Article extends Abstract_Schema_Piece {
 	 * @return array Article data.
 	 */
 	public function generate() {
-		$author = \get_userdata( $this->context->post->post_author );
-		$data   = [
+		$data = [
 			'@type'            => $this->context->schema_article_type,
 			'@id'              => $this->context->canonical . Schema_IDs::ARTICLE_HASH,
-			'isPartOf'         => [ '@id' => $this->context->main_schema_id ],
-			'author'           => [
-				'name' => ( $author instanceof WP_User ) ? $this->helpers->schema->html->smart_strip_tags( $author->display_name ) : '',
-				'@id'  => $this->helpers->schema->id->get_user_schema_id( $this->context->post->post_author, $this->context ),
-			],
+			'isPartOf'         => [ '@id' => $this->context->canonical . Schema_IDs::WEBPAGE_HASH ],
+			'author'           => [ '@id' => $this->helpers->schema->id->get_user_schema_id( $this->context->post->post_author, $this->context ) ],
 			'headline'         => $this->helpers->schema->html->smart_strip_tags( $this->helpers->post->get_post_title_with_fallback( $this->context->id ) ),
 			'datePublished'    => $this->helpers->date->format( $this->context->post->post_date_gmt ),
+			'dateModified'     => $this->helpers->date->format( $this->context->post->post_modified_gmt ),
+			'mainEntityOfPage' => [ '@id' => $this->context->canonical . Schema_IDs::WEBPAGE_HASH ],
+			'wordCount'        => $this->word_count( $this->context->post->post_content, $this->context->post->post_title ),
 		];
-
-		if ( \strtotime( $this->context->post->post_modified_gmt ) > \strtotime( $this->context->post->post_date_gmt ) ) {
-			$data['dateModified'] = $this->helpers->date->format( $this->context->post->post_modified_gmt );
-		}
-
-		$data['mainEntityOfPage'] = [ '@id' => $this->context->main_schema_id ];
-		$data['wordCount']        = $this->word_count( $this->context->post->post_content, $this->context->post->post_title );
 
 		if ( $this->context->post->comment_status === 'open' ) {
 			$data['commentCount'] = \intval( $this->context->post->comment_count, 10 );
@@ -95,7 +87,7 @@ class Article extends Abstract_Schema_Piece {
 		/**
 		 * Filter: 'wpseo_schema_article_keywords_taxonomy' - Allow changing the taxonomy used to assign keywords to a post type Article data.
 		 *
-		 * @param string $taxonomy The chosen taxonomy.
+		 * @api string $taxonomy The chosen taxonomy.
 		 */
 		$taxonomy = \apply_filters( 'wpseo_schema_article_keywords_taxonomy', 'post_tag' );
 
@@ -113,7 +105,7 @@ class Article extends Abstract_Schema_Piece {
 		/**
 		 * Filter: 'wpseo_schema_article_sections_taxonomy' - Allow changing the taxonomy used to assign keywords to a post type Article data.
 		 *
-		 * @param string $taxonomy The chosen taxonomy.
+		 * @api string $taxonomy The chosen taxonomy.
 		 */
 		$taxonomy = \apply_filters( 'wpseo_schema_article_sections_taxonomy', 'category' );
 
@@ -136,7 +128,7 @@ class Article extends Abstract_Schema_Piece {
 			return $data;
 		}
 
-		$callback = static function ( $term ) {
+		$callback = static function( $term ) {
 			// We are using the WordPress internal translation.
 			return $term->name !== \__( 'Uncategorized', 'default' );
 		};
@@ -180,7 +172,7 @@ class Article extends Abstract_Schema_Piece {
 		/**
 		 * Filter: 'wpseo_schema_article_potential_action_target' - Allows filtering of the schema Article potentialAction target.
 		 *
-		 * @param array $targets The URLs for the Article potentialAction target.
+		 * @api array $targets The URLs for the Article potentialAction target.
 		 */
 		$targets = \apply_filters( 'wpseo_schema_article_potential_action_target', [ $this->context->canonical . '#respond' ] );
 
@@ -208,31 +200,9 @@ class Article extends Abstract_Schema_Piece {
 		// Strip pre/code blocks and their content.
 		$post_content = \preg_replace( '@<(pre|code)[^>]*?>.*?</\\1>@si', '', $post_content );
 
-		// Add space between tags that don't have it.
-		$post_content = \preg_replace( '@><@', '> <', $post_content );
-
 		// Strips all other tags.
 		$post_content = \wp_strip_all_tags( $post_content );
 
-		$characters = '';
-
-		if ( \preg_match( '@[а-я]@ui', $post_content ) ) {
-			// Correct counting of the number of words in the Russian and Ukrainian languages.
-			$alphabet = [
-				'ru' => 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя',
-				'ua' => 'абвгґдеєжзиіїйклмнопрстуфхцчшщьюя',
-			];
-
-			$characters  = \implode( '', $alphabet );
-			$characters  = \preg_split( '//u', $characters, -1, \PREG_SPLIT_NO_EMPTY );
-			$characters  = \array_unique( $characters );
-			$characters  = \implode( '', $characters );
-			$characters .= \mb_strtoupper( $characters );
-		}
-
-		// Remove characters from HTML entities.
-		$post_content = \preg_replace( '@&[a-z0-9]+;@i', ' ', \htmlentities( $post_content ) );
-
-		return \str_word_count( $post_content, 0, $characters );
+		return \str_word_count( $post_content, 0 );
 	}
 }

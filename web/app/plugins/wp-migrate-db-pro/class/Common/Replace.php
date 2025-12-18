@@ -2,17 +2,10 @@
 
 namespace DeliciousBrains\WPMDB\Common;
 
-use DeliciousBrains\WPMDB\Common\DryRun\DiffEntity;
-use DeliciousBrains\WPMDB\Common\DryRun\DiffInterpreter;
 use DeliciousBrains\WPMDB\Common\Error\ErrorLog;
 use DeliciousBrains\WPMDB\Common\FormData\FormData;
-use DeliciousBrains\WPMDB\Common\Http\Helper;
-use DeliciousBrains\WPMDB\Common\Http\Http;
-use DeliciousBrains\WPMDB\Common\Http\WPMDBRestAPIServer;
 use DeliciousBrains\WPMDB\Common\MigrationState\MigrationStateManager;
 use DeliciousBrains\WPMDB\Common\Properties\Properties;
-use DeliciousBrains\WPMDB\Common\Replace\ReplacePairInterface;
-use DeliciousBrains\WPMDB\Common\Replace\PairFactory;
 use DeliciousBrains\WPMDB\Common\Sql\TableHelper;
 use DeliciousBrains\WPMDB\Common\Util\Util;
 
@@ -22,11 +15,11 @@ class Replace
     /**
      * @var
      */
-    protected $search = [];
+    protected $search;
     /**
      * @var
      */
-    protected $replace = [];
+    protected $replace;
     /**
      * @var
      */
@@ -122,78 +115,20 @@ class Replace
      */
     protected $json_merged;
 
-    /**
-     * @var array
-     */
-    private $regex;
-
-    /**
-     * @var array
-     */
-    private $case_sensitive;
-
-    /**
-     * @var ReplacePairInterface[]
-     */
-    private $pairs = [];
-
-    /**
-     * @var Properties
-     */
-    private $properties;
-
-    /**
-     * @var PairFactory
-     */
-    private $pair_factory;
-
-    /**
-     * @var WPMDBRestAPIServer
-     */
-    private $rest_api_server;
-
-    /**
-     * @var Helper
-     */
-    private $http_helper;
-
-    /**
-     * @var Http
-     */
-    private $http;
-
-    /**
-     * @var DiffInterpreter
-     */
-    private $diff_interpreter;
-
-    public function __construct(
+    function __construct(
         MigrationStateManager $migration_state_manager,
         TableHelper $table_helper,
         ErrorLog $error_log,
         Util $util,
         FormData $form_data,
-        Properties $properties,
-        PairFactory $pairs_factory,
-        WPMDBRestAPIServer $rest_api_server,
-        Helper $http_helper,
-        Http $http,
-        DiffInterpreter $diff_interpreter
+        Properties $properties
     ) {
         $this->migration_state_manager = $migration_state_manager;
         $this->table_helper            = $table_helper;
         $this->error_log               = $error_log;
         $this->util                    = $util;
         $this->properties              = $properties;
-        $this->pair_factory            = $pairs_factory;
-        $this->rest_api_server         = $rest_api_server;
-        $this->http_helper             = $http_helper;
-        $this->http                    = $http;
-        $this->diff_interpreter        = $diff_interpreter;
         self::$form_data               = $form_data;
-
-        //Setup REST API routes
-        add_action('rest_api_init', [$this, 'register_rest_routes']);
     }
 
     public function get($prop)
@@ -212,8 +147,6 @@ class Replace
             'table',
             'search',
             'replace',
-            'regex',
-            'case_sensitive',
             'intent',
             'base_domain',
             'site_domain',
@@ -234,8 +167,6 @@ class Replace
         $this->table                = $args['table'];
         $this->search               = $args['search'];
         $this->replace              = $args['replace'];
-        $this->regex                = $args['regex'];
-        $this->case_sensitive       = $args['case_sensitive'];
         $this->intent               = $args['intent'];
         $this->base_domain          = $args['base_domain'];
         $this->site_domain          = $args['site_domain'];
@@ -246,71 +177,33 @@ class Replace
         $this->json_replace_columns = '';
         $this->json_merged          = false;
 
-        // Set diff interpreter table name
-        $this->diff_interpreter->getGroup()->setTable($this->table);
-
         global $wpdb;
 
         $prefix = $wpdb->base_prefix;
 
         $this->json_replaces($prefix);
-        $this->create_pairs();
 
         // Detect a protocol mismatch between the remote and local sites involved in the migration
         $this->detect_protocol_mismatch();
+
         return $this;
-    }
-
-    private function create_pairs($search = null, $replace = null, $json_pairs = false) {
-        if (null === $search) {
-            $search = $this->search;
-        }
-        if (null === $replace) {
-            $replace = $this->replace;
-        }
-
-        foreach ($search as $key => $pattern) {
-            if (!$json_pairs && array_key_exists($key, $this->regex) && true === $this->regex[$key]) {
-                $this->pairs[] = $this->pair_factory->create($pattern, $replace[$key], PairFactory::REGEX);
-                continue;
-            }
-            if ( array_key_exists($key, $this->case_sensitive) && true === $this->case_sensitive[$key]) {
-                $this->pairs[] = $this->pair_factory->create($pattern, $replace[$key], PairFactory::CASE_SENSITIVE);
-                continue;
-            }
-            $this->pairs[] = $this->pair_factory->create($pattern, $replace[$key], PairFactory::CASE_INSENSITIVE);
-        }
     }
 
     public static function parse_find_replace_pairs($intent = '', $site_url = '')
     {
-        $find_replace_pairs     = [
-            'regex'          => [],
-            'case_sensitive' => [],
-            'replace_old'    => [],
-            'replace_new'    => []
-        ];
-
+        $find_replace_pairs     = [];
         $tmp_find_replace_pairs = [];
-        $migration_options     = self::$form_data->getFormData();
-
-
-        if(!empty($migration_options['regex'])) {
-            $find_replace_pairs['regex'] = $migration_options['regex'];
-        }
-
-        if(!empty($migration_options['case_sensitive'])) {
-            $find_replace_pairs['case_sensitive'] = $migration_options['case_sensitive'];
-        }
-
+        $migration_options      = self::$form_data->getFormData();
 
         // Standard Pairs
-        if ( !empty($migration_options['search_replace']['standard_search_replace'])
+        if (
+            isset($migration_options['search_replace']['standard_search_replace'], $migration_options['search_replace']['standard_search_visible'])
+            && !empty($migration_options['search_replace']['standard_search_replace'])
             && $migration_options['search_replace']['standard_search_visible']
         ) {
             $standard_pairs = $migration_options['search_replace']['standard_search_replace'];
             foreach ($standard_pairs as $key => $pair) {
-                if (!empty(trim($pair['replace'])) && in_array($key, $migration_options['search_replace']['standard_options_enabled'], true)) {
+                if (in_array($key, $migration_options['search_replace']['standard_options_enabled'])) {
                     $tmp_find_replace_pairs[$pair['search']] = $pair['replace'];
                 }
             }
@@ -318,29 +211,12 @@ class Replace
 
         // Custom pairs
         if (
+            isset($migration_options['search_replace']['custom_search_replace']) &&
             !empty($migration_options['search_replace']['custom_search_replace'])
         ) {
-            $standard_pairs_count = count($tmp_find_replace_pairs);
-            $custom_pairs         = $migration_options['search_replace']['custom_search_replace'];
-
-            $i = 1;
+            $custom_pairs = $migration_options['search_replace']['custom_search_replace'];
             foreach ($custom_pairs as $pair) {
-                $index = $i + $standard_pairs_count;
-                if (empty($pair['replace_old']) && empty($pair['replace_new'])) {
-                    $i++;
-                    continue;
-                }
                 $tmp_find_replace_pairs[$pair['replace_old']] = $pair['replace_new'];
-
-                if(empty($migration_options['regex']) && isset($pair['regex'])) {
-                    $find_replace_pairs['regex'][$index] = $pair['regex'];
-                }
-
-                if(empty($migration_options['case_sensitive']) && isset($pair['case_sensitive'])) {
-                    $find_replace_pairs['case_sensitive'][$index] = $pair['case_sensitive'];
-                }
-
-                $i++;
             }
         }
 
@@ -353,6 +229,11 @@ class Replace
                 $find_replace_pairs['replace_new'][$i] = $replace_new;
                 $i++;
             }
+        }
+
+        if (empty($find_replace_pairs)) {
+            $find_replace_pairs['replace_old'] = [];
+            $find_replace_pairs['replace_new'] = [];
         }
 
         return $find_replace_pairs;
@@ -543,10 +424,9 @@ class Replace
             return false;
         }
 
-        //Create the json replace pairs.
-        $this->create_pairs($this->json_search, $this->json_replace, true);
-
         //Only add json replacements once
+        $this->search      = array_merge($this->search, $this->json_search);
+        $this->replace     = array_merge($this->replace, $this->json_replace);
         $this->json_merged = true;
 
         return true;
@@ -561,40 +441,22 @@ class Replace
      */
     public function apply_replaces($subject)
     {
-        $original = $subject;
-
         if (empty($this->search) && empty($this->replace)) {
             return $subject;
         }
 
-        if (count($this->search) !== count($this->replace)) {
-            return $subject;
-        }
-
         $this->maybe_merge_json_replaces(); // Maybe merge in json_encoded find/replace values
-
-        foreach ($this->pairs as $pair) {
-            $subject = $pair->apply($subject);
-        }
+        $new = str_ireplace($this->search, $this->replace, $subject, $count);
 
         if ($this->is_subdomain_replaces_on()) {
-            $subject = $this->subdomain_replaces($subject);
+            $new = $this->subdomain_replaces($new);
         }
 
         if (true === $this->is_protocol_mismatch) {
-            $subject = $this->do_protocol_replace($subject, $this->destination_url);
+            $new = $this->do_protocol_replace($new, $this->destination_url);
         }
 
-        if ('find_replace' === $this->intent) {
-            $row = null;
-            if (is_object($this->row) ) {
-                $get_vars = function_exists('get_mangled_object_vars') ? get_mangled_object_vars($this->row) : $this->row;
-                $row      = reset($get_vars);
-            }
-            $this->diff_interpreter->compute(DiffEntity::create($original, $subject, $this->column, $row));
-        }
-
-        return $subject;
+        return $new;
     }
 
     /**
@@ -617,39 +479,19 @@ class Replace
             return $pre;
         }
 
-        //If the intent is find_replace we need to prefix the tables with the temp prefix and wp base table prefix.
-        global $wpdb;
-        $table_prefix = $wpdb->base_prefix;
-        if ( 'find_replace' === $this->get_intent() ) {
+		//If the intent is find_replace we need to prefix the tables with the temp prefix and wp base table prefix.
+		$table_prefix = '';
+		if ( 'find_replace' === $this->get_intent() ) {
+			global $wpdb;
+			$table_prefix = $this->properties->temp_prefix . $wpdb->base_prefix;
+		}
 
-            $table_prefix = $this->properties->temp_prefix . $table_prefix;
-        }
-
-        //Check if find and replace needs be skipped for the current table
-        $skipped_tables = apply_filters('wpmdb_skip_search_replace_tables', ['eum_logs']);
-        foreach ($skipped_tables as $skipped_table) {
-            if ($this->table === $table_prefix . $skipped_table) {
-                return $data;
-            }
-        }
-
-        if ($this->should_do_reference_check($table_prefix) && is_serialized( $data ) && preg_match('/r\:\d+;/i', $data)) {
-            $current_row   = $this->get_row();
-            $first_row_key = reset($current_row);
-            $skipped       = [
-                'table'          => str_replace('_mig_', '', $this->get_table()),
-                'primary_key'    => $first_row_key,
-                'column'         => $this->get_column(),
-                'contains_match' => $this->has_skipped_values($data)
-            ];
-
-            if (property_exists($this->get_row(), 'option_name') && $this->table_is('options', $table_prefix)) {
-                $skipped['option_name'] = $this->get_row()->option_name;
-            }
-
-            error_log('WPMDB Find & Replace skipped: ' . json_encode($skipped));
-            return $data;
-        }
+		// Some options contain serialized self-references which leads to memory exhaustion. Skip these.
+		if ( $this->table_is( 'options', $table_prefix ) && 'option_value' === $this->get_column() && is_serialized( $data ) ) {
+			if ( preg_match( '/r\:\d+;/i', $data ) ) {
+				return $data;
+			}
+		}
 
         $is_json           = false;
         $before_fired      = false;
@@ -668,14 +510,19 @@ class Replace
             if (is_string($data) && ($unserialized = Util::unserialize($data, __METHOD__)) !== false) {
                 // PHP currently has a bug that doesn't allow you to clone the DateInterval / DatePeriod classes.
                 // We skip them here as they probably won't need data to be replaced anyway
-                if (
-                    'object' == gettype($unserialized) && 
-                    (
-                        $unserialized instanceof \DateInterval ||
-                        $unserialized instanceof \DatePeriod
-                    )
-                ) {
-                    return $data;
+                if ('object' == gettype($unserialized)) {
+                    if ($unserialized instanceof \DateInterval || $unserialized instanceof \DatePeriod) {
+                        return $data;
+                    }
+                    if ($unserialized instanceof \__PHP_Incomplete_Class && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
+                        $objectName = array();
+                        preg_match('/O:\d+:\"([^\"]+)\"/', $data, $objectName);
+                        $objectName = $objectName[1] ? $objectName[1] : $data;
+                        $error      = sprintf(__("WP Migrate DB - Failed to instantiate object for replacement. If the serialized object's class is defined by a plugin, you should enable that plugin for migration requests. \nClass Name: %s", 'wp-migrate-db'), $objectName);
+                        error_log($error);
+
+                        return $data;
+                    }
                 }
                 $data = $this->recursive_unserialize_replace($unserialized, true, true, $successive_filter);
             } elseif (is_array($data)) {
@@ -686,22 +533,19 @@ class Replace
 
                 $data = $_tmp;
                 unset($_tmp);
-            //is_object does not return true for __PHP_Incomplete_Class until 7.2 using gettype instead
-            } elseif ('object' == gettype($data)) { // Submitted by Tina Matter
-                if ($this->is_object_cloneable($data)) {
-                    $_tmp = clone $data;
-                    foreach ($data as $key => $value) {
-                        // Integer properties are crazy and the best thing we can do is to just ignore them.
-                        // see http://stackoverflow.com/a/10333200 and https://github.com/deliciousbrains/wp-migrate-db-pro/issues/853
-                        if (is_int($key)) {
-                            continue;
-                        }
-                        $_tmp->$key = $this->recursive_unserialize_replace($value, false, $parent_serialized, $successive_filter);
+            } elseif (is_object($data)) { // Submitted by Tina Matter
+                $_tmp = clone $data;
+                foreach ($data as $key => $value) {
+                    // Integer properties are crazy and the best thing we can do is to just ignore them.
+                    // see http://stackoverflow.com/a/10333200 and https://github.com/deliciousbrains/wp-migrate-db-pro/issues/853
+                    if (is_int($key)) {
+                        continue;
                     }
-
-                    $data = $_tmp;
-                    unset($_tmp);
+                    $_tmp->$key = $this->recursive_unserialize_replace($value, false, $parent_serialized, $successive_filter);
                 }
+
+                $data = $_tmp;
+                unset($_tmp);
             } elseif (Util::is_json($data, true)) {
                 $_tmp = array();
                 $data = json_decode($data, true);
@@ -742,58 +586,6 @@ class Replace
 
         return $data;
     }
-
-    /**
-     * Search unseralized string for potential match
-     *
-     * @param string $data
-     * @return bool
-     **/
-    protected function has_skipped_values($data)
-    {
-        foreach( $this->search as $search_string) {
-            if (false !== strpos($data, $search_string)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Table and cloumns to search for references
-     * @param string $table_prefix
-     * @return bool
-     **/
-    protected function should_do_reference_check($table_prefix)
-    {
-        if ( $this->table_is('options', $table_prefix) && 'option_value' === $this->get_column()) {
-            return true;
-        }
-        $table_column_for_check = [
-            [
-                'table' => $table_prefix . 'duplicator_packages',
-                'column' => 'package'
-            ],
-            [
-                'table' => $table_prefix . 'aiowps_audit_log',
-                'column' => 'stacktrace'
-            ]
-        ];
-        $table_column_for_check = apply_filters('wpmdb_check_table_column_for_reference', $table_column_for_check);
-        foreach($table_column_for_check as $table_column ) {
-            if (
-                array_key_exists('table', $table_column)
-                && $table_column['table'] === $this->get_table()
-                && array_key_exists('column', $table_column)
-                && $table_column['column'] === $this->get_column()
-                ) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
 
     /**
      * Getter for the $table class property.
@@ -882,7 +674,7 @@ class Replace
     {
         $prefix         = in_array($this->intent, ['find_replace', 'import']) ? '_mig_' . $prefix : $prefix;
         $default_tables = [
-            "{$prefix}posts",
+            "${prefix}posts",
         ];
 
         // Account for multisite subsites.
@@ -915,74 +707,5 @@ class Replace
                 return Util::json_encode_trim($item);
             }, $this->replace);
         }
-    }
-
-    /**
-     * @throws \WP_CLI\ExitException
-     * @throws \DI\DependencyException
-     * @throws \DI\NotFoundException
-     */
-    public function validate_regex_pattern() {
-       $_POST = $this->http_helper->convert_json_body_to_post();
-        if (isset($_POST['pattern'])) {
-            $pattern = Util::safe_wp_unslash($_POST['pattern']);
-            if (Util::is_regex_pattern_valid( $pattern ) === false) {
-                return $this->http->end_ajax(false);
-            }
-        }
-        $key_rules = array(
-            'pattern' => 'regex',
-        );
-
-        $state_data = $this->migration_state_manager->set_post_data( $key_rules );
-        return $this->http->end_ajax(isset($state_data['pattern']) === true);
-    }
-
-    public function register_rest_routes() {
-        $this->rest_api_server->registerRestRoute('/regex-validate', [
-            'methods'  => 'POST',
-            'callback' => [ $this, 'validate_regex_pattern' ],
-        ]);
-    }
-
-
-    /**
-     * Check if a given object can be cloned.
-     *
-     * @param object $object
-     *
-     * @return bool
-     */
-    private function is_object_cloneable($object) {
-        return (new \ReflectionClass(get_class($object)))->isCloneable();
-    }
-
-    /**
-     * Empties pairs array
-     */
-    public function reset_pairs() {
-        $this->pairs = [];
-    }
-
-
-    /**
-     * @return DiffInterpreter
-     */
-    public function get_diff_interpreter() {
-        return $this->diff_interpreter;
-    }
-
-
-    /**
-     * Returns an array of json serialized entities.
-     *
-     * @return array
-     */
-    public function get_diff_result() {
-        $result = [];
-        foreach($this->diff_interpreter->getGroup()->getEntities() as $entity) {
-            $result[] = $entity->jsonSerialize();
-        }
-        return $result;
     }
 }

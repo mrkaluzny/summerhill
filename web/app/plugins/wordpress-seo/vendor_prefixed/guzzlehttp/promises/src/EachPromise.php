@@ -1,29 +1,25 @@
 <?php
 
-declare (strict_types=1);
 namespace YoastSEO_Vendor\GuzzleHttp\Promise;
 
 /**
  * Represents a promise that iterates over many promises and invokes
  * side-effect functions in the process.
- *
- * @final
  */
 class EachPromise implements \YoastSEO_Vendor\GuzzleHttp\Promise\PromisorInterface
 {
     private $pending = [];
-    private $nextPendingIndex = 0;
-    /** @var \Iterator|null */
+    /** @var \Iterator */
     private $iterable;
-    /** @var callable|int|null */
+    /** @var callable|int */
     private $concurrency;
-    /** @var callable|null */
+    /** @var callable */
     private $onFulfilled;
-    /** @var callable|null */
+    /** @var callable */
     private $onRejected;
-    /** @var Promise|null */
+    /** @var Promise */
     private $aggregate;
-    /** @var bool|null */
+    /** @var bool */
     private $mutex;
     /**
      * Configuration hash can include the following key value pairs:
@@ -43,12 +39,12 @@ class EachPromise implements \YoastSEO_Vendor\GuzzleHttp\Promise\PromisorInterfa
      *   allowed number of outstanding concurrently executing promises,
      *   creating a capped pool of promises. There is no limit by default.
      *
-     * @param mixed $iterable Promises or values to iterate.
-     * @param array $config   Configuration options
+     * @param mixed    $iterable Promises or values to iterate.
+     * @param array    $config   Configuration options
      */
     public function __construct($iterable, array $config = [])
     {
-        $this->iterable = \YoastSEO_Vendor\GuzzleHttp\Promise\Create::iterFor($iterable);
+        $this->iterable = iter_for($iterable);
         if (isset($config['concurrency'])) {
             $this->concurrency = $config['concurrency'];
         }
@@ -59,52 +55,49 @@ class EachPromise implements \YoastSEO_Vendor\GuzzleHttp\Promise\PromisorInterfa
             $this->onRejected = $config['rejected'];
         }
     }
-    /** @psalm-suppress InvalidNullableReturnType */
-    public function promise() : \YoastSEO_Vendor\GuzzleHttp\Promise\PromiseInterface
+    public function promise()
     {
         if ($this->aggregate) {
             return $this->aggregate;
         }
         try {
             $this->createPromise();
-            /** @psalm-assert Promise $this->aggregate */
             $this->iterable->rewind();
             $this->refillPending();
         } catch (\Throwable $e) {
             $this->aggregate->reject($e);
+        } catch (\Exception $e) {
+            $this->aggregate->reject($e);
         }
-        /**
-         * @psalm-suppress NullableReturnStatement
-         */
         return $this->aggregate;
     }
-    private function createPromise() : void
+    private function createPromise()
     {
         $this->mutex = \false;
-        $this->aggregate = new \YoastSEO_Vendor\GuzzleHttp\Promise\Promise(function () : void {
-            if ($this->checkIfFinished()) {
+        $this->aggregate = new \YoastSEO_Vendor\GuzzleHttp\Promise\Promise(function () {
+            \reset($this->pending);
+            if (empty($this->pending) && !$this->iterable->valid()) {
+                $this->aggregate->resolve(null);
                 return;
             }
-            \reset($this->pending);
             // Consume a potentially fluctuating list of promises while
             // ensuring that indexes are maintained (precluding array_shift).
             while ($promise = \current($this->pending)) {
                 \next($this->pending);
                 $promise->wait();
-                if (\YoastSEO_Vendor\GuzzleHttp\Promise\Is::settled($this->aggregate)) {
+                if ($this->aggregate->getState() !== \YoastSEO_Vendor\GuzzleHttp\Promise\PromiseInterface::PENDING) {
                     return;
                 }
             }
         });
         // Clear the references when the promise is resolved.
-        $clearFn = function () : void {
+        $clearFn = function () {
             $this->iterable = $this->concurrency = $this->pending = null;
             $this->onFulfilled = $this->onRejected = null;
-            $this->nextPendingIndex = 0;
         };
         $this->aggregate->then($clearFn, $clearFn);
     }
-    private function refillPending() : void
+    private function refillPending()
     {
         if (!$this->concurrency) {
             // Add all pending promises.
@@ -113,7 +106,7 @@ class EachPromise implements \YoastSEO_Vendor\GuzzleHttp\Promise\PromisorInterfa
             return;
         }
         // Add only up to N pending promises.
-        $concurrency = \is_callable($this->concurrency) ? ($this->concurrency)(\count($this->pending)) : $this->concurrency;
+        $concurrency = \is_callable($this->concurrency) ? \call_user_func($this->concurrency, \count($this->pending)) : $this->concurrency;
         $concurrency = \max($concurrency - \count($this->pending), 0);
         // Concurrency may be set to 0 to disallow new promises.
         if (!$concurrency) {
@@ -128,30 +121,27 @@ class EachPromise implements \YoastSEO_Vendor\GuzzleHttp\Promise\PromisorInterfa
         while (--$concurrency && $this->advanceIterator() && $this->addPending()) {
         }
     }
-    private function addPending() : bool
+    private function addPending()
     {
         if (!$this->iterable || !$this->iterable->valid()) {
             return \false;
         }
-        $promise = \YoastSEO_Vendor\GuzzleHttp\Promise\Create::promiseFor($this->iterable->current());
-        $key = $this->iterable->key();
-        // Iterable keys may not be unique, so we use a counter to
-        // guarantee uniqueness
-        $idx = $this->nextPendingIndex++;
-        $this->pending[$idx] = $promise->then(function ($value) use($idx, $key) : void {
+        $promise = promise_for($this->iterable->current());
+        $idx = $this->iterable->key();
+        $this->pending[$idx] = $promise->then(function ($value) use($idx) {
             if ($this->onFulfilled) {
-                ($this->onFulfilled)($value, $key, $this->aggregate);
+                \call_user_func($this->onFulfilled, $value, $idx, $this->aggregate);
             }
             $this->step($idx);
-        }, function ($reason) use($idx, $key) : void {
+        }, function ($reason) use($idx) {
             if ($this->onRejected) {
-                ($this->onRejected)($reason, $key, $this->aggregate);
+                \call_user_func($this->onRejected, $reason, $idx, $this->aggregate);
             }
             $this->step($idx);
         });
         return \true;
     }
-    private function advanceIterator() : bool
+    private function advanceIterator()
     {
         // Place a lock on the iterator so that we ensure to not recurse,
         // preventing fatal generator errors.
@@ -167,12 +157,16 @@ class EachPromise implements \YoastSEO_Vendor\GuzzleHttp\Promise\PromisorInterfa
             $this->aggregate->reject($e);
             $this->mutex = \false;
             return \false;
+        } catch (\Exception $e) {
+            $this->aggregate->reject($e);
+            $this->mutex = \false;
+            return \false;
         }
     }
-    private function step(int $idx) : void
+    private function step($idx)
     {
         // If the promise was already resolved, then ignore this step.
-        if (\YoastSEO_Vendor\GuzzleHttp\Promise\Is::settled($this->aggregate)) {
+        if ($this->aggregate->getState() !== \YoastSEO_Vendor\GuzzleHttp\Promise\PromiseInterface::PENDING) {
             return;
         }
         unset($this->pending[$idx]);
@@ -184,7 +178,7 @@ class EachPromise implements \YoastSEO_Vendor\GuzzleHttp\Promise\PromisorInterfa
             $this->refillPending();
         }
     }
-    private function checkIfFinished() : bool
+    private function checkIfFinished()
     {
         if (!$this->pending && !$this->iterable->valid()) {
             // Resolve the promise if there's nothing left to do.

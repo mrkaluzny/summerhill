@@ -14,7 +14,8 @@ if ( ! defined( 'WPSEO_VERSION' ) ) {
 }
 
 /**
- * WARNING: This hook is intended for internal use only.
- * Don't use it in your code as it will be removed shortly.
+ * Fires when displaying the site wide analysis tab.
+ *
+ * @param Yoast_Form $yform The yoast form object.
  */
-do_action( 'wpseo_settings_tab_site_analysis_internal', $yform );
+do_action( 'wpseo_settings_tab_site_analysis', $yform );

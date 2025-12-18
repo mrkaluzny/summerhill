@@ -15,7 +15,7 @@ class WPSEO_Options {
 	/**
 	 * The option values.
 	 *
-	 * @var array|null
+	 * @var null
 	 */
 	protected static $option_values = null;
 
@@ -30,7 +30,6 @@ class WPSEO_Options {
 		'wpseo_social'        => 'WPSEO_Option_Social',
 		'wpseo_ms'            => 'WPSEO_Option_MS',
 		'wpseo_taxonomy_meta' => 'WPSEO_Taxonomy_Meta',
-		'wpseo_llmstxt'       => 'WPSEO_Option_Llmstxt',
 	];
 
 	/**
@@ -60,15 +59,13 @@ class WPSEO_Options {
 	protected function __construct() {
 		$this->register_hooks();
 
-		foreach ( static::$options as $option_class ) {
+		foreach ( static::$options as $option_name => $option_class ) {
 			static::register_option( call_user_func( [ $option_class, 'get_instance' ] ) );
 		}
 	}
 
 	/**
 	 * Register our hooks.
-	 *
-	 * @return void
 	 */
 	public function register_hooks() {
 		add_action( 'registered_taxonomy', [ $this, 'clear_cache' ] );
@@ -94,8 +91,6 @@ class WPSEO_Options {
 	 * Registers an option to the options list.
 	 *
 	 * @param WPSEO_Option $option_instance Instance of the option.
-	 *
-	 * @return void
 	 */
 	public static function register_option( WPSEO_Option $option_instance ) {
 		$option_name = $option_instance->get_option_name();
@@ -205,7 +200,7 @@ class WPSEO_Options {
 		/**
 		 * Filter: wpseo_options - Allow developers to change the option name to include.
 		 *
-		 * @param array $option_names The option names to include in get_all and reset().
+		 * @api array The option names to include in get_all and reset().
 		 */
 		return apply_filters( 'wpseo_options', $option_names );
 	}
@@ -213,13 +208,10 @@ class WPSEO_Options {
 	/**
 	 * Retrieve all the options for the SEO plugin in one go.
 	 *
-	 * @param array<string> $specific_options The option groups of the option you want to get.
-	 *
 	 * @return array Array combining the values of all the options.
 	 */
-	public static function get_all( $specific_options = [] ) {
-		$option_names          = ( empty( $specific_options ) ) ? static::get_option_names() : $specific_options;
-		static::$option_values = static::get_options( $option_names );
+	public static function get_all() {
+		static::$option_values = static::get_options( static::get_option_names() );
 
 		return static::$option_values;
 	}
@@ -273,27 +265,24 @@ class WPSEO_Options {
 	/**
 	 * Retrieve a single field from any option for the SEO plugin. Keys are always unique.
 	 *
-	 * @param string        $key           The key it should return.
-	 * @param mixed         $default_value The default value that should be returned if the key isn't set.
-	 * @param array<string> $option_groups The option groups to retrieve the option from.
+	 * @param string $key     The key it should return.
+	 * @param mixed  $default The default value that should be returned if the key isn't set.
 	 *
-	 * @return mixed Returns value if found, $default_value if not.
+	 * @return mixed|null Returns value if found, $default if not.
 	 */
-	public static function get( $key, $default_value = null, $option_groups = [] ) {
-		if ( ! isset( static::$option_values[ $key ] ) ) {
-			static::prime_cache( $option_groups );
+	public static function get( $key, $default = null ) {
+		if ( static::$option_values === null ) {
+			static::prime_cache();
 		}
 		if ( isset( static::$option_values[ $key ] ) ) {
 			return static::$option_values[ $key ];
 		}
 
-		return $default_value;
+		return $default;
 	}
 
 	/**
 	 * Resets the cache to null.
-	 *
-	 * @return void
 	 */
 	public static function clear_cache() {
 		static::$option_values = null;
@@ -301,27 +290,22 @@ class WPSEO_Options {
 
 	/**
 	 * Primes our cache.
-	 *
-	 * @param array<string> $option_groups The option groups to prime the cache with.
-	 *
-	 * @return void
 	 */
-	private static function prime_cache( $option_groups = [] ) {
-		static::$option_values = static::get_all( $option_groups );
+	private static function prime_cache() {
+		static::$option_values = static::get_all();
 		static::$option_values = static::add_ms_option( static::$option_values );
 	}
 
 	/**
 	 * Retrieve a single field from an option for the SEO plugin.
 	 *
-	 * @param string $key          The key to set.
-	 * @param mixed  $value        The value to set.
-	 * @param string $option_group The lookup table which represents the option_group where the key is stored.
+	 * @param string $key   The key to set.
+	 * @param mixed  $value The value to set.
 	 *
 	 * @return mixed|null Returns value if found, $default if not.
 	 */
-	public static function set( $key, $value, $option_group = '' ) {
-		$lookup_table = static::get_lookup_table( $option_group );
+	public static function set( $key, $value ) {
+		$lookup_table = static::get_lookup_table();
 
 		if ( isset( $lookup_table[ $key ] ) ) {
 			return static::save_option( $lookup_table[ $key ], $key, $value );
@@ -340,18 +324,18 @@ class WPSEO_Options {
 	/**
 	 * Get an option only if it's been auto-loaded.
 	 *
-	 * @param string $option        The option to retrieve.
-	 * @param mixed  $default_value A default value to return.
+	 * @param string     $option  The option to retrieve.
+	 * @param bool|mixed $default A default value to return.
 	 *
-	 * @return mixed
+	 * @return bool|mixed
 	 */
-	public static function get_autoloaded_option( $option, $default_value = false ) {
+	public static function get_autoloaded_option( $option, $default = false ) {
 		$value = wp_cache_get( $option, 'options' );
 		if ( $value === false ) {
 			$passed_default = func_num_args() > 1;
 
 			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals -- Using WP native filter.
-			return apply_filters( "default_option_{$option}", $default_value, $option, $passed_default );
+			return apply_filters( "default_option_{$option}", $default, $option, $passed_default );
 		}
 
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals -- Using WP native filter.
@@ -570,15 +554,13 @@ class WPSEO_Options {
 	/**
 	 * Retrieves a lookup table to find in which option_group a key is stored.
 	 *
-	 * @param string $option_group The option_group where the key is stored.
-	 *
 	 * @return array The lookup table.
 	 */
-	private static function get_lookup_table( $option_group = '' ) {
-		$lookup_table  = [];
-		$option_groups = ( $option_group === '' ) ? static::$options : [ $option_group => static::$options[ $option_group ] ];
+	private static function get_lookup_table() {
+		$lookup_table = [];
 
-		foreach ( array_keys( $option_groups ) as $option_name ) {
+
+		foreach ( array_keys( static::$options ) as $option_name ) {
 			$full_option = static::get_option( $option_name );
 			foreach ( $full_option as $key => $value ) {
 				$lookup_table[ $key ] = $option_name;

@@ -3,7 +3,6 @@
 namespace DeliciousBrains\WPMDB\Pro;
 
 use DeliciousBrains\WPMDB\Common\Error\ErrorLog;
-use DeliciousBrains\WPMDB\Common\Helpers;
 use DeliciousBrains\WPMDB\Common\Properties\Properties;
 use DeliciousBrains\WPMDB\Common\Settings\Settings;
 use DeliciousBrains\WPMDB\Common\Util\Util;
@@ -147,7 +146,7 @@ class Api {
 			}
 
 			// Don't cache the license response so we can try again
-            delete_site_transient( Helpers::get_licence_response_transient_key() );
+			delete_site_transient( 'wpmdb_licence_response' );
 
 			return json_encode( array( 'errors' => array( 'connection_failed' => $connection_failed_message ) ) );
 		}

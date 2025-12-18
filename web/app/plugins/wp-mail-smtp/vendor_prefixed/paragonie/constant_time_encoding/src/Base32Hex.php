@@ -1,11 +1,9 @@
 <?php
 
-declare (strict_types=1);
 namespace WPMailSMTP\Vendor\ParagonIE\ConstantTime;
 
-use function pack;
 /**
- *  Copyright (c) 2016 - 2022 Paragon Initiative Enterprises.
+ *  Copyright (c) 2016 - 2017 Paragon Initiative Enterprises.
  *  Copyright (c) 2014 Steve "Sc00bz" Thomas (steve at tobtu dot com)
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,7 +30,7 @@ use function pack;
  *
  * @package ParagonIE\ConstantTime
  */
-abstract class Base32Hex extends Base32
+abstract class Base32Hex extends \WPMailSMTP\Vendor\ParagonIE\ConstantTime\Base32
 {
     /**
      * Uses bitwise operators instead of table-lookups to turn 5-bit integers
@@ -41,7 +39,7 @@ abstract class Base32Hex extends Base32
      * @param int $src
      * @return int
      */
-    protected static function decode5Bits(int $src) : int
+    protected static function decode5Bits($src)
     {
         $ret = -1;
         // if ($src > 0x30 && $src < 0x3a) ret += $src - 0x2e + 1; // -47
@@ -57,7 +55,7 @@ abstract class Base32Hex extends Base32
      * @param int $src
      * @return int
      */
-    protected static function decode5BitsUpper(int $src) : int
+    protected static function decode5BitsUpper($src)
     {
         $ret = -1;
         // if ($src > 0x30 && $src < 0x3a) ret += $src - 0x2e + 1; // -47
@@ -73,12 +71,12 @@ abstract class Base32Hex extends Base32
      * @param int $src
      * @return string
      */
-    protected static function encode5Bits(int $src) : string
+    protected static function encode5Bits($src)
     {
         $src += 0x30;
         // if ($src > 0x39) $src += 0x61 - 0x3a; // 39
         $src += 0x39 - $src >> 8 & 39;
-        return pack('C', $src);
+        return \pack('C', $src);
     }
     /**
      * Uses bitwise operators instead of table-lookups to turn 8-bit integers
@@ -89,11 +87,11 @@ abstract class Base32Hex extends Base32
      * @param int $src
      * @return string
      */
-    protected static function encode5BitsUpper(int $src) : string
+    protected static function encode5BitsUpper($src)
     {
         $src += 0x30;
         // if ($src > 0x39) $src += 0x41 - 0x3a; // 7
         $src += 0x39 - $src >> 8 & 7;
-        return pack('C', $src);
+        return \pack('C', $src);
     }
 }

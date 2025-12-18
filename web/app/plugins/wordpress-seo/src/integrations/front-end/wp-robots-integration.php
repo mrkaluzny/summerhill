@@ -139,26 +139,24 @@ class WP_Robots_Integration implements Integration_Interface {
 	 * @return array The filtered robots.
 	 */
 	protected function enforce_robots_congruence( $robots ) {
-		if ( ! empty( $robots['nofollow'] ) ) {
+		if ( isset( $robots['nofollow'] ) ) {
 			$robots['follow'] = null;
 		}
-		if ( ! empty( $robots['noarchive'] ) ) {
+		if ( isset( $robots['noarchive'] ) ) {
 			$robots['archive'] = null;
 		}
-		if ( ! empty( $robots['noimageindex'] ) ) {
+		if ( isset( $robots['noimageindex'] ) ) {
 			$robots['imageindex'] = null;
 
-			// `max-image-preview` should set be to `none` when `noimageindex` is present.
-			// Using `isset` rather than `! empty` here so that in the rare case of `max-image-preview`
-			// being equal to an empty string due to filtering, its value would still be set to `none`.
+			// max-image-preview should be to none when noimageindex is present.
 			if ( isset( $robots['max-image-preview'] ) ) {
 				$robots['max-image-preview'] = 'none';
 			}
 		}
-		if ( ! empty( $robots['nosnippet'] ) ) {
+		if ( isset( $robots['nosnippet'] ) ) {
 			$robots['snippet'] = null;
 		}
-		if ( ! empty( $robots['noindex'] ) ) {
+		if ( isset( $robots['noindex'] ) ) {
 			$robots['index']             = null;
 			$robots['imageindex']        = null;
 			$robots['noimageindex']      = null;
@@ -191,8 +189,8 @@ class WP_Robots_Integration implements Integration_Interface {
 					'follow'            => 2,
 					'nofollow'          => 3,
 				];
-				$ai    = ( $order[ $a ] ?? 4 );
-				$bi    = ( $order[ $b ] ?? 4 );
+				$ai    = isset( $order[ $a ] ) ? $order[ $a ] : 4;
+				$bi    = isset( $order[ $b ] ) ? $order[ $b ] : 4;
 
 				return ( $ai - $bi );
 			}

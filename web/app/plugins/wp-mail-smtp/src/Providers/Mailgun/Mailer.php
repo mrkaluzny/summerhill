@@ -2,9 +2,7 @@
 
 namespace WPMailSMTP\Providers\Mailgun;
 
-use WPMailSMTP\ConnectionInterface;
-use WPMailSMTP\Helpers\Helpers;
-use WPMailSMTP\MailCatcherInterface;
+use WPMailSMTP\Debug;
 use WPMailSMTP\Providers\MailerAbstract;
 use WPMailSMTP\WP;
 
@@ -52,23 +50,18 @@ class Mailer extends MailerAbstract {
 	protected $url = '';
 
 	/**
-	 * Mailer constructor.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param MailCatcherInterface $phpmailer  The MailCatcher object.
-	 * @param ConnectionInterface  $connection The Connection object.
+	 * @inheritdoc
 	 */
-	public function __construct( $phpmailer, $connection = null ) {
+	public function __construct( $phpmailer ) {
 
 		// Default value should be defined before the parent class contructor fires.
 		$this->url = self::API_BASE_US;
 
 		// We want to prefill everything from MailCatcher class, which extends PHPMailer.
-		parent::__construct( $phpmailer, $connection );
+		parent::__construct( $phpmailer );
 
 		// We have a special API URL to query in case of EU region.
-		if ( $this->connection_options->get( $this->mailer, 'region' ) === 'EU' ) {
+		if ( 'EU' === $this->options->get( $this->mailer, 'region' ) ) {
 			$this->url = self::API_BASE_EU;
 		}
 
@@ -76,9 +69,9 @@ class Mailer extends MailerAbstract {
 		 * Append the url with a domain,
 		 * to avoid passing the domain name as a query parameter with all requests.
 		 */
-		$this->url .= sanitize_text_field( $this->connection_options->get( $this->mailer, 'domain' ) . '/messages' );
+		$this->url .= sanitize_text_field( $this->options->get( $this->mailer, 'domain' ) . '/messages' );
 
-		$this->set_header( 'Authorization', 'Basic ' . base64_encode( 'api:' . $this->connection_options->get( $this->mailer, 'api_key' ) ) );
+		$this->set_header( 'Authorization', 'Basic ' . base64_encode( 'api:' . $this->options->get( $this->mailer, 'api_key' ) ) );
 	}
 
 	/**
@@ -224,7 +217,7 @@ class Mailer extends MailerAbstract {
 
 		$this->set_body_param(
 			array(
-				'h:' . $name => $this->sanitize_header_value( $name, $value ),
+				'h:' . $name => WP::sanitize_value( $value ),
 			)
 		);
 	}
@@ -236,26 +229,38 @@ class Mailer extends MailerAbstract {
 	 *
 	 * @param array $attachments The array of attachments data.
 	 */
-	public function set_attachments( $attachments ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh, Generic.Metrics.NestingLevel.MaxExceeded
+	public function set_attachments( $attachments ) {
 
 		if ( empty( $attachments ) ) {
 			return;
 		}
 
 		$payload = '';
-		$data    = [];
+		$data    = array();
 
 		foreach ( $attachments as $attachment ) {
-			$file = $this->get_attachment_file_content( $attachment );
+			$file = false;
+
+			/*
+			 * We are not using WP_Filesystem API as we can't reliably work with it.
+			 * It is not always available, same as credentials for FTP.
+			 */
+			try {
+				if ( is_file( $attachment[0] ) && is_readable( $attachment[0] ) ) {
+					$file = file_get_contents( $attachment[0] );
+				}
+			} catch ( \Exception $e ) {
+				$file = false;
+			}
 
 			if ( $file === false ) {
 				continue;
 			}
 
-			$data[] = [
+			$data[] = array(
 				'content' => $file,
-				'name'    => $this->get_attachment_file_name( $attachment ),
-			];
+				'name'    => $attachment[2],
+			);
 		}
 
 		if ( ! empty( $data ) ) {
@@ -266,7 +271,7 @@ class Mailer extends MailerAbstract {
 			// Iterate through pre-built params and build a payload.
 			foreach ( $this->body as $key => $value ) {
 				if ( is_array( $value ) ) {
-					foreach ( $value as $child_value ) {
+					foreach ( $value as $child_key => $child_value ) {
 						$payload .= '--' . $boundary;
 						$payload .= "\r\n";
 						$payload .= 'Content-Disposition: form-data; name="' . $key . "\"\r\n\r\n";
@@ -348,7 +353,7 @@ class Mailer extends MailerAbstract {
 	public function set_return_path( $email ) {
 
 		if (
-			$this->connection_options->get( 'mail', 'return_path' ) !== true ||
+			$this->options->get( 'mail', 'return_path' ) !== true ||
 			! filter_var( $email, FILTER_VALIDATE_EMAIL )
 		) {
 			return;
@@ -373,11 +378,10 @@ class Mailer extends MailerAbstract {
 
 		parent::process_response( $response );
 
-		if ( is_wp_error( $response ) ) {
-			return;
-		}
-
-		if ( ! empty( $this->response['body']->id ) ) {
+		if (
+			! is_wp_error( $response ) &&
+			! empty( $this->response['body']->id )
+		) {
 			$this->phpmailer->MessageID = $this->response['body']->id;
 			$this->verify_sent_status   = true;
 		}
@@ -397,17 +401,24 @@ class Mailer extends MailerAbstract {
 	 */
 	public function is_email_sent() {
 
-		$is_sent = false;
+		$is_sent = parent::is_email_sent();
 
 		if (
-			wp_remote_retrieve_response_code( $this->response ) === $this->email_sent_code &&
-			! empty( $this->response['body']->id )
+			$is_sent &&
+			isset( $this->response['body'] ) &&
+			! array_key_exists( 'id', (array) $this->response['body'] )
 		) {
-			$is_sent = true;
+			$message = 'Mailer: Mailgun' . PHP_EOL .
+				esc_html__( 'It looks like there\'s most likely a setup issue. Please check your WP Mail SMTP settings to see if any details might be missing or incorrect.', 'wp-mail-smtp' );
+
+			$this->error_message = $message;
+
+			Debug::set( $message );
+
+			return false;
 		}
 
-		/** This filter is documented in src/Providers/MailerAbstract.php. */
-		return apply_filters( 'wp_mail_smtp_providers_mailer_is_email_sent', $is_sent, $this->mailer );
+		return $is_sent;
 	}
 
 	/**
@@ -419,19 +430,27 @@ class Mailer extends MailerAbstract {
 	 */
 	public function get_response_error() {
 
-		$error_text[] = $this->error_message;
+		$body = (array) wp_remote_retrieve_body( $this->response );
 
-		if ( ! empty( $this->response ) ) {
-			$body = wp_remote_retrieve_body( $this->response );
+		$error_text = array();
 
-			if ( ! empty( $body->message ) ) {
-				$error_text[] = Helpers::format_error_message( $body->message );
+		if ( ! empty( $body['message'] ) ) {
+			if ( is_string( $body['message'] ) ) {
+				$error_text[] = $body['message'];
 			} else {
-				$error_text[] = WP::wp_remote_get_response_error_message( $this->response );
+				$error_text[] = \json_encode( $body['message'] );
+			}
+		} elseif ( ! empty( $this->error_message ) ) {
+			$error_text[] = $this->error_message;
+		} elseif ( ! empty( $body[0] ) ) {
+			if ( is_string( $body[0] ) ) {
+				$error_text[] = $body[0];
+			} else {
+				$error_text[] = \json_encode( $body[0] );
 			}
 		}
 
-		return implode( WP::EOL, array_map( 'esc_textarea', array_filter( $error_text ) ) );
+		return implode( '<br>', array_map( 'esc_textarea', $error_text ) );
 	}
 
 	/**
@@ -441,7 +460,8 @@ class Mailer extends MailerAbstract {
 
 		$mg_text = array();
 
-		$mailgun = $this->connection_options->get_group( $this->mailer );
+		$options = new \WPMailSMTP\Options();
+		$mailgun = $options->get_group( 'mailgun' );
 
 		$mg_text[] = '<strong>Api Key / Domain:</strong> ' . ( ! empty( $mailgun['api_key'] ) && ! empty( $mailgun['domain'] ) ? 'Yes' : 'No' );
 
@@ -453,7 +473,7 @@ class Mailer extends MailerAbstract {
 	 */
 	public function is_mailer_complete() {
 
-		$options = $this->connection_options->get_group( $this->mailer );
+		$options = $this->options->get_group( $this->mailer );
 
 		// API key is the only required option.
 		if (

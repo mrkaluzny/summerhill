@@ -10,18 +10,11 @@ use Yoast\WP\SEO\Presentations\Indexable_Presentation;
 class Rel_Next_Presenter extends Abstract_Indexable_Tag_Presenter {
 
 	/**
-	 * The tag key name.
-	 *
-	 * @var string
-	 */
-	protected $key = 'next';
-
-	/**
 	 * The tag format including placeholders.
 	 *
 	 * @var string
 	 */
-	protected $tag_format = self::LINK_REL_HREF;
+	protected $tag_format = '<link rel="next" href="%s" />';
 
 	/**
 	 * The method of escaping to use.
@@ -42,7 +35,7 @@ class Rel_Next_Presenter extends Abstract_Indexable_Tag_Presenter {
 			/**
 			 * Filter: 'wpseo_next_rel_link' - Allow changing link rel output by Yoast SEO.
 			 *
-			 * @param string $unsigned The full `<link` element.
+			 * @api string $unsigned The full `<link` element.
 			 */
 			return \apply_filters( 'wpseo_next_rel_link', $output );
 		}
@@ -63,7 +56,8 @@ class Rel_Next_Presenter extends Abstract_Indexable_Tag_Presenter {
 		/**
 		 * Filter: 'wpseo_adjacent_rel_url' - Allow filtering of the rel next URL put out by Yoast SEO.
 		 *
-		 * @param string                 $rel_next     The rel next URL.
+		 * @api string $rel_next The rel next URL.
+		 *
 		 * @param string                 $rel          Link relationship, prev or next.
 		 * @param Indexable_Presentation $presentation The presentation of an indexable.
 		 */

@@ -1,6 +1,5 @@
 <?php
 
-declare (strict_types=1);
 namespace WPMailSMTP\Vendor\GuzzleHttp\Psr7;
 
 use WPMailSMTP\Vendor\Psr\Http\Message\UriInterface;
@@ -9,16 +8,20 @@ use WPMailSMTP\Vendor\Psr\Http\Message\UriInterface;
  *
  * @author Tobias Schultze
  *
- * @see https://datatracker.ietf.org/doc/html/rfc3986#section-5
+ * @link https://tools.ietf.org/html/rfc3986#section-5
  */
 final class UriResolver
 {
     /**
      * Removes dot segments from a path and returns the new path.
      *
-     * @see https://datatracker.ietf.org/doc/html/rfc3986#section-5.2.4
+     * @param string $path
+     *
+     * @return string
+     *
+     * @link http://tools.ietf.org/html/rfc3986#section-5.2.4
      */
-    public static function removeDotSegments(string $path) : string
+    public static function removeDotSegments($path)
     {
         if ($path === '' || $path === '/') {
             return $path;
@@ -46,9 +49,14 @@ final class UriResolver
     /**
      * Converts the relative URI into a new URI that is resolved against the base URI.
      *
-     * @see https://datatracker.ietf.org/doc/html/rfc3986#section-5.2
+     * @param UriInterface $base Base URI
+     * @param UriInterface $rel  Relative URI
+     *
+     * @return UriInterface
+     *
+     * @link http://tools.ietf.org/html/rfc3986#section-5.2
      */
-    public static function resolve(UriInterface $base, UriInterface $rel) : UriInterface
+    public static function resolve(\WPMailSMTP\Vendor\Psr\Http\Message\UriInterface $base, \WPMailSMTP\Vendor\Psr\Http\Message\UriInterface $rel)
     {
         if ((string) $rel === '') {
             // we can simply return the same base URI instance for this same-document reference
@@ -85,7 +93,7 @@ final class UriResolver
                 $targetQuery = $rel->getQuery();
             }
         }
-        return new Uri(Uri::composeComponents($base->getScheme(), $targetAuthority, $targetPath, $targetQuery, $rel->getFragment()));
+        return new \WPMailSMTP\Vendor\GuzzleHttp\Psr7\Uri(\WPMailSMTP\Vendor\GuzzleHttp\Psr7\Uri::composeComponents($base->getScheme(), $targetAuthority, $targetPath, $targetQuery, $rel->getFragment()));
     }
     /**
      * Returns the target URI as a relative reference from the base URI.
@@ -107,13 +115,18 @@ final class UriResolver
      * relative-path reference will be returned as-is.
      *
      *    echo UriResolver::relativize($base, new Uri('/a/b/c'));  // prints 'c' as well
+     *
+     * @param UriInterface $base   Base URI
+     * @param UriInterface $target Target URI
+     *
+     * @return UriInterface The relative URI reference
      */
-    public static function relativize(UriInterface $base, UriInterface $target) : UriInterface
+    public static function relativize(\WPMailSMTP\Vendor\Psr\Http\Message\UriInterface $base, \WPMailSMTP\Vendor\Psr\Http\Message\UriInterface $target)
     {
         if ($target->getScheme() !== '' && ($base->getScheme() !== $target->getScheme() || $target->getAuthority() === '' && $base->getAuthority() !== '')) {
             return $target;
         }
-        if (Uri::isRelativePathReference($target)) {
+        if (\WPMailSMTP\Vendor\GuzzleHttp\Psr7\Uri::isRelativePathReference($target)) {
             // As the target is already highly relative we return it as-is. It would be possible to resolve
             // the target with `$target = self::resolve($base, $target);` and then try make it more relative
             // by removing a duplicate query. But let's not do that automatically.
@@ -137,13 +150,12 @@ final class UriResolver
         // inherit the base query component when resolving.
         if ($target->getQuery() === '') {
             $segments = \explode('/', $target->getPath());
-            /** @var string $lastSegment */
             $lastSegment = \end($segments);
             return $emptyPathUri->withPath($lastSegment === '' ? './' : $lastSegment);
         }
         return $emptyPathUri;
     }
-    private static function getRelativePath(UriInterface $base, UriInterface $target) : string
+    private static function getRelativePath(\WPMailSMTP\Vendor\Psr\Http\Message\UriInterface $base, \WPMailSMTP\Vendor\Psr\Http\Message\UriInterface $target)
     {
         $sourceSegments = \explode('/', $base->getPath());
         $targetSegments = \explode('/', $target->getPath());

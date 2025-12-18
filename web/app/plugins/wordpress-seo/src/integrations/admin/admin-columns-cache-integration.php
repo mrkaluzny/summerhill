@@ -53,10 +53,12 @@ class Admin_Columns_Cache_Integration implements Integration_Interface {
 	 *
 	 * This cache is used in showing the Yoast SEO columns on the posts overview
 	 * page (e.g. keyword score, incoming link count, etc.)
-	 *
-	 * @return void
 	 */
 	public function register_hooks() {
+		if ( \wp_doing_ajax() ) {
+			\add_action( 'admin_init', [ $this, 'fill_cache' ] );
+		}
+
 		// Hook into tablenav to calculate links and linked.
 		\add_action( 'manage_posts_extra_tablenav', [ $this, 'maybe_fill_cache' ] );
 	}
@@ -65,8 +67,6 @@ class Admin_Columns_Cache_Integration implements Integration_Interface {
 	 * Makes sure we calculate all values in one query by filling our cache beforehand.
 	 *
 	 * @param string $target Extra table navigation location which is triggered.
-	 *
-	 * @return void
 	 */
 	public function maybe_fill_cache( $target ) {
 		if ( $target === 'top' ) {
@@ -76,18 +76,11 @@ class Admin_Columns_Cache_Integration implements Integration_Interface {
 
 	/**
 	 * Fills the cache of indexables for all known post IDs.
-	 *
-	 * @return void
 	 */
 	public function fill_cache() {
 		global $wp_query;
 
-		// No need to continue building a cache if the main query did not return anything to cache.
-		if ( empty( $wp_query->posts ) ) {
-			return;
-		}
-
-		$posts    = $wp_query->posts;
+		$posts    = empty( $wp_query->posts ) ? $wp_query->get_posts() : $wp_query->posts;
 		$post_ids = [];
 
 		// Post lists return a list of objects.
@@ -115,9 +108,7 @@ class Admin_Columns_Cache_Integration implements Integration_Interface {
 		$indexables = $this->indexable_repository->find_by_multiple_ids_and_type( $post_ids, 'post', false );
 
 		foreach ( $indexables as $indexable ) {
-			if ( $indexable instanceof Indexable ) {
-				$this->indexable_cache[ $indexable->object_id ] = $indexable;
-			}
+			$this->indexable_cache[ $indexable->object_id ] = $indexable;
 		}
 	}
 
@@ -176,7 +167,7 @@ class Admin_Columns_Cache_Integration implements Integration_Interface {
 				$pages_map[ $page->ID ] = $page;
 			}
 
-			$pages = $top_level_pages;
+			$pages = &$top_level_pages;
 		}
 
 		$count      = 0;
@@ -224,7 +215,7 @@ class Admin_Columns_Cache_Integration implements Integration_Interface {
 	 *
 	 * @param array $children_pages The full map of child pages.
 	 * @param int   $count          The number of pages already processed.
-	 * @param int   $parent_id      The id of the parent that's currently being processed.
+	 * @param int   $parent         The parent that's currently being processed.
 	 * @param int   $start          The number at which the current overview starts.
 	 * @param int   $end            The number at which the current overview ends.
 	 * @param int   $to_display     The page IDs to be shown.
@@ -232,12 +223,12 @@ class Admin_Columns_Cache_Integration implements Integration_Interface {
 	 *
 	 * @return void
 	 */
-	private function get_child_page_ids( &$children_pages, &$count, $parent_id, $start, $end, &$to_display, &$pages_map ) {
-		if ( ! isset( $children_pages[ $parent_id ] ) ) {
+	private function get_child_page_ids( &$children_pages, &$count, $parent, $start, $end, &$to_display, &$pages_map ) {
+		if ( ! isset( $children_pages[ $parent ] ) ) {
 			return;
 		}
 
-		foreach ( $children_pages[ $parent_id ] as $page ) {
+		foreach ( $children_pages[ $parent ] as $page ) {
 			if ( $count >= $end ) {
 				break;
 			}
@@ -274,6 +265,6 @@ class Admin_Columns_Cache_Integration implements Integration_Interface {
 			$this->get_child_page_ids( $children_pages, $count, $page->ID, $start, $end, $to_display, $pages_map );
 		}
 
-		unset( $children_pages[ $parent_id ] ); // Required in order to keep track of orphans.
+		unset( $children_pages[ $parent ] ); // Required in order to keep track of orphans.
 	}
 }

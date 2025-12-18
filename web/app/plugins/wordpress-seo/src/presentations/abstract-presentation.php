@@ -2,13 +2,11 @@
 
 namespace Yoast\WP\SEO\Presentations;
 
-use AllowDynamicProperties;
 use Exception;
 
 /**
  * The abstract presentation class.
  */
-#[AllowDynamicProperties]
 class Abstract_Presentation {
 
 	/**
@@ -85,9 +83,9 @@ class Abstract_Presentation {
 	/**
 	 * Returns `true` if this class is a prototype.
 	 *
-	 * @codeCoverageIgnore Wrapper method.
-	 *
 	 * @return bool If this class is a prototype or not.
+	 *
+	 * @codeCoverageIgnore Wrapper method.
 	 */
 	protected function is_prototype() {
 		return $this->is_prototype;

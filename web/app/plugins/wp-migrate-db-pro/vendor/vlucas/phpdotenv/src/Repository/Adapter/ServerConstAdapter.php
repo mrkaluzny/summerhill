@@ -4,7 +4,7 @@ namespace DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter;
 
 use DeliciousBrains\WPMDB\Container\PhpOption\None;
 use DeliciousBrains\WPMDB\Container\PhpOption\Some;
-class ServerConstAdapter implements AvailabilityInterface, ReaderInterface, WriterInterface
+class ServerConstAdapter implements \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\AvailabilityInterface, \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\ReaderInterface, \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\WriterInterface
 {
     /**
      * Determines if the adapter is supported.
@@ -18,31 +18,22 @@ class ServerConstAdapter implements AvailabilityInterface, ReaderInterface, Writ
     /**
      * Get an environment variable, if it exists.
      *
-     * @param non-empty-string $name
+     * @param string $name
      *
      * @return \PhpOption\Option<string|null>
      */
     public function get($name)
     {
-        if (!\array_key_exists($name, $_SERVER)) {
-            return None::create();
+        if (\array_key_exists($name, $_SERVER)) {
+            return \DeliciousBrains\WPMDB\Container\PhpOption\Some::create($_SERVER[$name]);
         }
-        $value = $_SERVER[$name];
-        if (\is_scalar($value)) {
-            /** @var \PhpOption\Option<string|null> */
-            return Some::create((string) $value);
-        }
-        if (null === $value) {
-            /** @var \PhpOption\Option<string|null> */
-            return Some::create(null);
-        }
-        return None::create();
+        return \DeliciousBrains\WPMDB\Container\PhpOption\None::create();
     }
     /**
      * Set an environment variable.
      *
-     * @param non-empty-string $name
-     * @param string|null      $value
+     * @param string      $name
+     * @param string|null $value
      *
      * @return void
      */
@@ -53,7 +44,7 @@ class ServerConstAdapter implements AvailabilityInterface, ReaderInterface, Writ
     /**
      * Clear an environment variable.
      *
-     * @param non-empty-string $name
+     * @param string $name
      *
      * @return void
      */

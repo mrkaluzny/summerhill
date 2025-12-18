@@ -1,19 +1,10 @@
 <?php
-/**
- * Support for personal data eraser tool
- *
- * @link https://developer.wordpress.org/plugins/privacy/adding-the-personal-data-eraser-to-your-plugin/
- */
-
 
 add_filter( 'wp_privacy_personal_data_erasers',
 	'flamingo_privacy_register_personal_data_erasers',
 	10, 1
 );
 
-/**
- * Registers callback functions.
- */
 function flamingo_privacy_register_personal_data_erasers( $erasers ) {
 	return array_merge( (array) $erasers, array(
 		'flamingo-contact' => array(
@@ -27,10 +18,6 @@ function flamingo_privacy_register_personal_data_erasers( $erasers ) {
 	) );
 }
 
-
-/**
- * Callback for the contact data.
- */
 function flamingo_privacy_contact_eraser( $email_address, $page = 1 ) {
 	$number = 100;
 
@@ -50,7 +37,7 @@ function flamingo_privacy_contact_eraser( $email_address, $page = 1 ) {
 			$items_retained = true;
 
 			$messages = array(
-				__( 'Flamingo Address Book: You are not allowed to delete contact data.', 'flamingo' ),
+				__( "Flamingo Address Book: You are not allowed to delete contact data.", 'flamingo' ),
 			);
 
 			continue;
@@ -73,10 +60,6 @@ function flamingo_privacy_contact_eraser( $email_address, $page = 1 ) {
 	);
 }
 
-
-/**
- * Callback for the inbound messages data.
- */
 function flamingo_privacy_inbound_eraser( $email_address, $page = 1 ) {
 	$number = 100;
 
@@ -96,7 +79,7 @@ function flamingo_privacy_inbound_eraser( $email_address, $page = 1 ) {
 			$items_retained = true;
 
 			$messages = array(
-				__( 'Flamingo Inbound Messages: You are not allowed to delete inbound messages.', 'flamingo' ),
+				__( "Flamingo Inbound Messages: You are not allowed to delete inbound messages.", 'flamingo' ),
 			);
 
 			continue;

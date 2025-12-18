@@ -3,7 +3,7 @@
 namespace DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter;
 
 use DeliciousBrains\WPMDB\Container\PhpOption\Option;
-class PutenvAdapter implements AvailabilityInterface, ReaderInterface, WriterInterface
+class PutenvAdapter implements \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\AvailabilityInterface, \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\ReaderInterface, \DeliciousBrains\WPMDB\Container\Dotenv\Repository\Adapter\WriterInterface
 {
     /**
      * Determines if the adapter is supported.
@@ -17,20 +17,20 @@ class PutenvAdapter implements AvailabilityInterface, ReaderInterface, WriterInt
     /**
      * Get an environment variable, if it exists.
      *
-     * @param non-empty-string $name
+     * @param string $name
      *
      * @return \PhpOption\Option<string|null>
      */
     public function get($name)
     {
         /** @var \PhpOption\Option<string|null> */
-        return Option::fromValue(\getenv($name), \false);
+        return \DeliciousBrains\WPMDB\Container\PhpOption\Option::fromValue(\getenv($name), \false);
     }
     /**
      * Set an environment variable.
      *
-     * @param non-empty-string $name
-     * @param string|null      $value
+     * @param string      $name
+     * @param string|null $value
      *
      * @return void
      */
@@ -41,7 +41,7 @@ class PutenvAdapter implements AvailabilityInterface, ReaderInterface, WriterInt
     /**
      * Clear an environment variable.
      *
-     * @param non-empty-string $name
+     * @param string $name
      *
      * @return void
      */

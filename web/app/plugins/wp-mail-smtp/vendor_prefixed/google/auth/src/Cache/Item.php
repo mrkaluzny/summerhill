@@ -17,19 +17,11 @@
  */
 namespace WPMailSMTP\Vendor\Google\Auth\Cache;
 
-use DateTime;
-use DateTimeInterface;
-use DateTimeZone;
 use WPMailSMTP\Vendor\Psr\Cache\CacheItemInterface;
-use TypeError;
 /**
  * A cache item.
- *
- * This class will be used by MemoryCacheItemPool and SysVCacheItemPool
- * on PHP 7.4 and below. It is compatible with psr/cache 1.0 and 2.0 (PSR-6).
- * @see TypedItem for compatiblity with psr/cache 3.0.
  */
-final class Item implements CacheItemInterface
+final class Item implements \WPMailSMTP\Vendor\Psr\Cache\CacheItemInterface
 {
     /**
      * @var string
@@ -40,7 +32,7 @@ final class Item implements CacheItemInterface
      */
     private $value;
     /**
-     * @var DateTimeInterface|null
+     * @var \DateTime|null
      */
     private $expiration;
     /**
@@ -99,8 +91,9 @@ final class Item implements CacheItemInterface
             $this->expiration = $expiration;
             return $this;
         }
-        $error = \sprintf('Argument 1 passed to %s::expiresAt() must implement interface DateTimeInterface, %s given', \get_class($this), \gettype($expiration));
-        throw new TypeError($error);
+        $implementationMessage = \interface_exists('DateTimeInterface') ? 'implement interface DateTimeInterface' : 'be an instance of DateTime';
+        $error = \sprintf('Argument 1 passed to %s::expiresAt() must %s, %s given', \get_class($this), $implementationMessage, \gettype($expiration));
+        $this->handleError($error);
     }
     /**
      * {@inheritdoc}
@@ -116,9 +109,22 @@ final class Item implements CacheItemInterface
         } else {
             $message = 'Argument 1 passed to %s::expiresAfter() must be an ' . 'instance of DateInterval or of the type integer, %s given';
             $error = \sprintf($message, \get_class($this), \gettype($time));
-            throw new TypeError($error);
+            $this->handleError($error);
         }
         return $this;
+    }
+    /**
+     * Handles an error.
+     *
+     * @param string $error
+     * @throws \TypeError
+     */
+    private function handleError($error)
+    {
+        if (\class_exists('TypeError')) {
+            throw new \TypeError($error);
+        }
+        \trigger_error($error, \E_USER_ERROR);
     }
     /**
      * Determines if an expiration is valid based on the rules defined by PSR6.
@@ -131,16 +137,19 @@ final class Item implements CacheItemInterface
         if ($expiration === null) {
             return \true;
         }
-        if ($expiration instanceof DateTimeInterface) {
+        // We test for two types here due to the fact the DateTimeInterface
+        // was not introduced until PHP 5.5. Checking for the DateTime type as
+        // well allows us to support 5.4.
+        if ($expiration instanceof \DateTimeInterface) {
+            return \true;
+        }
+        if ($expiration instanceof \DateTime) {
             return \true;
         }
         return \false;
     }
-    /**
-     * @return DateTime
-     */
     protected function currentTime()
     {
-        return new DateTime('now', new DateTimeZone('UTC'));
+        return new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

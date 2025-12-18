@@ -15,7 +15,6 @@
 namespace YoastSEO_Vendor\League\OAuth2\Client\Token;
 
 use JsonSerializable;
-use ReturnTypeWillChange;
 use RuntimeException;
 interface AccessTokenInterface extends \JsonSerializable
 {
@@ -32,7 +31,7 @@ interface AccessTokenInterface extends \JsonSerializable
      */
     public function getRefreshToken();
     /**
-     * Returns the expiration timestamp in seconds, if defined.
+     * Returns the expiration timestamp, if defined.
      *
      * @return integer|null
      */
@@ -62,6 +61,5 @@ interface AccessTokenInterface extends \JsonSerializable
      *
      * @return array
      */
-    #[ReturnTypeWillChange]
     public function jsonSerialize();
 }

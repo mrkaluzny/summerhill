@@ -12,9 +12,6 @@ use Yoast\WP\SEO\Actions\Indexing\Indexable_Post_Type_Archive_Indexation_Action;
 use Yoast\WP\SEO\Actions\Indexing\Indexable_Term_Indexation_Action;
 use Yoast\WP\SEO\Actions\Indexing\Indexation_Action_Interface;
 use Yoast\WP\SEO\Actions\Indexing\Indexing_Prepare_Action;
-use Yoast\WP\SEO\Actions\Indexing\Post_Link_Indexing_Action;
-use Yoast\WP\SEO\Actions\Indexing\Term_Link_Indexing_Action;
-use Yoast\WP\SEO\Helpers\Indexable_Helper;
 use Yoast\WP\SEO\Main;
 
 /**
@@ -51,20 +48,6 @@ class Index_Command implements Command_Interface {
 	private $general_indexation_action;
 
 	/**
-	 * The term link indexing action.
-	 *
-	 * @var Term_Link_Indexing_Action
-	 */
-	private $term_link_indexing_action;
-
-	/**
-	 * The post link indexing action.
-	 *
-	 * @var Post_Link_Indexing_Action
-	 */
-	private $post_link_indexing_action;
-
-	/**
 	 * The complete indexation action.
 	 *
 	 * @var Indexable_Indexing_Complete_Action
@@ -77,13 +60,6 @@ class Index_Command implements Command_Interface {
 	 * @var Indexing_Prepare_Action
 	 */
 	private $prepare_indexing_action;
-
-	/**
-	 * Represents the indexable helper.
-	 *
-	 * @var Indexable_Helper
-	 */
-	protected $indexable_helper;
 
 	/**
 	 * Generate_Indexables_Command constructor.
@@ -100,11 +76,6 @@ class Index_Command implements Command_Interface {
 	 *                                                                                           action.
 	 * @param Indexing_Prepare_Action                       $prepare_indexing_action             The prepare indexing
 	 *                                                                                           action.
-	 * @param Post_Link_Indexing_Action                     $post_link_indexing_action           The post link indexation
-	 *                                                                                           action.
-	 * @param Term_Link_Indexing_Action                     $term_link_indexing_action           The term link indexation
-	 *                                                                                           action.
-	 * @param Indexable_Helper                              $indexable_helper                    The indexable helper.
 	 */
 	public function __construct(
 		Indexable_Post_Indexation_Action $post_indexation_action,
@@ -112,10 +83,7 @@ class Index_Command implements Command_Interface {
 		Indexable_Post_Type_Archive_Indexation_Action $post_type_archive_indexation_action,
 		Indexable_General_Indexation_Action $general_indexation_action,
 		Indexable_Indexing_Complete_Action $complete_indexation_action,
-		Indexing_Prepare_Action $prepare_indexing_action,
-		Post_Link_Indexing_Action $post_link_indexing_action,
-		Term_Link_Indexing_Action $term_link_indexing_action,
-		Indexable_Helper $indexable_helper
+		Indexing_Prepare_Action $prepare_indexing_action
 	) {
 		$this->post_indexation_action              = $post_indexation_action;
 		$this->term_indexation_action              = $term_indexation_action;
@@ -123,9 +91,6 @@ class Index_Command implements Command_Interface {
 		$this->general_indexation_action           = $general_indexation_action;
 		$this->complete_indexation_action          = $complete_indexation_action;
 		$this->prepare_indexing_action             = $prepare_indexing_action;
-		$this->post_link_indexing_action           = $post_link_indexing_action;
-		$this->term_link_indexing_action           = $term_link_indexing_action;
-		$this->indexable_helper                    = $indexable_helper;
 	}
 
 	/**
@@ -151,12 +116,6 @@ class Index_Command implements Command_Interface {
 	 * [--skip-confirmation]
 	 * : Skips the confirmations (for automated systems).
 	 *
-	 * [--interval=<interval>]
-	 * : The number of microseconds (millionths of a second) to wait between index actions.
-	 * ---
-	 * default: 500000
-	 * ---
-	 *
 	 * ## EXAMPLES
 	 *
 	 *     wp yoast index
@@ -169,14 +128,6 @@ class Index_Command implements Command_Interface {
 	 * @return void
 	 */
 	public function index( $args = null, $assoc_args = null ) {
-		if ( ! $this->indexable_helper->should_index_indexables() ) {
-			WP_CLI::log(
-				\__( 'Your WordPress environment is running on a non-production site. Indexables can only be created on production environments. Please check your `WP_ENVIRONMENT_TYPE` settings.', 'wordpress-seo' )
-			);
-
-			return;
-		}
-
 		if ( ! isset( $assoc_args['network'] ) ) {
 			$this->run_indexation_actions( $assoc_args );
 
@@ -219,9 +170,9 @@ class Index_Command implements Command_Interface {
 			$this->clear();
 
 			// Delete the transients to make sure re-indexing runs every time.
-			\delete_transient( Indexable_Post_Indexation_Action::UNINDEXED_COUNT_TRANSIENT );
-			\delete_transient( Indexable_Post_Type_Archive_Indexation_Action::UNINDEXED_COUNT_TRANSIENT );
-			\delete_transient( Indexable_Term_Indexation_Action::UNINDEXED_COUNT_TRANSIENT );
+			\delete_transient( Indexable_Post_Indexation_Action::TRANSIENT_CACHE_KEY );
+			\delete_transient( Indexable_Post_Type_Archive_Indexation_Action::TRANSIENT_CACHE_KEY );
+			\delete_transient( Indexable_Term_Indexation_Action::TRANSIENT_CACHE_KEY );
 		}
 
 		$indexation_actions = [
@@ -229,15 +180,12 @@ class Index_Command implements Command_Interface {
 			'terms'              => $this->term_indexation_action,
 			'post type archives' => $this->post_type_archive_indexation_action,
 			'general objects'    => $this->general_indexation_action,
-			'post links'         => $this->post_link_indexing_action,
-			'term links'         => $this->term_link_indexing_action,
 		];
 
 		$this->prepare_indexing_action->prepare();
 
-		$interval = (int) $assoc_args['interval'];
 		foreach ( $indexation_actions as $name => $indexation_action ) {
-			$this->run_indexation_action( $name, $indexation_action, $interval );
+			$this->run_indexation_action( $name, $indexation_action );
 		}
 
 		$this->complete_indexation_action->complete();
@@ -248,11 +196,10 @@ class Index_Command implements Command_Interface {
 	 *
 	 * @param string                      $name              The name of the object to be indexed.
 	 * @param Indexation_Action_Interface $indexation_action The indexation action.
-	 * @param int                         $interval          Number of microseconds (millionths of a second) to wait between index actions.
 	 *
 	 * @return void
 	 */
-	protected function run_indexation_action( $name, Indexation_Action_Interface $indexation_action, $interval ) {
+	protected function run_indexation_action( $name, Indexation_Action_Interface $indexation_action ) {
 		$total = $indexation_action->get_total_unindexed();
 		if ( $total > 0 ) {
 			$limit    = $indexation_action->get_limit();
@@ -261,8 +208,6 @@ class Index_Command implements Command_Interface {
 				$indexables = $indexation_action->index();
 				$count      = \count( $indexables );
 				$progress->tick( $count );
-				\usleep( $interval );
-				Utils\wp_clear_object_cache();
 			} while ( $count >= $limit );
 			$progress->finish();
 		}
@@ -270,8 +215,6 @@ class Index_Command implements Command_Interface {
 
 	/**
 	 * Clears the database related to the indexables.
-	 *
-	 * @return void
 	 */
 	protected function clear() {
 		global $wpdb;

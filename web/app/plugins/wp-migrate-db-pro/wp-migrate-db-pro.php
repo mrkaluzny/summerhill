@@ -1,15 +1,14 @@
 <?php
 /*
-Plugin Name: WP Migrate
+Plugin Name: WP Migrate DB Pro
 Plugin URI: https://deliciousbrains.com/wp-migrate-db-pro/
-Description: Migrate between any two environments. Push, pull, and export full sites. Find and replace content including serialized data. Import and back up the database.
-Author: WP Engine
-Version: 2.7.0
+Description: Export, push, and pull to migrate your WordPress databases.
+Author: Delicious Brains
+Version: 2.0.2
 Author URI: https://deliciousbrains.com
 Network: True
 Text Domain: wp-migrate-db
 Domain Path: /languages/
-Update URI: https://deliciousbrains.com/wp-migrate-db-pro/
 */
 
 // Copyright (c) 2013 Delicious Brains. All rights reserved.
@@ -22,8 +21,6 @@ Update URI: https://deliciousbrains.com/wp-migrate-db-pro/
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // **********************************************************************
-
-defined( 'ABSPATH' ) || exit;
 
 $wpmdb_base_path = dirname(__FILE__);
 require_once 'version.php';
@@ -52,6 +49,3 @@ function wpmdb_pro_remove_mu_plugin()
     do_action('wp_migrate_db_remove_compatibility_plugin');
 }
 
-if(class_exists('\Deliciousbrains\MigrateDevTools\Launcher') && \DeliciousBrains\WPMDB\Common\Util\Util::is_dev_environment()) {
-    \Deliciousbrains\MigrateDevTools\Launcher::register($wpmdb_base_path);
-}

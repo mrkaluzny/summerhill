@@ -4,7 +4,6 @@ namespace Yoast\WP\SEO\Builders;
 
 use Yoast\WP\SEO\Helpers\Options_Helper;
 use Yoast\WP\SEO\Models\Indexable;
-use Yoast\WP\SEO\Values\Indexables\Indexable_Builder_Versions;
 
 /**
  * System page builder for the indexables.
@@ -16,7 +15,7 @@ class Indexable_System_Page_Builder {
 	/**
 	 * Mapping of object type to title option keys.
 	 */
-	public const OPTION_MAPPING = [
+	const OPTION_MAPPING = [
 		'search-result' => [
 			'title'            => 'title-search-wpseo',
 		],
@@ -31,24 +30,15 @@ class Indexable_System_Page_Builder {
 	 *
 	 * @var Options_Helper
 	 */
-	protected $options;
-
-	/**
-	 * The latest version of the Indexable_System_Page_Builder.
-	 *
-	 * @var int
-	 */
-	protected $version;
+	private $options;
 
 	/**
 	 * Indexable_System_Page_Builder constructor.
 	 *
-	 * @param Options_Helper             $options  The options helper.
-	 * @param Indexable_Builder_Versions $versions The latest version of each Indexable Builder.
+	 * @param Options_Helper $options The options helper.
 	 */
-	public function __construct( Options_Helper $options, Indexable_Builder_Versions $versions ) {
+	public function __construct( Options_Helper $options ) {
 		$this->options = $options;
-		$this->version = $versions->get_latest_version_for_type( 'system-page' );
 	}
 
 	/**
@@ -69,8 +59,6 @@ class Indexable_System_Page_Builder {
 		if ( \array_key_exists( 'breadcrumb_title', static::OPTION_MAPPING[ $object_sub_type ] ) ) {
 			$indexable->breadcrumb_title = $this->options->get( static::OPTION_MAPPING[ $object_sub_type ]['breadcrumb_title'] );
 		}
-
-		$indexable->version = $this->version;
 
 		return $indexable;
 	}
