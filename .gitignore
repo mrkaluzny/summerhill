@@ -1,15 +1,16 @@
 # Application
-web/app/plugins/*
 !web/app/plugins/.gitkeep
 web/app/mu-plugins/*/
+web/app/themes/twentytwentyfive/
 web/app/upgrade
 web/app/uploads/*
 !web/app/uploads/.gitkeep
+web/app/cache/*
 
 # WordPress
 web/wp
 web/.htaccess
-web/conf
+
 # Logs
 *.log
 
@@ -20,7 +21,9 @@ web/conf
 
 # Composer
 /vendor
+auth.json
 
 # WP-CLI
 wp-cli.local.yml
+
 .DS_Store
